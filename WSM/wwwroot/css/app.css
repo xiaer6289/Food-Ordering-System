@@ -1,0 +1,201 @@
+﻿html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+header {
+    background-color: #e4e8f0;
+    padding: 15px 30px;
+    position: relative;
+}
+
+.nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#search {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.orderLogout,
+.searchBar button {
+    padding: 6px 12px;
+    background-color: #258cfb;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+ .orderLogout:hover,
+ .searchBar button:hover {
+        background-color: #1a6fd0;
+ }
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* General Table Layout*/
+.record-table {
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0; 
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    border-radius: 8px; 
+    overflow: hidden; 
+}
+
+    .record-table th,
+    .record-table td {
+        border: 1px solid #ccc;
+        padding: 10px 12px;
+        text-align: left;
+    }
+
+    .record-table th {
+        background-color: #3f51b5;
+        color: #fff;
+        font-weight: 600;
+    }
+
+        .record-table th a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+
+            .record-table th a.asc::after {
+                content: ' ▴';
+                font-size: 12px;
+            }
+
+            .record-table th a.des::after {
+                content: ' ▾';
+                font-size: 12px;
+            }
+
+    .record-table tr:hover td {
+        background-color: #f1f1f1;
+        transition: background-color 0.2s ease;
+    }
+
+    .record-table tr:has(input:checked) td {
+        background-color: #d1e0ff;
+    }
+
+
+.detail th {
+    text-align: left;
+}
+
+.record-table td:last-child {
+    position: relative;
+}
+
+.record-table .popup {
+    background: #fff;
+    border: 1px solid #999;
+    padding: 8px 10px;
+    position: absolute;
+    z-index: 2;
+    white-space: nowrap;
+    top: 50%;
+    left: 100%;
+    transform: translate(10px, -50%);
+    display: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.record-table img.popup {
+    padding: 0;
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 6px;
+}
+
+.record-table tr:hover .popup {
+    display: block;
+}
+
+/* === Pagination Layout === */
+.pagination {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    gap: 0; 
+}
+
+    .pagination li {
+        display: inline;
+    }
+
+        /* common style */
+        .pagination li a,
+        .pagination li span {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 1px solid #3f51b5;
+            background-color: #fff;
+            color: #3f51b5;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            margin-left: -1px;
+        }
+
+        .pagination li:first-child a,
+        .pagination li:first-child span {
+            margin-left: 0;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .pagination li:last-child a,
+        .pagination li:last-child span {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .pagination li.active span {
+            background-color: #3f51b5;
+            color: #fff;
+            border-color: #3f51b5;
+        }
+
+        .pagination li a:hover {
+            background-color: #3f51b5;
+            color: #fff;
+        }

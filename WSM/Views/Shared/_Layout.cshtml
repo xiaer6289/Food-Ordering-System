@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
+    @RenderSection("head", false) @*optional section name head for individual page to inject content*@
+    <script src="~/js/app.js"></script>
+
+ </head>
+    <body>
+    <header>
+        <nav class="nav-bar">
+            <a class="title">Restaurant Ordering System</a>
+
+            <form class="searchBar" asp-controller="Search" asp-action="Global" method="get">
+                <input type="search" id="search" name="q" placeholder="@ViewBag.SearchPlaceholder Search " Search"" />
+                <input type="hidden" name="context" value="@ViewBag.SearchContext" />
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="button-group">
+                <a class="orderLogout" href="order.cshtml">Order</a>
+                <button class="orderLogout" onclick="window.location.href='index.cshtml'">Log Out</button>
+            </div>
+        </nav>
+    </header>
+
+        <main>
+            @RenderBody()
+        </main>
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/jquery.unobtrusive-ajax.min.js"></script>
+        <script src="/js/jquery.validate.min.js"></script>
+        <script src="/js/jquery.validate.unobtrusive.min.js"></script>
+        <script src="/js/app.js" asp-append-version="true"></script>
+        @RenderSection("scripts", required: false)
+    </body>
+</html>

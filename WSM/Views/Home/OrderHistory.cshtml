@@ -1,0 +1,69 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.OrderDetail>
+
+@{
+    ViewBag.Title = "Order History";
+    string[] fields = ["Id", "Name", "Seat", "Quantity", "status", "Total", "Date"];
+}
+
+
+<form>
+    @* @Html.TextBox("name", "",
+                  new { type = "search", autofocus="", data_trim="" }) *@
+    @Html.Hidden("sort")
+    @Html.Hidden("dir")
+    @* <button>Search</button> *@
+</form>
+
+<p>
+    @Model.Count() of @Model.TotalItemCount orders |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
+<table class="record-table">
+    <tr>
+        @foreach (var f in fields)
+        {
+            string d = "asc";
+            string c = "";
+
+            if(f == ViewBag.Sort)
+            {
+                d = ViewBag.Dir == "des" ? "asc" : "des";
+                c = ViewBag.Dir;
+            }
+
+            <th>
+                <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+            </th>
+        }
+    </tr>
+
+    @foreach(var s in Model)
+    {
+        <tr>
+            <td>@s.Id</td>
+            <td>@s.Foods</td>
+            <td>@s.SeatNo</td>
+            <td>@s.Quantity</td>
+            <td>@s.Status</td>
+            <td>@s.TotalPrice</td>
+            <td>@s.OrderDate</td>
+        </tr>
+    }
+</table>
+
+@{
+    var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+    options.LinkToFirstPageFormat = "First";
+    options.LinkToLastPageFormat = "Last";
+    options.LinkToPreviousPageFormat = "Previous";
+    options.LinkToNextPageFormat = "Next";
+}
+
+@Html.PagedListPager(
+Model,
+page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+options
+)
