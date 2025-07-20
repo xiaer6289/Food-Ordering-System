@@ -4,14 +4,11 @@
 
 @{
     ViewBag.Title = "Order History";
-    string[] fields = ["Id", "status", "Total", "Date"];
+    string[] fields = ["Id", "Name", "Seat", "Quantity", "status", "Total", "Date"];
 }
-@* "Name", "Seat", "Quantity",    move it to detail to dsiplay*@
 
-<form data-ajax="true"
-      data-ajax-update="#target"
-      data-ajax-loading="#loader"
-      id="f">    
+
+<form>
     @* @Html.TextBox("name", "",
                   new { type = "search", autofocus="", data_trim="" }) *@
     @Html.Hidden("sort")
@@ -19,7 +16,6 @@
     @* <button>Search</button> *@
 </form>
 
-<div id="target">
 <p>
     @Model.Count() of @Model.TotalItemCount orders |
     Page @Model.PageNumber of @Model.PageCount
@@ -48,15 +44,12 @@
     {
         <tr>
             <td>@s.Id</td>
+            <td>@s.Foods</td>
+            <td>@s.SeatNo</td>
+            <td>@s.Quantity</td>
             <td>@s.Status</td>
             <td>@s.TotalPrice</td>
             <td>@s.OrderDate</td>
-                @* <td>@s.Foods</td>
-                <td>@s.SeatNo</td>
-                <td>@s.Quantity</td>    move to detail to display*@
-            <td>
-                <button data-get="/Home/Detail/@s.Id">Detail</button>
-            </td>
         </tr>
     }
 </table>
@@ -67,19 +60,10 @@
     options.LinkToLastPageFormat = "Last";
     options.LinkToPreviousPageFormat = "Previous";
     options.LinkToNextPageFormat = "Next";
-
-    var ajaxOptions = new AjaxOptions
-    {
-        HttpMethod       = "get",
-        UpdateTargetId   = "target",
-        LoadingElementId = "#loader",
-    };
 }
-
 
 @Html.PagedListPager(
 Model,
-p => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={p}",
-PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(options, ajaxOptions)
+page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+options
 )
-</div>
