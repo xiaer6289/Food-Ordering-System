@@ -79,6 +79,11 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = m.PageCount });
             }
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("OrderHistory", m);
+            }
+
 
             return View(m);
 

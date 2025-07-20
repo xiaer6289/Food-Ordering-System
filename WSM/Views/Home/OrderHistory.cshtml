@@ -4,9 +4,9 @@
 
 @{
     ViewBag.Title = "Order History";
-    string[] fields = ["Id", "Name", "Seat", "Quantity", "status", "Total", "Date"];
+    string[] fields = ["Id", "Total", "status","Date"];
 }
-
+ @* "Name", "Seat", "Quantity", move to detail*@
 
 <form>
     @* @Html.TextBox("name", "",
@@ -21,6 +21,7 @@
     Page @Model.PageNumber of @Model.PageCount
 </p>
 
+<div id="target">
 <table class="record-table">
     <tr>
         @foreach (var f in fields)
@@ -60,6 +61,13 @@
     options.LinkToLastPageFormat = "Last";
     options.LinkToPreviousPageFormat = "Previous";
     options.LinkToNextPageFormat = "Next";
+    
+    var ajaxOptions = new AjaxOptions
+    {
+        HttpMethod = "get",
+        UpdateTargetId = "target",
+        LoadingElementId = "#loader",
+    };
 }
 
 @Html.PagedListPager(
@@ -67,3 +75,4 @@ Model,
 page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
 options
 )
+</div>
