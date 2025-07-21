@@ -32,6 +32,13 @@ namespace WSM.Controllers
             return View();
         }
 
+        public IActionResult Menu()
+        {
+
+
+            return View();
+        }
+
         public IActionResult OrderHistory(string? id, string? sort, string? dir, int page = 1)
         {
             // For Layout.cshtml search bar
