@@ -11,13 +11,13 @@
     @Html.Hidden("sort")
     @Html.Hidden("dir")
 </form>
-
 <p>
     @Model.Count() of @Model.TotalItemCount orders |
     Page @Model.PageNumber of @Model.PageCount
 </p>
 
-<div id="target">
+<div class="restock-container" id="target">
+
     <table class="restock-table">
         <tr>
             @foreach (var f in fields)
@@ -50,6 +50,13 @@
         }
     </table>
 
+    <div class="restock-button">
+        <button class="update-ingredient" type="submit">Add New</button>
+        <button class="remove-ingredient" type="submit">Delete</button>
+    </div>
+</div>
+
+<div class="pagination-wrapper">
     @{
         var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
         options.LinkToFirstPageFormat = "First";
