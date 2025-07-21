@@ -37,6 +37,7 @@ header {
 #search {
     padding: 5px 10px;
     font-size: 14px;
+    width: 300px;
 }
 
 .orderLogout,
@@ -63,7 +64,8 @@ header {
 }
 
 /* General Table Layout*/
-.record-table {
+.record-table,
+.restock-table{
     width: 100%;
     border-collapse: separate; 
     border-spacing: 0; 
@@ -76,40 +78,48 @@ header {
 }
 
     .record-table th,
-    .record-table td {
+    .record-table td, 
+    .restock-table th,
+    .restock-table td{
         border: 1px solid #ccc;
         padding: 10px 12px;
         text-align: left;
     }
 
-    .record-table th {
+    .record-table th,
+    .restock-table th{
         background-color: #3f51b5;
         color: #fff;
         font-weight: 600;
     }
 
-        .record-table th a {
+        .record-table th a,
+        .restock-table th a{
             color: #fff;
             text-decoration: none;
             display: block;
         }
 
-            .record-table th a.asc::after {
+            .record-table th a.asc::after,
+            .restock-table th a.asc::after {
                 content: ' ▴';
                 font-size: 12px;
             }
 
-            .record-table th a.des::after {
+            .record-table th a.des::after,
+            .restock-table th a.des::after {
                 content: ' ▾';
                 font-size: 12px;
             }
 
-    .record-table tr:hover td {
+    .record-table tr:hover td,
+    .restock-table tr:hover td {
         background-color: #f1f1f1;
         transition: background-color 0.2s ease;
     }
 
-    .record-table tr:has(input:checked) td {
+    .record-table tr:has(input:checked) td,
+    .restock-table tr:has(input:checked) td {
         background-color: #d1e0ff;
     }
 
@@ -118,11 +128,13 @@ header {
     text-align: left;
 }
 
-.record-table td:last-child {
+.record-table td:last-child,
+.restock-table td:last-child {
     position: relative;
 }
 
-.record-table .popup {
+.record-table .popup,
+.restock-table .popup{
     background: #fff;
     border: 1px solid #999;
     padding: 8px 10px;
@@ -136,14 +148,16 @@ header {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.record-table img.popup {
+.record-table img.popup,
+.restock-table .popup {
     padding: 0;
     max-width: 250px;
     max-height: 250px;
     border-radius: 6px;
 }
 
-.record-table tr:hover .popup {
+.record-table tr:hover .popup ,
+.restock-table tr:hover .popup{
     display: block;
 }
 
