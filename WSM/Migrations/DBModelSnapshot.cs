@@ -22,6 +22,21 @@ namespace WMS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FoodIngredient", b =>
+                {
+                    b.Property<string>("FoodsId")
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("IngredientsId")
+                        .HasColumnType("nvarchar(4)");
+
+                    b.HasKey("FoodsId", "IngredientsId");
+
+                    b.HasIndex("IngredientsId");
+
+                    b.ToTable("FoodIngredient");
+                });
+
             modelBuilder.Entity("FoodOrderDetail", b =>
                 {
                     b.Property<string>("FoodsId")
@@ -108,6 +123,37 @@ namespace WMS.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Foods");
+                });
+
+            modelBuilder.Entity("WSM.Models.Ingredient", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<decimal?>("Kilogram")
+                        .HasPrecision(5, 3)
+                        .HasColumnType("decimal(5,3)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
@@ -209,6 +255,21 @@ namespace WMS.Migrations
                     b.HasIndex("AdminId");
 
                     b.ToTable("Staff");
+                });
+
+            modelBuilder.Entity("FoodIngredient", b =>
+                {
+                    b.HasOne("WSM.Models.Food", null)
+                        .WithMany()
+                        .HasForeignKey("FoodsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WSM.Models.Ingredient", null)
+                        .WithMany()
+                        .HasForeignKey("IngredientsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FoodOrderDetail", b =>

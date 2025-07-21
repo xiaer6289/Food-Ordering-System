@@ -14,6 +14,7 @@ public class DB : DbContext
     public DbSet<Admin> Admins { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Ingredient> Ingredients { get; set; }
 }
 
 public class Food
@@ -39,6 +40,7 @@ public class Food
     public Category Category { get; set; }
 
     public ICollection<OrderDetail> OrderDetails { get; set; } = [];
+    public ICollection<Ingredient> Ingredients { get; set; } = [];
 }
 
 public class Category
@@ -129,9 +131,27 @@ public class Payment
     [MaxLength(20)]
     public string PaymentMethod { get; set; }
 
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}")] 
     public DateTime Paymentdate { get; set; }
 
     public double AmountPaid { get; set; }
 
     public OrderDetail OrderDetail { get; set; }
+}
+
+public class Ingredient
+{
+    [Key, MaxLength(4)]
+    public string Id { get; set; }
+    [MaxLength(50)]
+    public string Name { get; set; }
+    public int? Quantity { get; set; }
+    [Precision(5, 3)]
+    public decimal? Kilogram { get; set; }
+    [Precision(5, 2)]
+    public decimal Price { get; set; }
+    [Precision(6,2)]
+    public decimal TotalPrice { get; set; }
+    [MaxLength(100)]
+    public ICollection<Food> Foods { get; set; } = [];
 }

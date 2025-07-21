@@ -37,6 +37,22 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Ingredients",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Kilogram = table.Column<decimal>(type: "decimal(5,3)", precision: 5, scale: 3, nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ingredients", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Staff",
                 columns: table => new
                 {
@@ -104,6 +120,30 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FoodIngredient",
+                columns: table => new
+                {
+                    FoodsId = table.Column<string>(type: "nvarchar(4)", nullable: false),
+                    IngredientsId = table.Column<string>(type: "nvarchar(4)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodIngredient", x => new { x.FoodsId, x.IngredientsId });
+                    table.ForeignKey(
+                        name: "FK_FoodIngredient_Foods_FoodsId",
+                        column: x => x.FoodsId,
+                        principalTable: "Foods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FoodIngredient_Ingredients_IngredientsId",
+                        column: x => x.IngredientsId,
+                        principalTable: "Ingredients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FoodOrderDetail",
                 columns: table => new
                 {
@@ -149,6 +189,11 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_FoodIngredient_IngredientsId",
+                table: "FoodIngredient",
+                column: "IngredientsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FoodOrderDetail_OrderDetailsId",
                 table: "FoodOrderDetail",
                 column: "OrderDetailsId");
@@ -179,10 +224,16 @@ namespace WMS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "FoodIngredient");
+
+            migrationBuilder.DropTable(
                 name: "FoodOrderDetail");
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "Ingredients");
 
             migrationBuilder.DropTable(
                 name: "Foods");
