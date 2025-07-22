@@ -1,0 +1,80 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.Ingredient>
+
+@{
+    ViewBag.Title = "Restock";
+    string[] fields = ["Id", "Name", "Quantity", "Weight(kg)", "Price", "Total Price"];
+}
+
+<form>
+    @Html.Hidden("sort")
+    @Html.Hidden("dir")
+</form>
+<p>
+    @Model.Count() of @Model.TotalItemCount orders |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
+<div class="restock-container" id="target">
+
+    <table class="restock-table">
+        <tr>
+            @foreach (var f in fields)
+            {
+                string d = "asc";
+                string c = "";
+
+                if (f == ViewBag.Sort)
+                {
+                    d = ViewBag.Dir == "des" ? "asc" : "des";
+                    c = ViewBag.Dir;
+                }
+
+                <th>
+                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                </th>
+            }
+        </tr>
+
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.Name</td>
+                <td>@s.Quantity</td>
+                <td>@s.Kilogram</td>
+                <td>@s.Price</td>
+                <td>@s.TotalPrice</td>
+            </tr>
+        }
+    </table>
+
+    <div class="restock-button">
+        <button class="update-ingredient" type="submit">Add New</button>
+        <button class="remove-ingredient" type="submit">Delete</button>
+    </div>
+</div>
+
+<div class="pagination-wrapper">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+
+        var ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "get",
+            UpdateTargetId = "target",
+            LoadingElementId = "#loader",
+        };
+    }
+
+    @Html.PagedListPager(
+    Model,
+    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
+        )
+</div>
