@@ -1,0 +1,75 @@
+﻿@using WSM.Models
+@model IngredientVM
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2 class="edit-ingredient-title">Edit Ingredient</h2>
+
+<form asp-action="Edit" asp-controller="Ingredient" method="post" class="edit-ingredient-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="edit-ingredient-wrapper">
+        <div>
+            <label asp-for="Id">Ingredient ID:</label>
+            <input asp-for="Id" readonly />
+        </div>
+
+        <div>
+            <label asp-for="Name">Ingredient Name:</label>
+            <input asp-for="Name" class="edit-ingredient-name" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label>Quantity / Weight :</label>
+            <input type="text" name="CombinedInput" class="edit-ingredient-quantity" value="@(Model.Quantity > 0 ? Model.Quantity + " pcs" : Model.Kilogram + " kg")" />
+        </div>
+
+        <!-- Hidden fields to store separately -->
+        <input asp-for="Quantity" type="hidden" />
+        <input asp-for="Kilogram" type="hidden" />
+
+
+        <div>
+            <label asp-for="Price">Cost per Unit:</label>
+            <input asp-for="Price" class="edit-ingredient-cost" required />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <input type="hidden" name="Unit" id="EditUnitValue" value="" />
+
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Submit</button>
+            <button type="button" class="edit-cancel-btn" onclick="window.location.href='/Home/Restock'">Cancel</button>
+        </div>
+    </div>
+</form>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const qtyRadio = document.querySelector("input[value='quantity']");
+            const kgRadio = document.querySelector("input[value='kilogram']");
+            const qtyInput = document.querySelector(".quantity");
+            const kgInput = document.querySelector(".kilogram");
+            const unitHidden = document.getElementById("UnitValue");
+
+            // Determine which field is filled and set the correct radio on page load
+            const quantity = parseFloat(qtyInput.value) || 0;
+            const kilogram = parseFloat(kgInput.value) || 0;
+
+            if (quantity > 0 && kilogram === 0) {
+                qtyRadio.checked = true;
+                unitHidden.value = "quantity";
+            } else if (kilogram > 0 && quantity === 0) {
+                kgRadio.checked = true;
+                unitHidden.value = "kilogram";
+            }
+        });
+    </script>
+}
+

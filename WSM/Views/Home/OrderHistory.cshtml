@@ -4,9 +4,9 @@
 
 @{
     ViewBag.Title = "Order History";
-    string[] fields = ["Id", "Total", "status","Date"];
+    string[] fields = ["Id", "Total", "status", "Date"];
 }
- @* "Name", "Seat", "Quantity", move to detail*@
+@* "Name", "Seat", "Quantity", move to detail*@
 
 <form>
     @* @Html.TextBox("name", "",
@@ -22,58 +22,59 @@
 </p>
 
 <div id="target">
-<table class="record-table">
-    <tr>
-        @foreach (var f in fields)
-        {
-            string d = "asc";
-            string c = "";
-
-            if(f == ViewBag.Sort)
-            {
-                d = ViewBag.Dir == "des" ? "asc" : "des";
-                c = ViewBag.Dir;
-            }
-
-            <th>
-                <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
-            </th>
-        }
-    </tr>
-
-    @foreach(var s in Model)
-    {
+    <table class="record-table">
         <tr>
-            <td>@s.Id</td>
-            <td>@s.Status</td>
-            <td>@s.TotalPrice</td>
-            <td>@s.OrderDate</td>
+            @foreach (var f in fields)
+            {
+                string d = "asc";
+                string c = "";
+
+                if (f == ViewBag.Sort)
+                {
+                    d = ViewBag.Dir == "des" ? "asc" : "des";
+                    c = ViewBag.Dir;
+                }
+
+                <th>
+                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                </th>
+            }
         </tr>
-    }
+
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.Status</td>
+                <td>@s.TotalPrice</td>
+                <td>@s.OrderDate</td>
+                <td>@s.Foods.Count()</td>
+            </tr>
+        }
 
         @* <td>@s.Foods</td>
         <td>@s.SeatNo</td>
         <td>@s.Quantity</td>  move to detail page*@ 
 </table>
 
-@{
-    var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
-    options.LinkToFirstPageFormat = "First";
-    options.LinkToLastPageFormat = "Last";
-    options.LinkToPreviousPageFormat = "Previous";
-    options.LinkToNextPageFormat = "Next";
-    
-    var ajaxOptions = new AjaxOptions
-    {
-        HttpMethod = "get",
-        UpdateTargetId = "target",
-        LoadingElementId = "#loader",
-    };
-}
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
 
-@Html.PagedListPager(
-Model,
-page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
-options
-)
-</div>
+        var ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "get",
+            UpdateTargetId = "target",
+            LoadingElementId = "#loader",
+        };
+    }
+
+    @Html.PagedListPager(
+    Model,
+    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
+        )
+</div> 

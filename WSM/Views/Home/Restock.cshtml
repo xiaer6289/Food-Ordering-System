@@ -1,10 +1,11 @@
-﻿@using X.PagedList
+﻿@using WSM.Models
+@using X.PagedList
 @using X.PagedList.Mvc.Core
 @model IPagedList<WSM.Models.Ingredient>
 
 @{
     ViewBag.Title = "Restock";
-    string[] fields = ["Id", "Name", "Quantity", "Weight(kg)", "Price", "Total Price"];
+    string[] fields = ["Id", "Name", "Quantity", "Weight(kg)", "Unit Price", ""];
 }
 
 <form>
@@ -45,15 +46,27 @@
                 <td>@s.Quantity</td>
                 <td>@s.Kilogram</td>
                 <td>@s.Price</td>
-                <td>@s.TotalPrice</td>
+                @* <td>@s.TotalPrice</td> *@
+                <td>
+                    <div class="edit-remove-group">
+                        <a asp-controller="Ingredient" asp-action="Edit" asp-route-id="@s.Id" class="edit-ingredient">Edit</a>
+                        <form asp-controller="Ingredient" asp-action="Delete" method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this ingredient?');" style="display:inline;">
+                            <input type="hidden" name="id" value="@s.Id" />
+                            <button type="submit" class="remove-ingredient">Delete</button>
+                        </form>
+                    </div>
+
+                </td>
             </tr>
         }
     </table>
 
     <div class="restock-button">
-        <button class="update-ingredient" type="submit">Add New</button>
-        <button class="remove-ingredient" type="submit">Delete</button>
+        <button type="button" class="update-ingredient" onclick="location.href='/Home/PurchaseOrder'">Add New</button>
+        @* <button type="submit" class="remove-ingredient">Delete</button> *@
     </div>
+
 </div>
 
 <div class="pagination-wrapper">

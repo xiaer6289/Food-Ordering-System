@@ -52,16 +52,17 @@ header {
     text-decoration: none;
 }
 
- .orderLogout:hover,
- .searchBar button:hover {
+    .orderLogout:hover,
+    .searchBar button:hover {
         background-color: #1a6fd0;
- }
+    }
 
 .button-group {
     display: flex;
     gap: 10px;
     align-items: center;
 }
+
 .restock-container {
     display: flex;
     justify-content: space-between;
@@ -70,7 +71,6 @@ header {
     margin-bottom: 20px;
 }
 
-/* Button column */
 .restock-button {
     display: flex;
     flex-direction: column;
@@ -79,22 +79,9 @@ header {
     margin-top: 40px;
 }
 
-/* Buttons */
-.update-ingredient,
-.remove-ingredient {
-    font-size: 16px;
-    font-family: 'Lora', sans-serif;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-}
 
-.update-ingredient,
-.remove-ingredient {
-    background-color: #66bb6a; /* default, will override below */
+.update-ingredient {
+    background-color: #66bb6a;
     color: white;
     padding: 20px 28px;
     font-size: 16px;
@@ -105,26 +92,55 @@ header {
     cursor: pointer;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.2s ease;
-    width: 160px; /* 👈 fixed width */
+    width: 160px;
     text-align: center;
-}
-
-/* Specific color overrides */
-.update-ingredient {
-    background-color: #66bb6a;
 }
 
     .update-ingredient:hover {
         background-color: #57a65c;
     }
 
-.remove-ingredient {
-    background-color: #ff9999;
+.edit-remove-group {
+    display: flex;
+    gap: 30px;
 }
 
-    .remove-ingredient:hover {
-        background-color: #e88888;
+.edit-ingredient {
+    background-color: rgba(252, 225, 114, 0.8);
+    color: white;
+    padding: 14px 12px;
+    font-size: 12px;
+    font-family: 'Lora', sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 160px;
+    text-align: center;
+}
+
+    .edit-ingredient:hover {
+        background-color: rgba(251, 215, 68, 0.8);
     }
+
+
+.remove-ingredient {
+    background-color: #ff9999;
+    color: white;
+    padding: 14px 12px;
+    font-size: 12px;
+    font-family: 'Lora', sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 160px;
+    text-align: center;
+}
 
     .remove-ingredient:hover {
         background-color: #e88888;
@@ -132,36 +148,36 @@ header {
 
 /* General Table Layout*/
 .record-table,
-.restock-table{
+.restock-table {
     width: 100%;
-    border-collapse: separate; 
-    border-spacing: 0; 
+    border-collapse: separate;
+    border-spacing: 0;
     margin-bottom: 20px;
     background-color: #fff;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
     font-size: 14px;
-    border-radius: 8px; 
-    overflow: hidden; 
+    border-radius: 8px;
+    overflow: hidden;
 }
 
     .record-table th,
-    .record-table td, 
+    .record-table td,
     .restock-table th,
-    .restock-table td{
+    .restock-table td {
         border: 1px solid #ccc;
         padding: 10px 12px;
         text-align: left;
     }
 
     .record-table th,
-    .restock-table th{
+    .restock-table th {
         background-color: #3f51b5;
         color: #fff;
         font-weight: 600;
     }
 
         .record-table th a,
-        .restock-table th a{
+        .restock-table th a {
             color: #fff;
             text-decoration: none;
             display: block;
@@ -201,7 +217,7 @@ header {
 }
 
 .record-table .popup,
-.restock-table .popup{
+.restock-table .popup {
     background: #fff;
     border: 1px solid #999;
     padding: 8px 10px;
@@ -223,10 +239,118 @@ header {
     border-radius: 6px;
 }
 
-.record-table tr:hover .popup ,
-.restock-table tr:hover .popup{
+.record-table tr:hover .popup,
+.restock-table tr:hover .popup {
     display: block;
 }
+
+.purchase-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 40px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.purchase-ingredient {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto;
+    margin-bottom: 15px;
+}
+
+    .purchase-ingredient label {
+        margin: 0;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    .purchase-ingredient input {
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100px;
+    }
+
+    .purchase-ingredient .ingredient {
+        width: 180px;
+    }
+
+    .purchase-ingredient .total-cost {
+        background-color: #f0f0f0;
+    }
+
+.add-ingredient-purchase-form,
+.remove-ingredient-purchase-form {
+    font-size: 18px;
+    padding: 6px 12px;
+    background-color: ##66bb6a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-ingredient-purchase-form {
+    background-color: #66bb6a
+}
+
+    .add-ingredient-purchase-form:hover {
+        background-color: #57a65c;
+    }
+
+.remove-ingredient-purchase-form {
+    background-color: #ff9999;
+}
+
+    .remove-ingredient-purchase-form:hover {
+        background-color: #e88888;
+    }
+
+.summary {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.form-buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.print-po-pdf {
+    padding: 18px 30px;
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+    .print-po-pdf:hover {
+        background-color: #3e9142;
+    }
+
+.cancel-po,
+.edit-cancel-btn{
+    padding: 18px 54px;
+    background-color: #ff9999;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+    .cancel-po:hover,
+    .edit-cancel-btn {
+        background-color: #e88888;
+    }
 
 /* Pagination Layout */
 .pagination {
@@ -236,7 +360,7 @@ header {
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 30px;
-    gap: 0; 
+    gap: 0;
 }
 
     .pagination li {
@@ -284,3 +408,83 @@ header {
 .pagination-wrapper {
     margin-top: 30px;
 }
+
+
+/*edit page for ingredient*/
+.edit-ingredient-form {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.edit-ingredient-title {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.edit-ingredient-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+    .edit-ingredient-wrapper label {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .edit-ingredient-wrapper input[type="text"],
+    .edit-ingredient-wrapper input[type="number"],
+    .edit-ingredient-wrapper input[type="radio"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s ease;
+    }
+
+    .edit-ingredient-wrapper input:focus {
+        border-color: #007BFF;
+        outline: none;
+    }
+
+.text-danger {
+    font-size: 0.9rem;
+    color: #dc3545;
+}
+
+.edit-button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.edit-ingredient-quantity {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.edit-submit-btn{
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    background-color: #007BFF;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.edit-submit-btn:hover {
+    background-color: #0056b3;
+}
+
