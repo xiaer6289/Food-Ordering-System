@@ -17,15 +17,17 @@ namespace WSM.Controllers
             _stripeSettings = stripeSettings.Value;
         }
 
-        public IActionResult CreateCheckoutSession(string amount)
+        public IActionResult CreateCheckoutSession(string amount, string email)
         {
             var currency = "myr";
-            var successUrl = Url.Action("Success", "Payment", null, Request.Scheme);
+            var successUrl = Url.Action("Success", "Payment", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}";
             var cancelUrl = Url.Action("Cancel", "Payment", null, Request.Scheme);
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
             var options = new SessionCreateOptions
             {
+                CustomerEmail = email,
+                CustomerCreation = "always",
                 PaymentMethodTypes = new List<string>
                 {
                     "card"
@@ -60,13 +62,13 @@ namespace WSM.Controllers
 
         public async Task<IActionResult> Success()
         {
-            return View("~/Views/Home/OrderConfirmation.cshtml");
+            return View("OrderConfirmation");
         }
 
 
         public async Task<IActionResult> Cancel()
         {
-            return View("Index");
+            return View("OrderCancel");
         }
     }
 }
