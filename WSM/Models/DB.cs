@@ -154,4 +154,6 @@ public class Ingredient
     public decimal TotalPrice { get; set; }
     [MaxLength(100)]
     public ICollection<Food> Foods { get; set; } = [];
+
+
 }
