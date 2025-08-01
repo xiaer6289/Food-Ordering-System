@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WSM.Models;
 
@@ -11,9 +12,11 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20250731163243_Database")]
+    partial class Database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,6 +38,21 @@ namespace WMS.Migrations
                     b.HasIndex("IngredientsId");
 
                     b.ToTable("FoodIngredient");
+                });
+
+            modelBuilder.Entity("FoodOrderDetail", b =>
+                {
+                    b.Property<string>("FoodsId")
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("OrderDetailsId")
+                        .HasColumnType("nvarchar(4)");
+
+                    b.HasKey("FoodsId", "OrderDetailsId");
+
+                    b.HasIndex("OrderDetailsId");
+
+                    b.ToTable("FoodOrderDetail");
                 });
 
             modelBuilder.Entity("WSM.Models.Admin", b =>
@@ -144,8 +162,8 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -178,52 +196,18 @@ namespace WMS.Migrations
                     b.ToTable("OrderDetails");
                 });
 
-            modelBuilder.Entity("WSM.Models.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FoodId")
-                        .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
-
-                    b.Property<string>("OrderDetailId")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FoodId");
-
-                    b.HasIndex("OrderDetailId");
-
-                    b.ToTable("OrderItems");
-                });
-
             modelBuilder.Entity("WSM.Models.Payment", b =>
                 {
-                    b.Property<string>("PaymentId")
+                    b.Property<string>("Id")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<double>("AmountPaid")
                         .HasColumnType("float");
 
-                    b.Property<string>("OrderDetailId")
+                    b.Property<string>("OrderId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(4)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -233,13 +217,9 @@ namespace WMS.Migrations
                     b.Property<DateTime>("Paymentdate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StripeTransactionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("Id");
 
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("OrderDetailId")
+                    b.HasIndex("OrderId")
                         .IsUnique();
 
                     b.ToTable("Payments");
@@ -295,6 +275,21 @@ namespace WMS.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("FoodOrderDetail", b =>
+                {
+                    b.HasOne("WSM.Models.Food", null)
+                        .WithMany()
+                        .HasForeignKey("FoodsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WSM.Models.OrderDetail", null)
+                        .WithMany()
+                        .HasForeignKey("OrderDetailsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
                     b.HasOne("WSM.Models.Category", "Category")
@@ -317,30 +312,11 @@ namespace WMS.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("WSM.Models.OrderItem", b =>
-                {
-                    b.HasOne("WSM.Models.Food", "Food")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("FoodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WSM.Models.OrderDetail", "OrderDetail")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderDetailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Food");
-
-                    b.Navigation("OrderDetail");
-                });
-
             modelBuilder.Entity("WSM.Models.Payment", b =>
                 {
                     b.HasOne("WSM.Models.OrderDetail", "OrderDetail")
                         .WithOne("Payment")
-                        .HasForeignKey("WSM.Models.Payment", "OrderDetailId")
+                        .HasForeignKey("WSM.Models.Payment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -368,15 +344,8 @@ namespace WMS.Migrations
                     b.Navigation("Foods");
                 });
 
-            modelBuilder.Entity("WSM.Models.Food", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
-                    b.Navigation("OrderItems");
-
                     b.Navigation("Payment")
                         .IsRequired();
                 });

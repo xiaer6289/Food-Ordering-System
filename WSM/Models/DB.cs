@@ -13,6 +13,7 @@ public class DB : DbContext
     public DbSet<Staff> Staff { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
 }
@@ -39,7 +40,7 @@ public class Food
     
     public Category Category { get; set; }
 
-    public ICollection<OrderDetail> OrderDetails { get; set; } = [];
+    public ICollection<OrderItem> OrderItems { get; set; } = [];
     public ICollection<Ingredient> Ingredients { get; set; } = [];
 }
 
@@ -93,12 +94,13 @@ public class Staff //use salary to differentiate waiter,manager...
 
 public class OrderDetail
 {
-    [Key, MaxLength(4)]
+    [Key, MaxLength(10)]
     public string Id { get; set; }
 
     [MaxLength(4)]
     public string SeatNo { get; set; }
 
+    //Total Quantity
     public int Quantity { get; set; }
 
     [MaxLength(20)]
@@ -112,29 +114,51 @@ public class OrderDetail
 
     //[ForeignKey("Staff")]
     public string StaffId { get; set; }
-
-    public ICollection<Food> Foods { get; set; } = [];
-
     public Staff Staff { get; set; }
+
+    public ICollection<OrderItem> OrderItems { get; set; } = [];
 
     public Payment Payment { get; set; }
 }
 
+public class OrderItem
+{
+    [Key]
+    public int Id { get; set; }
+
+    
+    [MaxLength(10)]
+    public string OrderDetailId { get; set; }
+    public OrderDetail OrderDetail { get; set; }
+
+    [MaxLength(4)]
+    public string FoodId { get; set; }
+    public Food Food { get; set; }
+
+    public int Quantity { get; set; }
+
+    [Precision(5, 2)]
+    public decimal SubTotal { get; set; }
+}
+
+
 public class Payment
 {
     [Key, MaxLength(10)]
-    public string Id { get; set; }
+    public string PaymentId { get; set; }
 
     [ForeignKey("OrderDetail")]
-    public string OrderId { get; set; }
+    public string OrderDetailId { get; set; } 
 
     [MaxLength(20)]
     public string PaymentMethod { get; set; }
 
+    public double AmountPaid { get; set; }
+
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}")] 
     public DateTime Paymentdate { get; set; }
 
-    public double AmountPaid { get; set; }
+    public string StripeTransactionId { get; set; } // save the stripe id
 
     public OrderDetail OrderDetail { get; set; }
 }
