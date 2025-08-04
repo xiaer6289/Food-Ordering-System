@@ -1,0 +1,65 @@
+﻿@model List<WSM.Models.Food>
+<h2>Food List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price (RM)</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var food in Model)
+        {
+            <tr>
+                <td>@food.Id</td>
+                <td>@food.Name</td>
+                <td>@food.Price</td>
+                <td>@food.Description</td>
+                <td>@food.CategoryId</td>
+                <td>
+                    <!-- Form to add/update food in cart -->
+                    <form method="post" action="/Cart/UpdateCart">
+                        <input type="hidden" name="foodId" value="@food.Id" />
+                        <!-- Show current quantity if in cart, else 0 -->
+                        <input type="number" name="quantity" value="@(ViewBag.Cart.ContainsKey(food.Id) ? ViewBag.Cart[food.Id] : 0)" min="0" max="10" style="width: 60px;" />
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Display current cart contents for debugging -->
+<h3>Current Cart</h3>
+@if (ViewBag.Cart.Count > 0)
+{
+    <ul>
+        @foreach (var item in ViewBag.Cart)
+        {
+            <!-- Show Food ID and quantity in cart -->
+            <li>Food ID: @item.Key, Quantity: @item.Value</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Cart is empty</p>
+}
+
+<!-- Link to view cart (to be implemented later) -->
+<a href="/Cart/ShoppingCart">View Cart</a>
+
+<form method="post" action="/Payment/CreateCheckoutSession">
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+    </div>
+    <button type="submit">Checkout</button>
+</form>

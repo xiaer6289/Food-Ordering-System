@@ -94,7 +94,7 @@ public class Staff //use salary to differentiate waiter,manager...
 
 public class OrderDetail
 {
-    [Key, MaxLength(10)]
+    [Key, MaxLength(20)]
     public string Id { get; set; }
 
     [MaxLength(4)]
@@ -106,8 +106,7 @@ public class OrderDetail
     [MaxLength(20)]
     public string Status { get; set; }
 
-    [Precision(5, 3)]
-
+    [Precision(10, 2)]
     public decimal TotalPrice { get; set; }
 
     public DateTime OrderDate { get; set; }
@@ -124,10 +123,9 @@ public class OrderDetail
 public class OrderItem
 {
     [Key]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
-    
-    [MaxLength(10)]
+    [MaxLength(20)]
     public string OrderDetailId { get; set; }
     public OrderDetail OrderDetail { get; set; }
 
@@ -137,14 +135,14 @@ public class OrderItem
 
     public int Quantity { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(6, 2)]
     public decimal SubTotal { get; set; }
 }
 
 
 public class Payment
 {
-    [Key, MaxLength(10)]
+    [Key, MaxLength(20)]
     public string PaymentId { get; set; }
 
     [ForeignKey("OrderDetail")]
@@ -153,13 +151,18 @@ public class Payment
     [MaxLength(20)]
     public string PaymentMethod { get; set; }
 
-    public double AmountPaid { get; set; }
+    [Precision(10, 2)]
+    public decimal TotalPrice { get; set; }
+
+    [Precision(10, 2)]
+    public decimal AmountPaid { get; set; }
 
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}")] 
     public DateTime Paymentdate { get; set; }
 
     public string StripeTransactionId { get; set; } // save the stripe id
 
+    [ForeignKey(nameof(OrderDetailId))]
     public OrderDetail OrderDetail { get; set; }
 }
 
@@ -176,7 +179,7 @@ public class Ingredient
     public decimal Price { get; set; }
     [Precision(6,2)]
     public decimal TotalPrice { get; set; }
-    [MaxLength(100)]
+
     public ICollection<Food> Foods { get; set; } = [];
 
 
