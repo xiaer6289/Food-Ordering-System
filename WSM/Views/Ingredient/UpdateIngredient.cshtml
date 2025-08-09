@@ -2,12 +2,15 @@
 @model IngredientVM
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Update";
+    Layout = null;
 }
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 
-<h2 class="edit-ingredient-title">Edit Ingredient</h2>
 
-<form asp-action="Edit" asp-controller="Ingredient" method="post" class="edit-ingredient-form">
+<h2 class="edit-ingredient-title">Update Ingredient</h2>
+
+<form asp-controller="Ingredient"  asp-action="UpdateIngredient" method="post" class="edit-ingredient-form">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="edit-ingredient-wrapper">
@@ -42,34 +45,9 @@
 
         <div class="edit-button-group">
             <button type="submit" class="edit-submit-btn">Submit</button>
-            <button type="button" class="edit-cancel-btn" onclick="window.location.href='/Home/Restock'">Cancel</button>
+            <button type="button" class="edit-cancel-btn" onclick="window.location.href='/Ingredient/ReadIngredient'">Cancel</button>
         </div>
     </div>
 </form>
 
-
-
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const qtyRadio = document.querySelector("input[value='quantity']");
-            const kgRadio = document.querySelector("input[value='kilogram']");
-            const qtyInput = document.querySelector(".quantity");
-            const kgInput = document.querySelector(".kilogram");
-            const unitHidden = document.getElementById("UnitValue");
-
-            // Determine which field is filled and set the correct radio on page load
-            const quantity = parseFloat(qtyInput.value) || 0;
-            const kilogram = parseFloat(kgInput.value) || 0;
-
-            if (quantity > 0 && kilogram === 0) {
-                qtyRadio.checked = true;
-                unitHidden.value = "quantity";
-            } else if (kilogram > 0 && quantity === 0) {
-                kgRadio.checked = true;
-                unitHidden.value = "kilogram";
-            }
-        });
-    </script>
-}
 

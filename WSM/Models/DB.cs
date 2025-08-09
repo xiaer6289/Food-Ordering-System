@@ -142,6 +142,7 @@ public class Payment
 public class Ingredient
 {
     [Key, MaxLength(4)]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string Id { get; set; }
     [MaxLength(50)]
     public string Name { get; set; }

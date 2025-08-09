@@ -472,13 +472,14 @@ header {
     color: #333;
 }
 
-.edit-submit-btn{
-    padding: 10px 20px;
+.edit-submit-btn {
+    font-size: 16px;
+    padding: 18px 54px;
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     background-color: #007BFF;
     color: white;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }

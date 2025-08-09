@@ -1,0 +1,253 @@
+﻿@using WSM.Models
+@model List<IngredientVM>
+
+
+@{
+    ViewBag.Title = "Purchase Order";
+    var today = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
+
+
+<h1 style="text-align:center;"><strong>Purchase Order</strong></h1>
+
+<div class="purchase-header" style="text-align: right;">
+    <span>Date: @today</span>
+</div>
+
+<hr />
+
+<!-- Form posts to IngredientController > PurchaseOrder -->
+<form asp-controller="Ingredient" asp-action="CreateIngredient" method="post" id="purchase-form">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div id="ingredient-wrapper">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="purchase-ingredient">
+                <label>Ingredients:</label>
+                <input asp-for="@Model[i].Name" type="text" class="ingredient" placeholder="Ingredient" required />
+                <span asp-validation-for="@Model[i].Name" class="text-danger"></span>
+
+                <label>
+                    <input type="radio" class="qty-radio" name="unit@i" /> Quantity
+                </label>
+                <label>
+                    <input type="radio" class="kg-radio" name="unit@i" /> Weight (kg)
+                </label>
+
+                <label>Quantity:</label>
+                <input asp-for="@Model[i].Quantity" type="number" class="quantity" min="1" step="1" placeholder="Single unit" readonly />
+
+                <label>Weight(Kg):</label>
+                <input asp-for="@Model[i].Kilogram" type="number" class="weight" min="0.1" step="1.00" placeholder="Kg per unit" readonly />
+
+                <label>Cost:</label>
+                <input asp-for="@Model[i].Price" type="text" class="cost" placeholder="Cost per unit" required />
+
+                <label>Total Cost:</label>
+                <input asp-for="@Model[i].TotalPrice" type="text" class="total-cost" placeholder="0.00" readonly />
+                <span asp-validation-for="@Model[i].TotalPrice" class="text-danger"></span>
+
+                <button type="button" class="add-ingredient-purchase-form">+</button>
+                <button type="button" class="remove-ingredient-purchase-form">-</button>
+            </div>
+        }
+        
+        
+            
+    </div>
+
+    <hr />
+
+    <div class="summary">
+        <h4>Subtotal: RM <span id="subtotal">0.00</span></h4>
+        <h4>
+            Discount: RM
+            <input type="text" id="discount" class="discount-input" placeholder="0.00" min="0.00" />
+        </h4>
+
+        <h4>Total: RM <span id="total">0.00</span></h4>
+    </div>
+
+    <div class="form-buttons">
+        <button type="submit" class="print-po-pdf">Save and Add</button>
+        <button type="button" class="cancel-po" onclick="window.location.href='/Ingredient/ReadIngredient'">Cancel</button>
+    </div>
+</form>
+
+
+@section Scripts {
+    <script>
+        let index = 1;
+
+        function calculateTotals() {
+            let subtotal = 0;
+
+            document.querySelectorAll('.purchase-ingredient').forEach(row => {
+                // Quantity
+                let qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                if (qty < 0) {
+                    qty = 1;
+                    row.querySelector('.quantity').value = 1;
+                }
+
+                // Weight
+                let kg = parseFloat(row.querySelector('.weight').value) || 0;
+                if (kg < 0) {
+                    kg = 1;
+                    row.querySelector('.weight').value = 1;
+                }
+
+                // Cost
+                let costInput = row.querySelector('.cost');
+                let cost = parseFloat(costInput.value);
+                if (isNaN(cost) || cost < 0) {
+                    costInput.value = "";
+                    cost = 0;
+                } else {
+                    cost = parseFloat(cost.toFixed(2));
+                }
+
+                // Calculate total using either qty or weight
+                let total = 0;
+                if (!row.querySelector('.quantity').readOnly) {
+                    total = qty * cost;
+                } else {
+                    total = kg * cost;
+                }
+
+                row.querySelector('.total-cost').value = total.toFixed(2);
+                subtotal += total;
+            });
+
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+
+            // Handle discount
+            const discountInput = document.getElementById('discount');
+            let discountRaw = discountInput.value.trim();
+            let discount = parseFloat(discountRaw);
+
+            if (isNaN(discount) || discount < 0) {
+                discount = 0;
+                discountInput.value = "";
+                discountInput.placeholder = "0.00";
+            } else {
+                discount = parseFloat(discount.toFixed(2));
+                discountInput.value = discount;
+            }
+
+            const finalTotal = subtotal - discount;
+            document.getElementById('total').textContent = finalTotal.toFixed(2);
+        }
+
+        document.addEventListener('input', (e) => {
+            const classList = e.target.classList;
+            if (classList.contains('quantity') || classList.contains('weight') || classList.contains('cost') || classList.contains('discount-input')) {
+                calculateTotals();
+            }
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('qty-radio') || e.target.classList.contains('kg-radio')) {
+                const row = e.target.closest('.purchase-ingredient');
+                const qty = row.querySelector('.quantity');
+                const kg = row.querySelector('.weight');
+
+                if (e.target.classList.contains('qty-radio')) {
+                    qty.readOnly = false;
+                    kg.readOnly = true;
+                    kg.value = '';
+                } else if (e.target.classList.contains('kg-radio')) {
+                    kg.readOnly = false;
+                    qty.readOnly = true;
+                    qty.value = '';
+                }
+
+                calculateTotals();
+            }
+        });
+
+               document.getElementById('ingredient-wrapper').addEventListener('click', function (e) {
+                if (e.target.classList.contains('add-ingredient-purchase-form')) {
+                const allRows = document.querySelectorAll('.purchase-ingredient');
+                const currentRow = e.target.closest('.purchase-ingredient');
+                const clone = currentRow.cloneNode(true);
+
+                const newIndex = allRows.length;
+
+                // Clear values and update names
+                clone.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'radio') {
+                        input.value = '';
+                    }
+
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        // Replace the old index with new one
+                        const newName = name.replace(/\[\d+\]/, `[${newIndex}]`);
+                        input.setAttribute('name', newName);
+                    }
+
+                    // Update id if needed (for validation messages)
+                    const id = input.getAttribute('id');
+                    if (id) {
+                        const newId = id.replace(/\_\d+\_/, `_${newIndex}_`);
+                        input.setAttribute('id', newId);
+                    }
+                });
+
+                // Update radio group names to avoid conflicts
+                clone.querySelector('.qty-radio').setAttribute('name', `unit${newIndex}`);
+                clone.querySelector('.kg-radio').setAttribute('name', `unit${newIndex}`);
+                clone.querySelector('.qty-radio').checked = true;
+                clone.querySelector('.kg-radio').checked = false;
+
+                clone.querySelector('.quantity').readOnly = false;
+                clone.querySelector('.weight').readOnly = true;
+
+                document.getElementById('ingredient-wrapper').appendChild(clone);
+                index++;
+                calculateTotals();
+            }
+        });
+
+    </script>
+}
+
+
+@*          document.getElementById('ingredient-wrapper').addEventListener('click', function (e) {
+            if (e.target.classList.contains('add-ingredient-purchase-form')) {
+                const currentRow = e.target.closest('.purchase-ingredient');
+                const clone = currentRow.cloneNode(true);
+
+                clone.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'radio') input.value = '';
+                });
+
+                clone.querySelector('.qty-radio').name = `unit${index}`;
+                clone.querySelector('.kg-radio').name = `unit${index}`;
+                clone.querySelector('.qty-radio').checked = true;
+                clone.querySelector('.kg-radio').checked = false;
+                clone.querySelector('.quantity').readOnly = false;
+                clone.querySelector('.weight').readOnly = true;
+
+                document.getElementById('ingredient-wrapper').appendChild(clone);
+                index++;
+                calculateTotals();
+            }
+
+            if (e.target.classList.contains('remove-ingredient-purchase-form')) {
+                const row = e.target.closest('.purchase-ingredient');
+                const allRows = document.querySelectorAll('.purchase-ingredient');
+
+                if (allRows.length > 1) {
+                    row.remove();
+                    calculateTotals();
+                } else {
+                    alert("System does not allow to remove all form!");
+                }
+            }
+        });
+} *@

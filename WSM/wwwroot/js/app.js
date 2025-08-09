@@ -1,11 +1,13 @@
-﻿//Trim input
+﻿
+
+//Trim input
 $('[data-trim]').on('change', e => {
     e.target.value = e.target.value.trim();
 
 });
 
 //Auto uppercase
-$['data-upper]') on('input', e => {
+$('[data-upper]').on('input', e => {
     const a = e.target.selectionStart;
     const b = e.target.selectionEnd;
     e.target.value = e.target.value.toUpperCase();

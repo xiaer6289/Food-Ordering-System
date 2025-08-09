@@ -7,24 +7,23 @@ namespace WSM.Models;
 public class IngredientVM
 {
     [StringLength(4)]
-    [RegularExpression(@"^[A-Z]{1}\d{3}", ErrorMessage = "Invalid {0}.")]
-    [Remote("CheckId", "home", ErrorMessage = "Duplicated {0}/")]
+    [RegularExpression(@"^I\d{3}", ErrorMessage = "Invalid {0}.")]
     public string? Id { get; set; }
 
     [StringLength(50)]
     public string Name { get; set; }
+
+    [Range(1,99999)]
     public int? Quantity { get; set; }
 
+    [Range(0.01, 999999.99)]
     [Precision(5, 2)]
     public decimal? Kilogram { get; set; }
     public decimal Price { get; set; }
+
+    [Precision(8, 2)]
     public decimal TotalPrice { get; set; }
-
-
 }
 
-public class PurchaseOrderVM
-{
-    public List<IngredientVM> Ingredients { get; set; } = new();
-}
+
 

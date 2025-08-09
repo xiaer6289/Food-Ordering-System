@@ -10,8 +10,9 @@ public class SearchController : Controller
     {
         switch (context)
         {
-            case "Restock":
-                return RedirectToAction("Restock", "Home", new { id = q });
+            case "Ingredient":
+                return RedirectToAction("ReadIngredient", "Ingredient", new { id = q });
+
             default:
                 return RedirectToAction("Index", "Home");
         }
