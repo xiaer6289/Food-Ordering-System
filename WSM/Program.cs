@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using WMS.Models;
 using WSM.Models;
 
 var builder = WebApplication.CreateBuilder(args);

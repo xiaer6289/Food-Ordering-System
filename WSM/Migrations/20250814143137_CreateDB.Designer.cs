@@ -12,7 +12,7 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250721052723_CreateDB")]
+    [Migration("20250814143137_CreateDB")]
     partial class CreateDB
     {
         /// <inheritdoc />
@@ -30,29 +30,14 @@ namespace WMS.Migrations
                     b.Property<string>("FoodsId")
                         .HasColumnType("nvarchar(4)");
 
-                    b.Property<string>("IngredientsId")
-                        .HasColumnType("nvarchar(4)");
+                    b.Property<int>("IngredientsId")
+                        .HasColumnType("int");
 
                     b.HasKey("FoodsId", "IngredientsId");
 
                     b.HasIndex("IngredientsId");
 
                     b.ToTable("FoodIngredient");
-                });
-
-            modelBuilder.Entity("FoodOrderDetail", b =>
-                {
-                    b.Property<string>("FoodsId")
-                        .HasColumnType("nvarchar(4)");
-
-                    b.Property<string>("OrderDetailsId")
-                        .HasColumnType("nvarchar(4)");
-
-                    b.HasKey("FoodsId", "OrderDetailsId");
-
-                    b.HasIndex("OrderDetailsId");
-
-                    b.ToTable("FoodOrderDetail");
                 });
 
             modelBuilder.Entity("WSM.Models.Admin", b =>
@@ -130,9 +115,11 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Ingredient", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Kilogram")
                         .HasPrecision(5, 3)
@@ -162,8 +149,8 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -186,8 +173,8 @@ namespace WMS.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasPrecision(5, 3)
-                        .HasColumnType("decimal(5,3)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -196,18 +183,50 @@ namespace WMS.Migrations
                     b.ToTable("OrderDetails");
                 });
 
-            modelBuilder.Entity("WSM.Models.Payment", b =>
+            modelBuilder.Entity("WSM.Models.OrderItem", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<double>("AmountPaid")
-                        .HasColumnType("float");
-
-                    b.Property<string>("OrderId")
+                    b.Property<string>("FoodId")
                         .IsRequired()
+                        .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("OrderDetailId")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodId");
+
+                    b.HasIndex("OrderDetailId");
+
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("WSM.Models.Payment", b =>
+                {
+                    b.Property<string>("PaymentId")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("OrderDetailId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -217,9 +236,17 @@ namespace WMS.Migrations
                     b.Property<DateTime>("Paymentdate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.Property<string>("StripeTransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("OrderId")
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("OrderDetailId")
                         .IsUnique();
 
                     b.ToTable("Payments");
@@ -275,21 +302,6 @@ namespace WMS.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FoodOrderDetail", b =>
-                {
-                    b.HasOne("WSM.Models.Food", null)
-                        .WithMany()
-                        .HasForeignKey("FoodsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WSM.Models.OrderDetail", null)
-                        .WithMany()
-                        .HasForeignKey("OrderDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
                     b.HasOne("WSM.Models.Category", "Category")
@@ -312,11 +324,30 @@ namespace WMS.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("WSM.Models.OrderItem", b =>
+                {
+                    b.HasOne("WSM.Models.Food", "Food")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("FoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WSM.Models.OrderDetail", "OrderDetail")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Food");
+
+                    b.Navigation("OrderDetail");
+                });
+
             modelBuilder.Entity("WSM.Models.Payment", b =>
                 {
                     b.HasOne("WSM.Models.OrderDetail", "OrderDetail")
                         .WithOne("Payment")
-                        .HasForeignKey("WSM.Models.Payment", "OrderId")
+                        .HasForeignKey("WSM.Models.Payment", "OrderDetailId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -344,8 +375,15 @@ namespace WMS.Migrations
                     b.Navigation("Foods");
                 });
 
+            modelBuilder.Entity("WSM.Models.Food", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
+                    b.Navigation("OrderItems");
+
                     b.Navigation("Payment")
                         .IsRequired();
                 });

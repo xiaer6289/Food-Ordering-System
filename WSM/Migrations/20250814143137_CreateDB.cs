@@ -40,7 +40,8 @@ namespace WMS.Migrations
                 name: "Ingredients",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     Kilogram = table.Column<decimal>(type: "decimal(5,3)", precision: 5, scale: 3, nullable: true),
@@ -100,11 +101,11 @@ namespace WMS.Migrations
                 name: "OrderDetails",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     SeatNo = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(5,3)", precision: 5, scale: 3, nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StaffId = table.Column<string>(type: "nvarchar(4)", nullable: false)
                 },
@@ -124,7 +125,7 @@ namespace WMS.Migrations
                 columns: table => new
                 {
                     FoodsId = table.Column<string>(type: "nvarchar(4)", nullable: false),
-                    IngredientsId = table.Column<string>(type: "nvarchar(4)", nullable: false)
+                    IngredientsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,24 +145,27 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FoodOrderDetail",
+                name: "OrderItems",
                 columns: table => new
                 {
-                    FoodsId = table.Column<string>(type: "nvarchar(4)", nullable: false),
-                    OrderDetailsId = table.Column<string>(type: "nvarchar(4)", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrderDetailId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    FoodId = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodOrderDetail", x => new { x.FoodsId, x.OrderDetailsId });
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FoodOrderDetail_Foods_FoodsId",
-                        column: x => x.FoodsId,
+                        name: "FK_OrderItems_Foods_FoodId",
+                        column: x => x.FoodId,
                         principalTable: "Foods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FoodOrderDetail_OrderDetails_OrderDetailsId",
-                        column: x => x.OrderDetailsId,
+                        name: "FK_OrderItems_OrderDetails_OrderDetailId",
+                        column: x => x.OrderDetailId,
                         principalTable: "OrderDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -171,18 +175,20 @@ namespace WMS.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(4)", nullable: false),
+                    PaymentId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    OrderDetailId = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     Paymentdate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AmountPaid = table.Column<double>(type: "float", nullable: false)
+                    StripeTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
                     table.ForeignKey(
-                        name: "FK_Payments_OrderDetails_OrderId",
-                        column: x => x.OrderId,
+                        name: "FK_Payments_OrderDetails_OrderDetailId",
+                        column: x => x.OrderDetailId,
                         principalTable: "OrderDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -192,11 +198,6 @@ namespace WMS.Migrations
                 name: "IX_FoodIngredient_IngredientsId",
                 table: "FoodIngredient",
                 column: "IngredientsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FoodOrderDetail_OrderDetailsId",
-                table: "FoodOrderDetail",
-                column: "OrderDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Foods_CategoryId",
@@ -209,9 +210,19 @@ namespace WMS.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_OrderId",
+                name: "IX_OrderItems_FoodId",
+                table: "OrderItems",
+                column: "FoodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_OrderDetailId",
+                table: "OrderItems",
+                column: "OrderDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_OrderDetailId",
                 table: "Payments",
-                column: "OrderId",
+                column: "OrderDetailId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -227,7 +238,7 @@ namespace WMS.Migrations
                 name: "FoodIngredient");
 
             migrationBuilder.DropTable(
-                name: "FoodOrderDetail");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
                 name: "Payments");

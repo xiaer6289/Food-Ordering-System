@@ -168,9 +168,9 @@ public class Payment
 
 public class Ingredient
 {
-    [Key, MaxLength(4)]
+    [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; }
+    public int Id { get; set; }
     [MaxLength(50)]
     public string Name { get; set; }
     public int? Quantity { get; set; }

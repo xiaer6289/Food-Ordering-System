@@ -1,8 +1,7 @@
-﻿namespace WMS.Models
+﻿namespace WSM.Models;
+
+public class StripeSettings
 {
-    public class StripeSettings
-    {
-        public string SecretKey { get; set; }
-        public string PublicKey { get; set; }
-    }
+    public string SecretKey { get; set; }
+    public string PublicKey { get; set; }
 }

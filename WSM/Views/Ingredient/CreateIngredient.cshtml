@@ -5,10 +5,10 @@
 @{
     ViewBag.Title = "Purchase Order";
     var today = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-    Layout = null;
+    // Layout = null;
+    // <link rel="stylesheet" href="~/css/app.css" />
 }
 
-<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 
 
 <h1 style="text-align:center;"><strong>Purchase Order</strong></h1>
@@ -25,38 +25,35 @@
     <div id="ingredient-wrapper">
         @for (int i = 0; i < Model.Count; i++)
         {
-            <div class="purchase-ingredient">
+            <div class="purchase-ingredient" data-index="@i">
                 <label>Ingredients:</label>
-                <input asp-for="@Model[i].Name" type="text" class="ingredient" placeholder="Ingredient" required />
+                <input name="[@i].Name" type="text" class="ingredient" placeholder="Ingredient" required />
                 <span asp-validation-for="@Model[i].Name" class="text-danger"></span>
 
                 <label>
-                    <input type="radio" class="qty-radio" name="unit@i" /> Quantity
+                    <input type="radio" class="qty-radio" name="unit@i" checked /> Quantity
                 </label>
                 <label>
                     <input type="radio" class="kg-radio" name="unit@i" /> Weight (kg)
                 </label>
 
                 <label>Quantity:</label>
-                <input asp-for="@Model[i].Quantity" type="number" class="quantity" min="1" step="1" placeholder="Single unit" readonly />
+                <input name="[@i].Quantity" type="number" class="quantity" min="1" step="1" placeholder="Single unit" />
 
                 <label>Weight(Kg):</label>
-                <input asp-for="@Model[i].Kilogram" type="number" class="weight" min="0.1" step="1.00" placeholder="Kg per unit" readonly />
+                <input name="[@i].Kilogram" type="number" class="weight" min="0.1" step="0.1" placeholder="Kg per unit" readonly />
 
                 <label>Cost:</label>
-                <input asp-for="@Model[i].Price" type="text" class="cost" placeholder="Cost per unit" required />
+                <input name="[@i].Price" type="number" class="cost" step="0.01" placeholder="Cost per unit" required />
 
                 <label>Total Cost:</label>
-                <input asp-for="@Model[i].TotalPrice" type="text" class="total-cost" placeholder="0.00" readonly />
+                <input name="[@i].TotalPrice" type="number" class="total-cost" step="0.01" placeholder="0.00" readonly />
                 <span asp-validation-for="@Model[i].TotalPrice" class="text-danger"></span>
 
                 <button type="button" class="add-ingredient-purchase-form">+</button>
                 <button type="button" class="remove-ingredient-purchase-form">-</button>
             </div>
         }
-        
-        
-            
     </div>
 
     <hr />
@@ -65,7 +62,7 @@
         <h4>Subtotal: RM <span id="subtotal">0.00</span></h4>
         <h4>
             Discount: RM
-            <input type="text" id="discount" class="discount-input" placeholder="0.00" min="0.00" />
+            <input type="number" id="discount" class="discount-input" placeholder="0.00" min="0.00" step="0.01" />
         </h4>
 
         <h4>Total: RM <span id="total">0.00</span></h4>
@@ -80,7 +77,9 @@
 
 @section Scripts {
     <script>
-        let index = 1;
+
+
+        let index = @Model.Count;
 
         function calculateTotals() {
             let subtotal = 0;
@@ -169,63 +168,25 @@
             }
         });
 
-               document.getElementById('ingredient-wrapper').addEventListener('click', function (e) {
-                if (e.target.classList.contains('add-ingredient-purchase-form')) {
-                const allRows = document.querySelectorAll('.purchase-ingredient');
-                const currentRow = e.target.closest('.purchase-ingredient');
-                const clone = currentRow.cloneNode(true);
-
-                const newIndex = allRows.length;
-
-                // Clear values and update names
-                clone.querySelectorAll('input').forEach(input => {
-                    if (input.type !== 'radio') {
-                        input.value = '';
-                    }
-
-                    const name = input.getAttribute('name');
-                    if (name) {
-                        // Replace the old index with new one
-                        const newName = name.replace(/\[\d+\]/, `[${newIndex}]`);
-                        input.setAttribute('name', newName);
-                    }
-
-                    // Update id if needed (for validation messages)
-                    const id = input.getAttribute('id');
-                    if (id) {
-                        const newId = id.replace(/\_\d+\_/, `_${newIndex}_`);
-                        input.setAttribute('id', newId);
-                    }
-                });
-
-                // Update radio group names to avoid conflicts
-                clone.querySelector('.qty-radio').setAttribute('name', `unit${newIndex}`);
-                clone.querySelector('.kg-radio').setAttribute('name', `unit${newIndex}`);
-                clone.querySelector('.qty-radio').checked = true;
-                clone.querySelector('.kg-radio').checked = false;
-
-                clone.querySelector('.quantity').readOnly = false;
-                clone.querySelector('.weight').readOnly = true;
-
-                document.getElementById('ingredient-wrapper').appendChild(clone);
-                index++;
-                calculateTotals();
-            }
-        });
-
-    </script>
-}
-
-
-@*          document.getElementById('ingredient-wrapper').addEventListener('click', function (e) {
+        document.getElementById('ingredient-wrapper').addEventListener('click', function (e) {
             if (e.target.classList.contains('add-ingredient-purchase-form')) {
                 const currentRow = e.target.closest('.purchase-ingredient');
                 const clone = currentRow.cloneNode(true);
 
+                // Update the index for the new row
+                clone.setAttribute('data-index', index);
+
+                // Update all input names with the new index
                 clone.querySelectorAll('input').forEach(input => {
-                    if (input.type !== 'radio') input.value = '';
+                    if (input.name) {
+                        input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                    if (input.type !== 'radio') {
+                        input.value = '';
+                    }
                 });
 
+                // Update radio button names
                 clone.querySelector('.qty-radio').name = `unit${index}`;
                 clone.querySelector('.kg-radio').name = `unit${index}`;
                 clone.querySelector('.qty-radio').checked = true;
@@ -245,9 +206,22 @@
                 if (allRows.length > 1) {
                     row.remove();
                     calculateTotals();
+                    
+                    // Reindex remaining rows
+                    document.querySelectorAll('.purchase-ingredient').forEach((row, idx) => {
+                        row.setAttribute('data-index', idx);
+                        row.querySelectorAll('input').forEach(input => {
+                            if (input.name) {
+                                input.name = input.name.replace(/\[\d+\]/, `[${idx}]`);
+                            }
+                        });
+                        row.querySelector('.qty-radio').name = `unit${idx}`;
+                        row.querySelector('.kg-radio').name = `unit${idx}`;
+                    });
                 } else {
                     alert("System does not allow to remove all form!");
                 }
             }
         });
-} *@
+    </script>
+}

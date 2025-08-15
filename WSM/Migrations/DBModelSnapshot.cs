@@ -27,8 +27,8 @@ namespace WMS.Migrations
                     b.Property<string>("FoodsId")
                         .HasColumnType("nvarchar(4)");
 
-                    b.Property<string>("IngredientsId")
-                        .HasColumnType("nvarchar(4)");
+                    b.Property<int>("IngredientsId")
+                        .HasColumnType("int");
 
                     b.HasKey("FoodsId", "IngredientsId");
 
@@ -112,9 +112,11 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Ingredient", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Kilogram")
                         .HasPrecision(5, 3)
