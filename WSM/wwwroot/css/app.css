@@ -100,6 +100,27 @@ header {
         background-color: #57a65c;
     }
 
+
+.remove-check-ingredient {
+    background-color: #ff9999;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    padding: 20px 30px;
+    font-size: 16px;
+    font-family: 'Lora', sans-serif;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 215px;
+}
+
+    .remove-check-ingredient:hover {
+        background-color: #e88888;
+    }
+
 .edit-remove-group {
     display: flex;
     gap: 30px;
@@ -145,6 +166,33 @@ header {
     .remove-ingredient:hover {
         background-color: #e88888;
     }
+
+.check-all-btn,
+.uncheck-all-btn {
+    border: none;
+    border-radius: 6px;
+    background-color: #ad73f0;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .check-all-btn:hover,
+    .uncheck-all-btn:hover {
+        background-color: #c295f5;
+    }
+
+.check-all-btn {
+    padding: 10px 8px;
+    width: 130px;
+}
+
+.uncheck-all-btn{
+    padding: 10px 10px;
+    width: 130px
+}
 
 /* General Table Layout*/
 .record-table,

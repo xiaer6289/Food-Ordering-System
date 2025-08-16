@@ -5,42 +5,51 @@
 
 @{
     ViewBag.Title = "Restock";
-    string[] fields = ["Id", "Name", "Quantity", "Weight(kg)", "Unit Price", ""];
+    string[] fields = ["","Id", "Name", "Quantity", "Weight(kg)", "Unit Price", ""];
 }
 
 <form>
     @Html.Hidden("sort")
     @Html.Hidden("dir")
 </form>
-<p>
-    @Model.Count() of @Model.TotalItemCount orders |
-    Page @Model.PageNumber of @Model.PageCount
-</p>
 
-<div class="restock-container" id="target">
+<form method="post" action="/Ingredient/DeleteMany" id="deleteForm">
+    <p>
+        <button type="button" class="check-all-btn">Check All</button>
+        <button type="button" class="uncheck-all-btn">Uncheck All</button>
+    </p>
 
-    <table class="restock-table">
-        <tr>
-            @foreach (var f in fields)
-            {
-                string d = "asc";
-                string c = "";
+    <p>
+        @Model.Count() of @Model.TotalItemCount orders |
+        Page @Model.PageNumber of @Model.PageCount
+    </p>
 
-                if (f == ViewBag.Sort)
-                {
-                    d = ViewBag.Dir == "des" ? "asc" : "des";
-                    c = ViewBag.Dir;
-                }
-
-                <th>
-                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
-                </th>
-            }
-        </tr>
-
-        @foreach (var s in Model)
-        {
+    <div class="restock-container" id="target">
+        <table class="restock-table">
             <tr>
+                @foreach (var f in fields)
+                {
+                    string d = "asc";
+                    string c = "";
+
+                    if (f == ViewBag.Sort)
+                    {
+                        d = ViewBag.Dir == "des" ? "asc" : "des";
+                        c = ViewBag.Dir;
+                    }
+
+                    <th>
+                        <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                    </th>
+                }
+            </tr>
+
+            @foreach (var s in Model)
+            {
+            <tr data-checkable data-id="@s.Id">
+                <td>
+                    <input type="checkbox" name="ids" value="@s.Id" class="ingredient-checkbox" />
+                </td>
                 <td>@s.Id</td>
                 <td>@s.Name</td>
                 <td>@s.Quantity</td>
@@ -49,24 +58,19 @@
                 <td>
                     <div class="edit-remove-group">
                         <a asp-controller="Ingredient" asp-action="UpdateIngredient" asp-route-id="@s.Id" class="edit-ingredient">Update</a>
-                        <form asp-controller="Ingredient" asp-action="Delete" method="post"
-                              onsubmit="return confirm('Are you sure you want to delete this ingredient?');" style="display:inline;">
-                            <input type="hidden" name="id" value="@s.Id" />
-                            <button type="submit" class="remove-ingredient">Delete</button>
-                        </form>
+                        <button type="button" class="remove-ingredient" data-id="@s.Id">Delete</button>
                     </div>
-
                 </td>
             </tr>
-        }
-    </table>
+            }
+        </table>
 
-    <div class="restock-button">
-        <a asp-controller="Ingredient" asp-action="CreateIngredient" class="update-ingredient">Add New</a>
-        @* <button type="submit" class="remove-ingredient">Delete</button> *@
+        <div class="restock-button">
+            <a asp-controller="Ingredient" asp-action="CreateIngredient" class="update-ingredient">Add New</a>
+            <button type="submit" class="remove-check-ingredient">Delete Selected</button>
+        </div>
     </div>
-
-</div>
+</form>
 
 <div class="pagination-wrapper">
     @{
@@ -85,8 +89,79 @@
     }
 
     @Html.PagedListPager(
-    Model,
-    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
-    options
-        )
+        Model,
+        page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+        options
+    )
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Check all functionality
+            $('.check-all-btn').click(function() {
+                $('.ingredient-checkbox').prop('checked', true);
+            });
+
+            // Uncheck all functionality
+            $('.uncheck-all-btn').click(function() {
+                $('.ingredient-checkbox').prop('checked', false);
+            });
+
+            // Single row delete
+            $('.remove-ingredient').click(function() {
+                var button = $(this);
+                var id = button.data('id');
+                
+                if (confirm('Are you sure you want to delete this ingredient?')) {
+                    $.ajax({
+                        url: '/Ingredient/Delete',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function() {
+                            // Remove the row from the table
+                            button.closest('tr').fadeOut(300, function() {
+                                $(this).remove();
+                                updateCount(-1);
+                            });
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the ingredient.');
+                        }
+                    });
+                }
+            });
+
+            // Bulk delete for selected items
+            $('#deleteForm').submit(function(e) {
+                e.preventDefault();
+                var checkedBoxes = $('.ingredient-checkbox:checked');
+                if (checkedBoxes.length === 0) {
+                    alert('Please select at least one ingredient to delete.');
+                    return false;
+                }
+                if (!confirm('Are you sure you want to delete the selected ingredients?')) {
+                    return false;
+                }
+
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function() {
+                        // Remove checked rows
+                        $('.ingredient-checkbox:checked').closest('tr').fadeOut(300, function() {
+                            $(this).remove();
+                            updateCount(-checkedBoxes.length);
+                        });
+                    },
+                    error: function () {
+                        alert('An error occurred while deleting.');
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+}

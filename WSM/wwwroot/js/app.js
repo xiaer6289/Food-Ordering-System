@@ -1,26 +1,4 @@
-﻿
-
-//Trim input
-$('[data-trim]').on('change', e => {
-    e.target.value = e.target.value.trim();
-
-});
-
-//Auto uppercase
-$('[data-upper]').on('input', e => {
-    const a = e.target.selectionStart;
-    const b = e.target.selectionEnd;
-    e.target.value = e.target.value.toUpperCase();
-    e.target.setSelectionRange(a, b);
-});
-
-//Reset form
-$('[type=reset]').on('click', e => {
-    e.preventDefault();
-    location = location;
-});
-
-// Initiate GET request (AJAX-supported)
+﻿// Initiate GET request (AJAX-supported)
 $(document).on('click', '[data-get]', e => {
     e.preventDefault();
     const url = e.target.dataset.get;
@@ -35,4 +13,46 @@ $(document).on('click', '[data-post]', e => {
     f.method = 'post';
     f.action = url || location;
     f.submit();
+});
+
+// Trim input
+$('[data-trim]').on('change', e => {
+    e.target.value = e.target.value.trim();
+});
+
+// Auto uppercase
+$('[data-upper]').on('input', e => {
+    const a = e.target.selectionStart;
+    const b = e.target.selectionEnd;
+    e.target.value = e.target.value.toUpperCase();
+    e.target.setSelectionRange(a, b);
+});
+
+// RESET form
+$('[type=reset]').on('click', e => {
+    e.preventDefault();
+    location = location;
+});
+
+// Check all checkboxes
+$('[data-check]').on('click', e => {
+    e.preventDefault();
+    const name = e.target.dataset.check;
+    $(`[name=${name}]`).prop('checked', true);
+});
+
+// Uncheck all checkboxes
+$('[data-uncheck]').on('click', e => {
+    e.preventDefault();
+    const name = e.target.dataset.uncheck;
+    $(`[name=${name}]`).prop('checked', false);
+});
+
+// Row checkable (AJAX-supported)
+$(document).on('click', '[data-checkable]', e => {
+    if ($(e.target).is(':input,a')) return;
+
+    $(e.currentTarget)
+        .find(':checkbox')
+        .prop('checked', (i, v) => !v);
 });
