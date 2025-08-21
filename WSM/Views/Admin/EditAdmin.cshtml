@@ -1,0 +1,34 @@
+﻿@model WSM.Models.Admin
+@{
+    ViewData["Title"] = "Edit Admin";
+}
+
+<h2>Edit Admin</h2>
+
+<form asp-action="EditAdmin" asp-controller="Admin" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Id"></label>
+        <input asp-for="Id" class="form-control" readonly />
+        <span asp-validation-for="Id" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNo"></label>
+        <input asp-for="PhoneNo" class="form-control" placeholder="Phone No without '-'" />
+        <span asp-validation-for="PhoneNo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Admins" asp-controller="Admin" class="btn btn-secondary">Cancel</a>
+</form>
+

@@ -8,6 +8,7 @@ public class DB : DbContext
 {
     public DB(DbContextOptions<DB> options) : base(options) { }
 
+    public DbSet<Company> Companies { get; set; }
     public DbSet<Food> Foods { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Staff> Staff { get; set; }
@@ -18,6 +19,15 @@ public class DB : DbContext
     public DbSet<Ingredient> Ingredients { get; set; }
 }
 
+public class Company
+{
+    [Key]
+    public int CompanyId { get; set; }   // Primary Key
+    public string CompanyName { get; set; }
+    public string Email { get; set; }
+    public string PasswordHash { get; set; }
+    public string? LogoPath { get; set; }
+}
 public class Food
 {
     [Key, MaxLength(4)]
@@ -54,8 +64,13 @@ public class Category
 
 public class Admin
 {
-    [Key, MaxLength(4)]
-    public string Id { get; set; }
+    [Key]
+    public Guid Id { get; set; }
+
+    [Required]               
+    [MaxLength(100)]     
+    [EmailAddress]           
+    public string Email { get; set; }
 
     [MaxLength(20)]
     public string Password { get; set; }
@@ -69,10 +84,15 @@ public class Admin
     public ICollection<Staff> Staffs { get; set; } = [];
 }
 
-public class Staff //use salary to differentiate waiter,manager...
+public class Staff
 {
     [Key, MaxLength(4)]
     public string Id { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    [EmailAddress]
+    public string Email { get; set; }
 
     [MaxLength(20)]
     public string Password { get; set; }
@@ -85,11 +105,10 @@ public class Staff //use salary to differentiate waiter,manager...
     [MaxLength(15)]
     public string PhoneNo { get; set; }
 
+    public Guid AdminId { get; set; }
 
-    //[ForeignKey("Admin")]
-    public string AdminId { get; set; }
-
-    public Admin Admin { get; set; } 
+    [ForeignKey("AdminId")]
+    public Admin Admin { get; set; }
 }
 
 public class OrderDetail

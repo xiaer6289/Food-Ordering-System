@@ -20,10 +20,7 @@ public class HomeController : Controller
     }
 
     // GET: /Home/Index
-    public IActionResult Index()
-    {
-        return View();
-    }
+ 
 
     public IActionResult OrderHistory(string? id, string? sort, string? dir, int page = 1)
     {
@@ -90,7 +87,11 @@ public class HomeController : Controller
         return View(m);
     }
 
-    
+    public IActionResult Both()
+    {
+        return View();
+    }
+
 
 
 
