@@ -1,0 +1,65 @@
+﻿@model IEnumerable<WSM.Models.Food>
+
+@{
+    ViewData["Title"] = "Food Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Food Management</h2>
+        <a asp-action="CreateFood" class="btn btn-success">+ Add Food</a>
+    </div>
+
+    <!-- Search Form -->
+    <form asp-action="Foods" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="searchString" class="form-control" placeholder="Search by name or description" value="@ViewData["CurrentFilter"]" />
+            <button type="submit" class="btn btn-primary">Search</button>
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+            {
+                <a asp-action="Foods" class="btn btn-secondary ms-2">Clear</a>
+            }
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category</th>
+                    <th scope="col" style="width: 150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No food records found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var food in Model)
+                    {
+                        <tr>
+                            <td>@food.Id</td>
+                            <td>@food.Name</td>
+                            <td>@food.Price.ToString("C")</td>
+                            <td>@food.Description</td>
+                            <td>@food.Category?.Name</td>
+                            <td class="text-center">
+                                <a asp-action="EditFood" asp-route-id="@food.Id" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                                <a asp-action="DeleteFood" asp-route-id="@food.Id" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Are you sure you want to delete this food item?');">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
