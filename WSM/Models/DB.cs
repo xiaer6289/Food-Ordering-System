@@ -54,8 +54,8 @@ public class Category
 
 public class Admin
 {
-    [Key, MaxLength(4)]
-    public string Id { get; set; }
+    [Key]
+    public Guid Id { get; set; }
 
     [MaxLength(20)]
     public string Password { get; set; }
@@ -69,7 +69,7 @@ public class Admin
     public ICollection<Staff> Staffs { get; set; } = [];
 }
 
-public class Staff //use salary to differentiate waiter,manager...
+public class Staff
 {
     [Key, MaxLength(4)]
     public string Id { get; set; }
@@ -85,11 +85,10 @@ public class Staff //use salary to differentiate waiter,manager...
     [MaxLength(15)]
     public string PhoneNo { get; set; }
 
+    public Guid AdminId { get; set; }
 
-    //[ForeignKey("Admin")]
-    public string AdminId { get; set; }
-
-    public Admin Admin { get; set; } 
+    [ForeignKey("AdminId")]
+    public Admin Admin { get; set; }
 }
 
 public class OrderDetail
