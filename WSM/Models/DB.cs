@@ -74,8 +74,7 @@ public class Category
 public class Admin
 {
     [Key, MaxLength(6)]
-    public string AdminId { get; set;
-
+    public string AdminId { get; set; }
     [Required]
     [MaxLength(100)]
     [EmailAddress]
