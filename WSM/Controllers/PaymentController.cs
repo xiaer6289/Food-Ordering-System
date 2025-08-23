@@ -2,10 +2,7 @@
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
-using Stripe.Climate;
-using System.Globalization;
 using WMS.Models;
-using WSM.Controllers; 
 using WSM.Helpers;
 using WSM.Models;
 
@@ -53,10 +50,7 @@ namespace WSM.Controllers
             {
                 CustomerEmail = email,
                 CustomerCreation = "always",
-                PaymentMethodTypes = new List<string>
-                {
-                    "card"
-                },
+                PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
                 {
                     new SessionLineItemOptions
@@ -77,10 +71,7 @@ namespace WSM.Controllers
                 Mode = "payment",
                 SuccessUrl = successUrl,
                 CancelUrl = cancelUrl,
-                Metadata = new Dictionary<string, string>
-                {
-                    { "order_id", orderId }
-                }
+                Metadata = new Dictionary<string, string> { { "order_id", orderId } }
             };
 
             var service = new SessionService();
@@ -94,70 +85,75 @@ namespace WSM.Controllers
             return "ORD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
         }
 
+        private string GeneratePaymentId(string orderId)
+        {
+            return "P" + orderId.Substring(3); 
+        }
+
+        private string GenerateOrderItemId(string orderId, int index)
+        {
+            return $"{orderId}-OI{index}";
+        }
+
         public async Task<IActionResult> Success(string session_id)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
             var service = new SessionService();
             var session = await service.GetAsync(session_id);
 
-            if (session.PaymentStatus == "paid")
+            if (session.PaymentStatus != "paid")
+                return View("OrderCancel");
+
+            var orderId = session.Metadata["order_id"];
+            if (string.IsNullOrEmpty(orderId))
+                return BadRequest("Order ID not found in session metadata.");
+
+            var cart = _helper.GetCart();
+            if (!cart.Any())
+                return BadRequest("Cart is empty during payment success.");
+
+            decimal totalAmount = (decimal)session.AmountTotal / 100;
+
+            // Create OrderDetail
+            var orderDetail = new OrderDetail
             {
-                var orderId = session.Metadata["order_id"];
-                if (string.IsNullOrEmpty(orderId))
-                {
-                    return BadRequest("Order ID not found in session metadata.");
-                }
+                Id = orderId,
+                SeatNo = "N/A",
+                Quantity = cart.Sum(x => x.Value),
+                TotalPrice = totalAmount,
+                Status = "Completed",
+                OrderDate = DateTime.Now,
+                StaffId = "S001"
+            };
 
-                // Get the cart data
-                var cart = _helper.GetCart();
-                if (!cart.Any())
-                {
-                    return BadRequest("Cart is empty during payment success.");
-                }
+            // Create OrderItems
+            int counter = 1;
+            orderDetail.OrderItems = cart.Select(x => new OrderItem
+            {
+                Id = GenerateOrderItemId(orderId, counter++),
+                OrderDetailId = orderId,
+                FoodId = x.Key,
+                Quantity = x.Value,
+                SubTotal = _db.Foods.Where(f => f.Id == x.Key).Select(f => f.Price * x.Value).FirstOrDefault()
+            }).ToList();
 
-                // Calculate total amount from session for verification
-                decimal totalAmount = (decimal)session.AmountTotal / 100;
+            _db.OrderDetails.Add(orderDetail);
+            _db.SaveChanges();
 
-                // Create OrderDetail
-                var orderDetail = new OrderDetail
-                {
-                    Id = orderId,
-                    SeatNo = "N/A", // Adjust as needed
-                    Quantity = cart.Sum(x => x.Value),
-                    TotalPrice = totalAmount,
-                    Status = "Completed",
-                    OrderDate = DateTime.Now,
-                    StaffId = "S001" // Adjust based on your logic (e.g., logged-in staff)
-                };
+            // Create Payment
+            var payment = new Payment
+            {
+                PaymentId = GeneratePaymentId(orderId),
+                OrderDetailId = orderId,
+                PaymentMethod = "Card",
+                AmountPaid = totalAmount,
+                Paymentdate = DateTime.Now,
+                StripeTransactionId = session.PaymentIntentId
+            };
+            _db.Payments.Add(payment);
+            _db.SaveChanges();
 
-                // Create OrderItems
-                orderDetail.OrderItems = cart.Select(x => new OrderItem
-                {
-                    OrderDetailId = orderId,
-                    FoodId = x.Key,
-                    Quantity = x.Value,
-                    SubTotal = _db.Foods.Where(f => f.Id == x.Key).Select(f => f.Price * x.Value).FirstOrDefault()
-                }).ToList();
-
-                _db.OrderDetails.Add(orderDetail);
-                _db.SaveChanges(); // Save OrderDetail and OrderItems first
-
-                // Create Payment
-                var payment = new Payment
-                {
-                    PaymentId = "P" + orderId,
-                    OrderDetailId = orderId, // Now this references an existing OrderDetail
-                    PaymentMethod = "Card",
-                    AmountPaid = (decimal)totalAmount,
-                    Paymentdate = DateTime.Now,
-                    StripeTransactionId = session.PaymentIntentId
-                };
-                _db.Payments.Add(payment);
-                _db.SaveChanges(); // Save Payment
-
-                // Clear the cart
-                _helper.SetCart(new Dictionary<string, int>());
-            }
+            _helper.SetCart(new Dictionary<string, int>());
 
             return View("OrderConfirmation");
         }

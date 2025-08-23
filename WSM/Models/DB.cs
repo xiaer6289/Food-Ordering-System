@@ -140,7 +140,7 @@ public class OrderDetail
 
 public class OrderItem
 {
-    [Key]
+    [Key, MaxLength(30)]
     public string Id { get; set; }
 
     [MaxLength(20)]
