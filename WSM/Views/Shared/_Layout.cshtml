@@ -22,7 +22,9 @@
 
             <div class="button-group">
                 <a class="orderLogout" href="home/menu">Order</a>
-                <button class="orderLogout" onclick="window.location.href='index.cshtml'">Log Out</button>
+                <button class="orderLogout" onclick="window.location.href='@Url.Action("Login", "Authorization")'">
+                    Log Out
+                </button>
             </div>
         </nav>
     </header>

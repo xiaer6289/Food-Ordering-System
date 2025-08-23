@@ -20,14 +20,15 @@ public class HomeController : Controller
     }
 
     // GET: /Home/Index
-    public IActionResult Index()
+ 
+
+    
+
+    public IActionResult Both()
     {
         return View();
     }
 
-    
-
-    
 
 
 
