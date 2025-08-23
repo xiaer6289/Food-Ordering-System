@@ -6,9 +6,10 @@
     ViewBag.Title = "Purchase Order";
     var today = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
     // Layout = null;
-    // <link rel="stylesheet" href="~/css/app.css" />
-}
 
+}
+@* <link rel="stylesheet" href="~/css/app.css" />
+<script src="~/js/Ingredient.js"></script> *@
 
 
 <h1 style="text-align:center;"><strong>Purchase Order</strong></h1>
@@ -77,9 +78,7 @@
 
 @section Scripts {
     <script>
-
-
-        let index = @Model.Count;
+                let index = @Model.Count;
 
         function calculateTotals() {
             let subtotal = 0;
@@ -206,7 +205,7 @@
                 if (allRows.length > 1) {
                     row.remove();
                     calculateTotals();
-                    
+
                     // Reindex remaining rows
                     document.querySelectorAll('.purchase-ingredient').forEach((row, idx) => {
                         row.setAttribute('data-index', idx);
@@ -223,5 +222,7 @@
                 }
             }
         });
+
+        
     </script>
 }

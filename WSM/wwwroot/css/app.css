@@ -171,7 +171,7 @@ header {
 .uncheck-all-btn {
     border: none;
     border-radius: 6px;
-    background-color: #ad73f0;
+    background-color: #54a0f7;
     color: white;
     text-align: center;
     font-size: 14px;
@@ -181,7 +181,7 @@ header {
 
     .check-all-btn:hover,
     .uncheck-all-btn:hover {
-        background-color: #c295f5;
+        background-color: #357bcc;
     }
 
 .check-all-btn {

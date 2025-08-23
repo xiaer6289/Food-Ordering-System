@@ -91,6 +91,7 @@
     @Html.PagedListPager(
         Model,
         page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+        // page => Url.Action("ReadIngredient", new { id = ViewBag.Id, sort = ViewBag.Sort, dir = ViewBag.Dir, page }),
         options
     )
 </div>

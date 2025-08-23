@@ -56,3 +56,17 @@ $(document).on('click', '[data-checkable]', e => {
         .find(':checkbox')
         .prop('checked', (i, v) => !v);
 });
+
+// save page to pdf
+document.addEventListener("DOMContentLoad", () => {
+    const saveBtn = document.getElementById("savePdf");
+    if (saveBtn) {
+        saveBtn.addEventListener("click", () => {
+            const element = document.body;
+            html2pdf().from(element).save("mypage.pdf");
+        } )
+    }
+})
+
+
+
