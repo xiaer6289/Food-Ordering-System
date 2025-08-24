@@ -18,21 +18,14 @@ public class AdminController : Controller
     // GET: /Admin/Admins
     public IActionResult Admins(string searchString)
     {
-        // Sanitize search string to prevent injection
         searchString = searchString?.Trim();
-
         var admins = db.Admins.AsQueryable();
         if (!string.IsNullOrEmpty(searchString))
         {
-            admins = admins.Where(a => a.Name.Contains(searchString) || a.PhoneNo.Contains(searchString));
+            admins = admins.Where(a => a.Name.Contains(searchString) || a.PhoneNo.Contains(searchString) || a.Email.Contains(searchString));
         }
-
-        // Fetch the filtered list
         var model = admins.ToList();
-
-        // Store search string for view to maintain state
         ViewData["CurrentFilter"] = searchString;
-
         return View(model);
     }
 
@@ -69,14 +62,20 @@ public class AdminController : Controller
             ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).");
         }
 
+        // Server-side validation for Email (handled by [EmailAddress] attribute, but explicit check for clarity)
+        if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            ModelState.AddModelError("Email", "Please enter a valid email address.");
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
-            db.Admins.Add(model);
-            db.SaveChanges();
-            return RedirectToAction("Admins");
-        }
+                db.Admins.Add(model);
+                db.SaveChanges();
+                return RedirectToAction("Admins");
+            }
             catch (DbUpdateException ex)
             {
                 ModelState.AddModelError("", $"Failed to create admin: {ex.InnerException?.Message ?? ex.Message}");
@@ -114,14 +113,20 @@ public class AdminController : Controller
             ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).");
         }
 
+        // Server-side validation for Email
+        if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            ModelState.AddModelError("Email", "Please enter a valid email address.");
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
-            db.Admins.Update(model);
-            db.SaveChanges();
-            return RedirectToAction("Admins");
-        }
+                db.Admins.Update(model);
+                db.SaveChanges();
+                return RedirectToAction("Admins");
+            }
             catch (DbUpdateException ex)
             {
                 ModelState.AddModelError("", $"Failed to update admin: {ex.InnerException?.Message ?? ex.Message}");

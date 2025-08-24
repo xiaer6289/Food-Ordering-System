@@ -1,63 +1,56 @@
 ﻿@model IEnumerable<WSM.Models.Admin>
-
 @{
-    ViewData["Title"] = "Admin Management";
+    ViewData["Title"] = "Admin List";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="mb-0">Admin Management</h2>
-        <a asp-action="CreateAdmin" class="btn btn-success">+ Add Admin</a>
-    </div>
+<h2>Admin List</h2>
 
-    <!-- Search Form -->
-    <form asp-action="Admins" method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="searchString" class="form-control" placeholder="Search by name or phone number" value="@ViewData["CurrentFilter"]" />
-            <button type="submit" class="btn btn-primary">Search</button>
-            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
-            {
-                <a asp-action="Admins" class="btn btn-secondary ms-2">Clear</a>
-            }
-        </div>
-    </form>
-
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover align-middle">
-            <thead class="table-dark text-center">
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Phone No</th>
-                    <th scope="col">Password</th>
-                    <th scope="col" style="width: 150px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">No admin records found.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var admin in Model)
-                    {
-                        <tr>
-                            <td>@admin.AdminId</td>
-                            <td>@admin.Name</td>
-                            <td>@admin.PhoneNo</td>
-                            <td>@admin.Password</td>
-                            <td class="text-center">
-                                <a asp-action="EditAdmin" asp-route-id="@admin.AdminId" class="btn btn-sm btn-outline-warning me-1">Edit</a>
-                                <a asp-action="DeleteAdmin" asp-route-id="@admin.AdminId" class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure you want to delete this admin?');">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+<div class="mb-3">
+    <a asp-action="CreateAdmin" class="btn btn-primary">Add New Admin</a>
 </div>
+
+<form asp-action="Admins" method="get" class="mb-3">
+    <div class="input-group">
+        <input name="searchString" class="form-control" placeholder="Search by name, email, or phone number" value="@ViewData["CurrentFilter"]" />
+        <button type="submit" class="btn btn-primary">Search</button>
+        @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        {
+            <a asp-action="Admins" class="btn btn-secondary ms-2">Clear</a>
+        }
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <p>No admins found.</p>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Admin ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var admin in Model)
+            {
+                <tr>
+                    <td>@admin.AdminId</td>
+                    <td>@admin.Name</td>
+                    <td>@admin.Email</td>
+                    <td>@admin.PhoneNo</td>
+                    <td>
+                        <a asp-action="EditAdmin" asp-route-id="@admin.AdminId" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="DeleteAdmin" asp-route-id="@admin.AdminId" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this admin?');">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
