@@ -25,7 +25,7 @@ namespace WMS.Migrations
             modelBuilder.Entity("FoodIngredient", b =>
                 {
                     b.Property<string>("FoodsId")
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<int>("IngredientsId")
                         .HasColumnType("int");
@@ -39,7 +39,7 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Admin", b =>
                 {
-                    b.Property<string>("AdminId")
+                    b.Property<string>("Id")
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
@@ -63,7 +63,7 @@ namespace WMS.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
-                    b.HasKey("AdminId");
+                    b.HasKey("Id");
 
                     b.ToTable("Admins");
                 });
@@ -115,8 +115,8 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
@@ -226,8 +226,8 @@ namespace WMS.Migrations
 
                     b.Property<string>("FoodId")
                         .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("OrderDetailId")
                         .IsRequired()

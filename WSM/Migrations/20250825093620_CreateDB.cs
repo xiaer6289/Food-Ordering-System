@@ -15,7 +15,7 @@ namespace WMS.Migrations
                 name: "Admins",
                 columns: table => new
                 {
-                    AdminId = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -23,7 +23,7 @@ namespace WMS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Admins", x => x.AdminId);
+                    table.PrimaryKey("PK_Admins", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,7 +90,7 @@ namespace WMS.Migrations
                         name: "FK_Staff_Admins_AdminId",
                         column: x => x.AdminId,
                         principalTable: "Admins",
-                        principalColumn: "AdminId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -98,7 +98,7 @@ namespace WMS.Migrations
                 name: "Foods",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(5,3)", precision: 5, scale: 3, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -143,7 +143,7 @@ namespace WMS.Migrations
                 name: "FoodIngredient",
                 columns: table => new
                 {
-                    FoodsId = table.Column<string>(type: "nvarchar(4)", nullable: false),
+                    FoodsId = table.Column<string>(type: "nvarchar(6)", nullable: false),
                     IngredientsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -169,7 +169,7 @@ namespace WMS.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     OrderDetailId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    FoodId = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    FoodId = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false)
                 },

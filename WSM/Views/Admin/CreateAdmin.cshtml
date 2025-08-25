@@ -9,7 +9,7 @@
 {
     <div class="alert alert-danger">
         <ul>
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            @foreach (var error in ViewData.ModelState.Where(m => m.Key != "PhoneNo").SelectMany(v => v.Value.Errors))
             {
                 <li>@error.ErrorMessage</li>
             }
@@ -49,4 +49,3 @@
         <a asp-action="Admins" class="btn btn-secondary ms-2">Cancel</a>
     </div>
 </form>
-

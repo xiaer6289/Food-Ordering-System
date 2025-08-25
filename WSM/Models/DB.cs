@@ -17,8 +17,6 @@ public class DB : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
-
-
 }
 
 public class Company
@@ -30,9 +28,10 @@ public class Company
     public string PasswordHash { get; set; }
     public string? LogoPath { get; set; }
 }
+
 public class Food
 {
-    [Key, MaxLength(4)]
+    [Key, MaxLength(6)]
     public string Id { get; set; }
 
     [MaxLength(50)]
@@ -49,7 +48,7 @@ public class Food
     [MaxLength(100)]
     public string Image { get; set; }
 
-    [ForeignKey(nameof(Category))] // Use nameof to avoid ambiguity
+    [ForeignKey(nameof(Category))]
     [Required(ErrorMessage = "Please select a category.")]
     public string CategoryId { get; set; }
 
@@ -74,7 +73,7 @@ public class Category
 public class Admin
 {
     [Key, MaxLength(6)]
-    public string AdminId { get; set; }
+    public string Id { get; set; }
     [Required]
     [MaxLength(100)]
     [EmailAddress]
@@ -82,6 +81,8 @@ public class Admin
 
     [MaxLength(20)]
     [Required]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$",
+        ErrorMessage = "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).")]
     public string Password { get; set; }
 
     [MaxLength(50)]
@@ -90,6 +91,7 @@ public class Admin
 
     [MaxLength(15)]
     [Required]
+    [RegularExpression(@"^01[0-9]{8,13}$", ErrorMessage = "Phone number must start with '01' and be 10 to 15 digits long.")]
     public string PhoneNo { get; set; }
 
     public ICollection<Staff> Staffs { get; set; } = [];
@@ -167,7 +169,7 @@ public class OrderItem
     public string OrderDetailId { get; set; }
     public OrderDetail OrderDetail { get; set; }
 
-    [MaxLength(4)]
+    [MaxLength(6)]
     [Required]
     public string FoodId { get; set; }
     public Food Food { get; set; }

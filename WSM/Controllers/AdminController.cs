@@ -40,14 +40,14 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult CreateAdmin(Admin model)
     {
-        // Generate AdminId before validation to satisfy [Required] constraint
-        model.AdminId = GenerateSequentialAdminId();
+        // Generate Id before validation to satisfy [Required] constraint
+        model.Id = GenerateSequentialId();
 
-        // Clear any ModelState errors for AdminId since it's auto-generated
-        if (ModelState.ContainsKey("AdminId"))
+        // Clear any ModelState errors for Id since it's auto-generated
+        if (ModelState.ContainsKey("Id"))
         {
-            ModelState["AdminId"].Errors.Clear();
-            ModelState["AdminId"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+            ModelState["Id"].Errors.Clear();
+            ModelState["Id"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
         }
 
         // Server-side validation for PhoneNo
@@ -62,7 +62,7 @@ public class AdminController : Controller
             ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).");
         }
 
-        // Server-side validation for Email (handled by [EmailAddress] attribute, but explicit check for clarity)
+        // Server-side validation for Email
         if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
         {
             ModelState.AddModelError("Email", "Please enter a valid email address.");
@@ -138,7 +138,7 @@ public class AdminController : Controller
     // GET: /Admin/DeleteAdmin/{id}
     public IActionResult DeleteAdmin(string id)
     {
-        var admin = db.Admins.Include(a => a.Staffs).FirstOrDefault(a => a.AdminId == id);
+        var admin = db.Admins.Include(a => a.Staffs).FirstOrDefault(a => a.Id == id);
         if (admin == null) return NotFound();
         if (admin.Staffs.Any())
         {
@@ -150,13 +150,13 @@ public class AdminController : Controller
         return RedirectToAction("Admins");
     }
 
-    // Helper method to generate a sequential AdminId (A0001, A0002, etc.)
-    private string GenerateSequentialAdminId()
+    // Helper method to generate a sequential Id (A0001, A0002, etc.)
+    private string GenerateSequentialId()
     {
-        // Get all AdminIds that start with 'A' and have a numeric suffix
+        // Get all Ids that start with 'A' and have a numeric suffix
         var adminIds = db.Admins
-            .Where(a => a.AdminId.StartsWith("A") && a.AdminId.Length == 5)
-            .Select(a => a.AdminId)
+            .Where(a => a.Id.StartsWith("A") && a.Id.Length == 5)
+            .Select(a => a.Id)
             .ToList();
 
         int maxNumber = 0;
