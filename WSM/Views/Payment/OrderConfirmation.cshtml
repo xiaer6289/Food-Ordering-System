@@ -1,3 +1,16 @@
-﻿<p>Order Placed Successfully</p>
+﻿@model WSM.ViewModels.OrderConfirmationViewModel
 
-<a href="/Home/Index">Return to Home</a>
+<h2>Order Confirmation</h2>
+
+<p>Order ID: @Model.OrderDetail.Id</p>
+<p>Total Price: RM @Model.OrderDetail.TotalPrice</p>
+<p>Amount Paid: RM @Model.Payment.AmountPaid</p>
+<p>Payment Method: @Model.Payment.PaymentMethod</p>
+
+<h3>Ordered Items:</h3>
+<ul>
+    @foreach (var item in Model.OrderItems)
+    {
+        <li>@item.Food.Id - Quantity: @item.Quantity</li>
+    }
+</ul>

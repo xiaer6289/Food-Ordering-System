@@ -5,6 +5,8 @@ using Stripe.Checkout;
 using WMS.Models;
 using WSM.Helpers;
 using WSM.Models;
+using WSM.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace WSM.Controllers
 {
@@ -21,35 +23,19 @@ namespace WSM.Controllers
             _db = db;
         }
 
+        // Create Stripe Checkout session
+        [HttpPost]
         public IActionResult CreateCheckoutSession(string email)
         {
-            var currency = "myr";
-            var successUrl = Url.Action("Success", "Payment", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}";
-            var cancelUrl = Url.Action("Cancel", "Payment", null, Request.Scheme);
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-            var cart = _helper.GetCart();
-            if (!cart.Any())
-            {
+            var orderDetail = _helper.CreateOrderDetail();
+            if (orderDetail == null)
                 return BadRequest("Cart is empty.");
-            }
-
-            decimal totalAmount = cart.Sum(item => _db.Foods
-                .Where(f => f.Id == item.Key)
-                .Select(f => f.Price * item.Value)
-                .FirstOrDefault());
-
-            if (totalAmount <= 0)
-            {
-                return BadRequest("Invalid total amount.");
-            }
-
-            var orderId = GenerateOrderId();
 
             var options = new SessionCreateOptions
             {
                 CustomerEmail = email,
-                CustomerCreation = "always",
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
                 {
@@ -57,21 +43,21 @@ namespace WSM.Controllers
                     {
                         PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Currency = currency,
-                            UnitAmount = (long)(totalAmount * 100),
+                            Currency = "myr",
+                            UnitAmount = (long)(orderDetail.TotalPrice * 100),
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
                                 Name = "Restaurant Order",
-                                Description = $"Order ID: {orderId}"
+                                Description = $"Order ID: {orderDetail.Id}"
                             }
                         },
-                        Quantity = 1,
+                        Quantity = 1
                     }
                 },
                 Mode = "payment",
-                SuccessUrl = successUrl,
-                CancelUrl = cancelUrl,
-                Metadata = new Dictionary<string, string> { { "order_id", orderId } }
+                SuccessUrl = Url.Action("Success", "Payment", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}",
+                CancelUrl = Url.Action("Cancel", "Payment", null, Request.Scheme),
+                Metadata = new Dictionary<string, string> { { "order_id", orderDetail.Id } }
             };
 
             var service = new SessionService();
@@ -80,21 +66,7 @@ namespace WSM.Controllers
             return Redirect(session.Url);
         }
 
-        private string GenerateOrderId()
-        {
-            return "ORD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
-        }
-
-        private string GeneratePaymentId(string orderId)
-        {
-            return "P" + orderId.Substring(3); 
-        }
-
-        private string GenerateOrderItemId(string orderId, int index)
-        {
-            return $"{orderId}-OI{index}";
-        }
-
+        // Payment success callback
         public async Task<IActionResult> Success(string session_id)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
@@ -104,61 +76,48 @@ namespace WSM.Controllers
             if (session.PaymentStatus != "paid")
                 return View("OrderCancel");
 
-            var orderId = session.Metadata["order_id"];
-            if (string.IsNullOrEmpty(orderId))
-                return BadRequest("Order ID not found in session metadata.");
+            string orderId = session.Metadata["order_id"];
 
-            var cart = _helper.GetCart();
-            if (!cart.Any())
-                return BadRequest("Cart is empty during payment success.");
-
-            decimal totalAmount = (decimal)session.AmountTotal / 100;
-
-            // Create OrderDetail
-            var orderDetail = new OrderDetail
-            {
-                Id = orderId,
-                SeatNo = "N/A",
-                Quantity = cart.Sum(x => x.Value),
-                TotalPrice = totalAmount,
-                Status = "Completed",
-                OrderDate = DateTime.Now,
-                StaffId = "S001"
-            };
-
-            // Create OrderItems
-            int counter = 1;
-            orderDetail.OrderItems = cart.Select(x => new OrderItem
-            {
-                Id = GenerateOrderItemId(orderId, counter++),
-                OrderDetailId = orderId,
-                FoodId = x.Key,
-                Quantity = x.Value,
-                SubTotal = _db.Foods.Where(f => f.Id == x.Key).Select(f => f.Price * x.Value).FirstOrDefault()
-            }).ToList();
-
-            _db.OrderDetails.Add(orderDetail);
-            _db.SaveChanges();
-
-            // Create Payment
+            // Save payment info
             var payment = new Payment
             {
-                PaymentId = GeneratePaymentId(orderId),
+                Id = "P" + orderId.Substring(3),
                 OrderDetailId = orderId,
                 PaymentMethod = "Card",
-                AmountPaid = totalAmount,
+                AmountPaid = (decimal)session.AmountTotal / 100,
                 Paymentdate = DateTime.Now,
                 StripeTransactionId = session.PaymentIntentId
             };
             _db.Payments.Add(payment);
             _db.SaveChanges();
 
+            // Get order details
+            var orderDetail = _db.OrderDetails
+                                 .FirstOrDefault(o => o.Id == orderId);
+
+            // Get list of foods in this order (Include Food for FoodName)
+            var orderItems = _db.OrderItems
+                                .Include(i => i.Food)
+                                .Where(i => i.OrderDetailId == orderId)
+                                .ToList();
+
+            // clear cart
             _helper.SetCart(new Dictionary<string, int>());
 
-            return View("OrderConfirmation");
+            // Pass everything to the view
+            var model = new OrderConfirmationViewModel
+            {
+                OrderDetail = orderDetail,
+                OrderItems = orderItems,
+                Payment = payment
+            };
+
+            return View("OrderConfirmation", model);
+
         }
 
-        public async Task<IActionResult> Cancel()
+        // Payment cancel page
+        public IActionResult Cancel()
         {
             return View("OrderCancel");
         }
