@@ -12,13 +12,8 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-<<<<<<<< HEAD:WSM/Migrations/20250825104038_CreateDB.Designer.cs
-    [Migration("20250825104038_CreateDB")]
+    [Migration("20250826132617_CreateDB")]
     partial class CreateDB
-========
-    [Migration("20250825141305_InitialCreate")]
-    partial class InitialCreate
->>>>>>>> 237377a3e6a10baada5f8ffd8bb17caa8443b26b:WSM/Migrations/20250825141305_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,8 +64,8 @@ namespace WMS.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -117,23 +112,23 @@ namespace WMS.Migrations
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("IngredientId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("decimal(8,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 

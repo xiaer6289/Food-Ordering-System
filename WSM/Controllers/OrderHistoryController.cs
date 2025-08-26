@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WSM.Models;
-using WMS.Models;
 using X.PagedList.Extensions;
 
 namespace WMS.Controllers;
@@ -70,14 +69,17 @@ public class OrderHistoryController : Controller
 
     public IActionResult Detail(string? id)
     {
-        var m = db.OrderDetails.Find(id);
+        var order = db.OrderDetails
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Food)
+            .FirstOrDefault(o => o.Id == id);
 
-        if (m == null)
+        if (order == null)
         {
             return RedirectToAction("OrderHistory");
         }
 
-        return View(m);
+        return View(order);
     }
 
     public IActionResult ReadDetail(string? id)

@@ -13,6 +13,9 @@ public class SearchController : Controller
             case "Ingredient":
                 return RedirectToAction("ReadIngredient", "Ingredient", new { id = q });
 
+            case "OrderDetail":
+                return RedirectToAction("OrderHistory", "OrderHistory", new { id = q });
+
             default:
                 return RedirectToAction("Index", "Home");
         }

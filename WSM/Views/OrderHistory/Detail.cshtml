@@ -19,9 +19,22 @@
     </tr>
     <tr>
         <th>Food</th>
-        @*<td>@Model.Foods</td> *@
+        <td>
+            @if (Model.OrderItems != null && Model.OrderItems.Any())
+            {
+                <ul style="list-style-type:upper-roman; padding: 0;">
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <li>@item.Food?.Name (@item.Quantity)</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>No food items</span>
+            }
+        </td>
     </tr>
-
     <tr>
         <th>Quantity</th>
         <td>@Model.Quantity</td>
@@ -32,21 +45,22 @@
     </tr>
     <tr>
         <th>Total Price</th>
-        <td>@Model.TotalPrice</td>
+        <td>RM @Model.TotalPrice.ToString("F2")</td>
     </tr>
     <tr>
         <th>Order Date</th>
-        <td>@Model.OrderDate</td>
+        <td>@Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+    </tr>
 </table>
 
 <p>
     <div class="pdf-button">
-        <a type="button" class="pdf-button">Print Details</a>
+        <a asp-action="ReadDetail" asp-route-id="@Model.Id" class="pdf-button">Print Details</a>
     </div>
 </p>
 
 <p>
     <div class="return-OrderHistory">
-        <button class="return-OrderHistory" onclick="window.location.href='OrderHistory.cshtml'">Return</button>
+        <a asp-action="OrderHistory" class="return-OrderHistory">Return</a>
     </div>
 </p>

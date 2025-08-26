@@ -57,16 +57,17 @@ $(document).on('click', '[data-checkable]', e => {
         .prop('checked', (i, v) => !v);
 });
 
-// save page to pdf
-document.addEventListener("DOMContentLoad", () => {
-    const saveBtn = document.getElementById("savePdf");
-    if (saveBtn) {
-        saveBtn.addEventListener("click", () => {
-            const element = document.body;
-            html2pdf().from(element).save("mypage.pdf");
-        } )
-    }
-})
+//const printBtn = document.getElementById('savePdf');
 
+//if (printBtn) {
+//    printBtn.addEventListener('click', function () {
+//        const element = document.body; // Or use a div like document.getElementById("orderDetail")
+//        html2pdf().from(element).save("myfile.pdf");
+//    });
+//}
 
+function generatePDF() {
+    const pdf = document.getElementById("PDF");
 
+    html2pdf().from(pdf).save();
+}
