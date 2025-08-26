@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WSM.Models;
 
 namespace WSM.Models;
 
@@ -31,44 +32,49 @@ public class Company
 
 public class Food
 {
-    [Key, MaxLength(6)]
-    public string Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [MaxLength(6)]
+    public string Id { get; set; }  
 
-    [MaxLength(50)]
-    [Required]
+    [Required(ErrorMessage = "Food name is required.")]
+    [StringLength(100)]
     public string Name { get; set; }
 
-    [Precision(5, 3)]
-    [Required]
+    [Range(0.10, 9999.99, ErrorMessage = "Price must be between 0.10 and 9999.99.")]
+    [Column(TypeName = "decimal(10,2)")]
     public decimal Price { get; set; }
 
-    [MaxLength(100)]
-    public string Description { get; set; }
+    [StringLength(500)]
+    public string? Description { get; set; }
 
-    [MaxLength(100)]
-    public string Image { get; set; }
+    [StringLength(255)]
+    [Url(ErrorMessage = "Please enter a valid URL for the image.")]
+    public string? Image { get; set; }   
 
-    [ForeignKey(nameof(Category))]
-    [Required(ErrorMessage = "Please select a category.")]
+    [Required(ErrorMessage = "Category is required.")]
+    [ForeignKey("Category")]
+    [MaxLength(6)]
     public string CategoryId { get; set; }
 
     public Category Category { get; set; }
-
-    public ICollection<OrderItem> OrderItems { get; set; } = [];
-    public ICollection<Ingredient> Ingredients { get; set; } = [];
 }
 
 public class Category
 {
-    [Key, MaxLength(2)]
-    public string Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)] 
+    [MaxLength(6)]
+    public string Id { get; set; }  // e.g., "C0001"
 
-    [MaxLength(50)]
-    [Required]
+    [Required(ErrorMessage = "Category name is required.")]
+    [StringLength(100)]
     public string Name { get; set; }
 
-    public ICollection<Food> Foods { get; set; } = []; // navigation
+    // Navigation
+    public ICollection<Food> Foods { get; set; }
 }
+
 
 public class Admin
 {
@@ -94,7 +100,7 @@ public class Admin
     [RegularExpression(@"^01[0-9]{8,13}$", ErrorMessage = "Phone number must start with '01' and be 10 to 15 digits long.")]
     public string PhoneNo { get; set; }
 
-    public ICollection<Staff> Staffs { get; set; } = [];
+    public ICollection<Staff> Staffs { get; set; } = new List<Staff>();
 }
 
 public class Staff
@@ -154,7 +160,7 @@ public class OrderDetail
     public string StaffId { get; set; }
     public Staff Staff { get; set; }
 
-    public ICollection<OrderItem> OrderItems { get; set; } = [];
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public Payment Payment { get; set; }
 }
@@ -231,5 +237,5 @@ public class Ingredient
     [Required]
     public decimal TotalPrice { get; set; }
 
-    public ICollection<Food> Foods { get; set; } = [];
+    public ICollection<Food> Foods { get; set; } = new List<Food>();
 }

@@ -27,6 +27,7 @@
             <thead class="table-dark text-center">
                 <tr>
                     <th scope="col">ID</th>
+                    <th scope="col">Image</th> <!-- New column for Image -->
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
                     <th scope="col">Description</th>
@@ -38,7 +39,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No food records found.</td>
+                        <td colspan="7" class="text-center text-muted">No food records found.</td>
                     </tr>
                 }
                 else
@@ -47,6 +48,16 @@
                     {
                         <tr>
                             <td>@food.Id</td>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(food.Image))
+                                {
+                                    <img src="@food.Image" alt="@food.Name" style="max-width:60px; max-height:60px; border-radius:5px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No Image</span>
+                                }
+                            </td>
                             <td>@food.Name</td>
                             <td>@food.Price.ToString("C")</td>
                             <td>@food.Description</td>

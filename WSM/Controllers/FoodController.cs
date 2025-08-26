@@ -1,92 +1,134 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WSM.Models;
+using System.Linq;
 
-namespace WSM.Controllers;
-
-public class FoodController : Controller
+namespace WSM.Controllers
 {
-    private readonly DB db;
-
-    public FoodController(DB db)
+    public class FoodController : Controller
     {
-        this.db = db;
-    }
+        private readonly DB db;
 
-    // GET: /Food/Foods
-    public IActionResult Foods(string searchString)
-    {
-        // Sanitize search string to prevent injection
-        searchString = searchString?.Trim();
-
-        var foods = db.Foods.Include(f => f.Category).AsQueryable();
-        if (!string.IsNullOrEmpty(searchString))
+        public FoodController(DB db)
         {
-            foods = foods.Where(f => f.Name.Contains(searchString) || f.Description.Contains(searchString));
+            this.db = db;
         }
 
-        // Fetch the filtered list
-        var model = foods.ToList();
-
-        // Store search string for view to maintain state
-        ViewData["CurrentFilter"] = searchString;
-
-        return View(model);
-    }
-
-    // GET: /Food/CreateFood
-    public IActionResult CreateFood()
-    {
-        ViewBag.Categories = db.Categories.ToList();
-        return View();
-    }
-
-    // POST: /Food/CreateFood
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult CreateFood(Food model)
-    {
-        if (ModelState.IsValid)
+        // GET: /Food/Foods
+        public IActionResult Foods(string searchString)
         {
+            searchString = searchString?.Trim();
+
+            var foods = db.Foods
+                          .Include(f => f.Category)
+                          .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                foods = foods.Where(f =>
+                    f.Name.Contains(searchString) ||
+                    f.Description.Contains(searchString));
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+            return View(foods.ToList());
+        }
+
+        // GET: /Food/CreateFood
+        public IActionResult CreateFood()
+        {
+            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name");
+            return View();
+        }
+
+        // POST: /Food/CreateFood
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateFood(Food model)
+        {
+            // 1️⃣ Check if input is valid
+            if (!ModelState.IsValid)
+            {
+                var errors = string.Join("; ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                Console.WriteLine("Validation Errors: " + errors);
+            }
+
+
+
+            // 2️⃣ Get last Food ID from database
+            var lastFood = db.Foods
+                             .OrderByDescending(f => f.Id)
+                             .FirstOrDefault();
+
+            // 3️⃣ Generate new ID
+            if (lastFood == null)
+                model.Id = "F0001"; // first food
+            else
+            {
+                int lastNum = int.Parse(lastFood.Id.Substring(1)); // remove 'F' and parse number
+                model.Id = "F" + (lastNum + 1).ToString("D4"); // pad with zeros
+            }
+
+            // 4️⃣ Add to database
             db.Foods.Add(model);
             db.SaveChanges();
-            return RedirectToAction("Foods");
+
+            // 5️⃣ Redirect to Foods list
+            return RedirectToAction(nameof(Foods));
         }
-        ViewBag.Categories = db.Categories.ToList();
-        return View(model);
-    }
 
-    // GET: /Food/EditFood/{id}
-    public IActionResult EditFood(string id)
-    {
-        var food = db.Foods.Find(id);
-        if (food == null) return NotFound();
-        ViewBag.Categories = db.Categories.ToList();
-        return View(food);
-    }
-
-    // POST: /Food/EditFood
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult EditFood(Food model)
-    {
-        if (ModelState.IsValid)
+        // GET: /Food/Edit/{id}
+        public IActionResult Edit(string id)
         {
-            db.Foods.Update(model);
-            db.SaveChanges();
-            return RedirectToAction("Foods");
-        }
-        ViewBag.Categories = db.Categories.ToList();
-        return View(model);
-    }
+            if (string.IsNullOrEmpty(id)) return NotFound();
 
-    // GET: /Food/DeleteFood/{id}
-    public IActionResult DeleteFood(string id)
-    {
-        var food = db.Foods.Find(id);
-        if (food == null) return NotFound();
-        db.Foods.Remove(food);
-        db.SaveChanges();
-        return RedirectToAction("Foods");
+            var food = db.Foods.Find(id);
+            if (food == null) return NotFound();
+
+            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", food.CategoryId);
+            return View(food);
+        }
+
+        // POST: /Food/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Food model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    db.Foods.Update(model);
+                    db.SaveChanges();
+                    return RedirectToAction(nameof(Foods));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!db.Foods.Any(f => f.Id == model.Id))
+                        return NotFound();
+
+                    throw;
+                }
+            }
+
+            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
+            return View(model);
+        }
+
+        // GET: /Food/Delete/{id}
+        public IActionResult Delete(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+            var food = db.Foods.Find(id);
+            if (food == null) return NotFound();
+
+            db.Foods.Remove(food);
+            db.SaveChanges();
+            return RedirectToAction(nameof(Foods));
+        }
     }
 }

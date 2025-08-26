@@ -12,8 +12,8 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250825093620_CreateDB")]
-    partial class CreateDB
+    [Migration("20250826020229_FoodDB")]
+    partial class FoodDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,21 +24,6 @@ namespace WMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("FoodIngredient", b =>
-                {
-                    b.Property<string>("FoodsId")
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<int>("IngredientsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FoodsId", "IngredientsId");
-
-                    b.HasIndex("IngredientsId");
-
-                    b.ToTable("FoodIngredient");
-                });
 
             modelBuilder.Entity("WSM.Models.Admin", b =>
                 {
@@ -74,13 +59,13 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.Category", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -123,30 +108,33 @@ namespace WMS.Migrations
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(2)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("IngredientId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(5, 3)
-                        .HasColumnType("decimal(5,3)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("IngredientId");
 
                     b.ToTable("Foods");
                 });
@@ -331,21 +319,6 @@ namespace WMS.Migrations
                     b.ToTable("Staff");
                 });
 
-            modelBuilder.Entity("FoodIngredient", b =>
-                {
-                    b.HasOne("WSM.Models.Food", null)
-                        .WithMany()
-                        .HasForeignKey("FoodsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WSM.Models.Ingredient", null)
-                        .WithMany()
-                        .HasForeignKey("IngredientsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
                     b.HasOne("WSM.Models.Category", "Category")
@@ -353,6 +326,10 @@ namespace WMS.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("WSM.Models.Ingredient", null)
+                        .WithMany("Foods")
+                        .HasForeignKey("IngredientId");
 
                     b.Navigation("Category");
                 });
@@ -371,7 +348,7 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.OrderItem", b =>
                 {
                     b.HasOne("WSM.Models.Food", "Food")
-                        .WithMany("OrderItems")
+                        .WithMany()
                         .HasForeignKey("FoodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -419,9 +396,9 @@ namespace WMS.Migrations
                     b.Navigation("Foods");
                 });
 
-            modelBuilder.Entity("WSM.Models.Food", b =>
+            modelBuilder.Entity("WSM.Models.Ingredient", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("Foods");
                 });
 
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
