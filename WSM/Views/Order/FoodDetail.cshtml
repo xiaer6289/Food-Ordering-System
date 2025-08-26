@@ -1,4 +1,5 @@
 ﻿@model List<WSM.Models.Food>
+
 <h2>Food List</h2>
 
 <table class="table">
@@ -23,27 +24,27 @@
                 <td>@food.Description</td>
                 <td>@food.CategoryId</td>
                 <td>
-                    <!-- Form to add/update food in cart -->
-                    <form method="post" action="/Cart/UpdateCart">
+                    <form method="post" action="/Order/UpdateCart">
                         <input type="hidden" name="foodId" value="@food.Id" />
-                        <!-- Show current quantity if in cart, else 0 -->
-                        <input type="number" name="quantity" value="@(ViewBag.Cart.ContainsKey(food.Id) ? ViewBag.Cart[food.Id] : 0)" min="0" max="10" style="width: 60px;" />
-                        <button type="submit">Add to Cart</button>
-                    </form>
-                </td>
-            </tr>
-        }
+                        <input type="number" name="quantity"
+                               value="@(ViewBag.Cart != null && ViewBag.Cart.ContainsKey(food.Id.ToString())
+                                                                   ? ViewBag.Cart[food.Id.ToString()]
+                                                                   : 0)"
+                           min="0" max="10" style="width: 60px;" />
+                    <button type="submit">Add/Update</button>
+                </form>
+            </td>
+        </tr>
+                }
     </tbody>
 </table>
 
-<!-- Display current cart contents for debugging -->
 <h3>Current Cart</h3>
-@if (ViewBag.Cart.Count > 0)
+@if (ViewBag.Cart != null && ViewBag.Cart.Count > 0)
 {
     <ul>
         @foreach (var item in ViewBag.Cart)
         {
-            <!-- Show Food ID and quantity in cart -->
             <li>Food ID: @item.Key, Quantity: @item.Value</li>
         }
     </ul>
@@ -53,8 +54,7 @@ else
     <p>Cart is empty</p>
 }
 
-<!-- Link to view cart (to be implemented later) -->
-<a href="/Cart/ShoppingCart">View Cart</a>
+<a href="/Order/Cart">View Cart</a>
 
 <form method="post" action="/Payment/CreateCheckoutSession">
     <div>

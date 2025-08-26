@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WMS.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -153,7 +153,8 @@ namespace WMS.Migrations
                     OrderDetailId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     FoodId = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false)
+                    SubTotal = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
+                    ExtraDetail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -176,7 +177,7 @@ namespace WMS.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    PaymentId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     OrderDetailId = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
@@ -186,7 +187,7 @@ namespace WMS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.PrimaryKey("PK_Payments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Payments_OrderDetails_OrderDetailId",
                         column: x => x.OrderDetailId,

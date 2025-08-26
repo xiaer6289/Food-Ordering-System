@@ -186,12 +186,15 @@ public class OrderItem
     [Precision(6, 2)]
     [Required]
     public decimal SubTotal { get; set; }
+
+    [MaxLength(200)]
+    public string ExtraDetail { get; set; }
 }
 
 public class Payment
 {
     [Key, MaxLength(20)]
-    public string PaymentId { get; set; }
+    public string Id { get; set; }
 
     [ForeignKey("OrderDetail")]
     [Required]

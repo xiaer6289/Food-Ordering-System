@@ -12,8 +12,13 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
+<<<<<<<< HEAD:WSM/Migrations/20250825104038_CreateDB.Designer.cs
     [Migration("20250825104038_CreateDB")]
     partial class CreateDB
+========
+    [Migration("20250825141305_InitialCreate")]
+    partial class InitialCreate
+>>>>>>>> 237377a3e6a10baada5f8ffd8bb17caa8443b26b:WSM/Migrations/20250825141305_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -215,6 +220,11 @@ namespace WMS.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("ExtraDetail")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("FoodId")
                         .IsRequired()
                         .HasMaxLength(6)
@@ -243,7 +253,7 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Payment", b =>
                 {
-                    b.Property<string>("PaymentId")
+                    b.Property<string>("Id")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -271,7 +281,7 @@ namespace WMS.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("PaymentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderDetailId")
                         .IsUnique();
