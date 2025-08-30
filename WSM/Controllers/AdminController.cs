@@ -16,17 +16,45 @@ public class AdminController : Controller
     }
 
     // GET: /Admin/Admins
-    public IActionResult Admins(string searchString)
+    public IActionResult Admins(string searchString, string sortOrder)
     {
         searchString = searchString?.Trim();
+
+        // Current filter
+        ViewData["CurrentFilter"] = searchString;
+
+        // Sort parameters toggle
+        ViewData["CurrentSort"] = sortOrder;
+        ViewData["IdSortParm"] = sortOrder == "Id" ? "id_desc" : "Id";
+        ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        ViewData["EmailSortParm"] = sortOrder == "Email" ? "email_desc" : "Email";
+        ViewData["PhoneSortParm"] = sortOrder == "Phone" ? "phone_desc" : "Phone";
+
         var admins = db.Admins.AsQueryable();
+
+        // Searching
         if (!string.IsNullOrEmpty(searchString))
         {
-            admins = admins.Where(a => a.Name.Contains(searchString) || a.PhoneNo.Contains(searchString) || a.Email.Contains(searchString));
+            admins = admins.Where(a =>
+                a.Name.Contains(searchString) ||
+                a.PhoneNo.Contains(searchString) ||
+                a.Email.Contains(searchString));
         }
-        var model = admins.ToList();
-        ViewData["CurrentFilter"] = searchString;
-        return View(model);
+
+        // Sorting
+        admins = sortOrder switch
+        {
+            "id_desc" => admins.OrderByDescending(a => a.Id),
+            "Id" => admins.OrderBy(a => a.Id),
+            "name_desc" => admins.OrderByDescending(a => a.Name),
+            "Email" => admins.OrderBy(a => a.Email),
+            "email_desc" => admins.OrderByDescending(a => a.Email),
+            "Phone" => admins.OrderBy(a => a.PhoneNo),
+            "phone_desc" => admins.OrderByDescending(a => a.PhoneNo),
+            _ => admins.OrderBy(a => a.Name), // default by name asc
+        };
+
+        return View(admins.ToList());
     }
 
     // GET: /Admin/CreateAdmin
@@ -40,29 +68,24 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult CreateAdmin(Admin model)
     {
-        // Generate Id before validation to satisfy [Required] constraint
         model.Id = GenerateSequentialId();
 
-        // Clear any ModelState errors for Id since it's auto-generated
         if (ModelState.ContainsKey("Id"))
         {
             ModelState["Id"].Errors.Clear();
             ModelState["Id"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
         }
 
-        // Server-side validation for PhoneNo
         if (!string.IsNullOrEmpty(model.PhoneNo) && !Regex.IsMatch(model.PhoneNo, @"^01[0-9]{8,13}$"))
         {
             ModelState.AddModelError("PhoneNo", "Phone number must start with '01' and be 10 to 15 digits long.");
         }
 
-        // Server-side validation for Password
         if (!string.IsNullOrEmpty(model.Password) && !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
         {
-            ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).");
+            ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase, one lowercase, one digit, and one special character (!@#$%^&*).");
         }
 
-        // Server-side validation for Email
         if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
         {
             ModelState.AddModelError("Email", "Please enter a valid email address.");
@@ -101,19 +124,16 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult EditAdmin(Admin model)
     {
-        // Server-side validation for PhoneNo
         if (!string.IsNullOrEmpty(model.PhoneNo) && !Regex.IsMatch(model.PhoneNo, @"^01[0-9]{8,13}$"))
         {
             ModelState.AddModelError("PhoneNo", "Phone number must start with '01' and be 10 to 15 digits long.");
         }
 
-        // Server-side validation for Password
         if (!string.IsNullOrEmpty(model.Password) && !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
         {
-            ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).");
+            ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase, one lowercase, one digit, and one special character (!@#$%^&*).");
         }
 
-        // Server-side validation for Email
         if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
         {
             ModelState.AddModelError("Email", "Please enter a valid email address.");
@@ -153,7 +173,6 @@ public class AdminController : Controller
     // Helper method to generate a sequential Id (A0001, A0002, etc.)
     private string GenerateSequentialId()
     {
-        // Get all Ids that start with 'A' and have a numeric suffix
         var adminIds = db.Admins
             .Where(a => a.Id.StartsWith("A") && a.Id.Length == 5)
             .Select(a => a.Id)
@@ -171,7 +190,7 @@ public class AdminController : Controller
             }
         }
 
-        int nextNumber = maxNumber + 1; // Increment the highest number found
+        int nextNumber = maxNumber + 1;
         if (nextNumber > 9999)
         {
             throw new InvalidOperationException("Maximum number of admin IDs reached (A9999).");

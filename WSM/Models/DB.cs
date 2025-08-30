@@ -65,7 +65,7 @@ public class Category
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)] 
     [MaxLength(6)]
-    public string Id { get; set; }  // e.g., "C0001"
+    public string Id { get; set; } 
 
     [Required(ErrorMessage = "Category name is required.")]
     [StringLength(100)]
