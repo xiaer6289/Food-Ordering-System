@@ -1,66 +1,110 @@
-﻿@model WSM.Models.OrderDetail
+﻿@using WSM.Models
+@model OrderDetail
 
 @{
-    ViewBag.Title = "Order Details";
+    ViewBag.Title = "Print Order Details";
+    Layout = null;
 }
 
-<p>
-    @* <img src= maybe use logo or not implement> *@
-</p>
+@*
+    <p>implement logo here</P
+*@
 
-<table class="table detail">
-    <tr>
-        <th>Id</th>
-        <td>@Model.Id</td>
-    </tr>
-    <tr>
-        <th>Tables</th>
-        <td>@Model.SeatNo</td>
-    </tr>
-    <tr>
-        <th>Food</th>
-        <td>
-            @if (Model.OrderItems != null && Model.OrderItems.Any())
-            {
-                <ul style="list-style-type:upper-roman; padding: 0;">
-                    @foreach (var item in Model.OrderItems)
-                    {
-                        <li>@item.Food?.Name (@item.Quantity)</li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <span>No food items</span>
-            }
-        </td>
-    </tr>
-    <tr>
-        <th>Quantity</th>
-        <td>@Model.Quantity</td>
-    </tr>
-    <tr>
-        <th>Status</th>
-        <td>@Model.Status</td>
-    </tr>
-    <tr>
-        <th>Total Price</th>
-        <td>RM @Model.TotalPrice.ToString("F2")</td>
-    </tr>
-    <tr>
-        <th>Order Date</th>
-        <td>@Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
-    </tr>
-</table>
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="~/js/app.js" asp-append-version="true"></script>
 
-<p>
-    <div class="pdf-button">
-        <a asp-action="ReadDetail" asp-route-id="@Model.Id" class="pdf-button">Print Details</a>
+<div id="PDF">
+    <div style="text-align:center;" class="read-details-header">
+        <h1><strong>Food Restaurant</strong></h1>
+        <h4>Address</h4>
+
+        <div class="order-info">
+            <span>Date: @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+            <br>
+            <span>Order ID: @Model.Id</span>
+        </div>
+        <div class="additional-info">
+            <span>Table No: @Model.SeatNo</span>
+            <br>
+            <span>Status: @Model.Status</span>
+            <br>
+        </div>
     </div>
-</p>
+
+    <table class="detail-table">
+        <tr style="border-top:2px solid black;">
+            <th><h3>No.</h3></th>
+            <th><h3>Food Ordered</h3></th>
+            <th><h3>Quantity</h3></th>
+            <th><h3>Unit Price (RM)</h3></th>
+            <th><h3>Subtotal (RM)</h3></th>
+        </tr>
+
+        @for (int i = 0; i < Model.OrderItems.Count; i++)
+        {
+            var item = Model.OrderItems.ElementAt(i);
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@item.Food?.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Food?.Price.ToString("F2")</td>
+                <td>@item.SubTotal.ToString("F2")</td>
+            </tr>
+        }
+        
+        <tr>
+            <td style="text-align:right;" colspan="4">
+                <strong>Subtotal:</strong>
+            </td>
+            <td>
+                RM @Model.TotalPrice.ToString("F2")
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align:right">
+                <strong>Service charge (6%):</strong>
+            </td>
+            <td>
+                RM @((Model.TotalPrice * 0.06M).ToString("F2"))
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align:right">
+                <strong>Total:</strong>
+            </td>
+            <td>
+                <strong>RM @((Model.TotalPrice * 1.06M).ToString("F2"))</strong>
+            </td>
+        </tr>
+    </table>
+
+    @if (Model.Payment != null)
+    {
+        <div class="payment-info">
+            <p>Payment Details:</p>
+            <p>Payment Method: @Model.Payment.PaymentMethod</p>
+            <p>Amount Paid: RM @Model.Payment.AmountPaid.ToString("F2")</p>
+            @if (Model.Payment.PaymentMethod == "Cash" && Model.Payment.AmountPaid >= (Model.TotalPrice * 1.06M))
+            {
+                decimal change = Model.Payment.AmountPaid - (Model.TotalPrice * 1.06M);
+                <p>Change: RM @change.ToString("F2")</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.Payment.StripeTransactionId))
+            {
+                <p>Transaction ID: @Model.Payment.StripeTransactionId</p>
+            }
+        </div>
+    }
+</div>
+
+<button type="button" onclick="generatePDF()" id="savePdf">Save in PDF 🗎</button>
+
+<br>
 
 <p>
     <div class="return-OrderHistory">
-        <a asp-action="OrderHistory" class="return-OrderHistory">Return</a>
+        <a asp-action="OrderHistory" class="return-orderhistory" type="button">Return</a>
     </div>
 </p>
+

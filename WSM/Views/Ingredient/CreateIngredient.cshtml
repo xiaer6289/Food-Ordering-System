@@ -5,12 +5,11 @@
 @{
     ViewBag.Title = "Purchase Order";
     var today = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-    // Layout = null;
+    Layout = "_LayoutIngredient";
 
 }
-@* <link rel="stylesheet" href="~/css/app.css" />
-<script src="~/js/Ingredient.js"></script> *@
-
+@* <link rel="stylesheet" href="~/css/app.css" /> *@
+ 
 
 <h1 style="text-align:center;"><strong>Purchase Order</strong></h1>
 
@@ -76,9 +75,9 @@
 </form>
 
 
-@section Scripts {
+@section scripts {
     <script>
-                let index = @Model.Count;
+        let index = @Model.Count 
 
         function calculateTotals() {
             let subtotal = 0;

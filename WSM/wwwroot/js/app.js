@@ -57,17 +57,13 @@ $(document).on('click', '[data-checkable]', e => {
         .prop('checked', (i, v) => !v);
 });
 
-//const printBtn = document.getElementById('savePdf');
-
-//if (printBtn) {
-//    printBtn.addEventListener('click', function () {
-//        const element = document.body; // Or use a div like document.getElementById("orderDetail")
-//        html2pdf().from(element).save("myfile.pdf");
-//    });
-//}
 
 function generatePDF() {
     const pdf = document.getElementById("PDF");
 
-    html2pdf().from(pdf).save();
+    // You can dynamically set the filename here
+    const fileName = "Order_" + new Date().toISOString().slice(0, 10) + ".pdf";
+
+    html2pdf().from(pdf).save(fileName);
 }
+
