@@ -1,0 +1,159 @@
+﻿/* General styling for the food management system */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styling */
+.header {
+    background-color: #e9ecef;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #495057;
+    }
+
+    .header .input-group {
+        max-width: 300px;
+    }
+
+    .header .form-control {
+        border-radius: 5px 0 0 5px;
+        border-right: none;
+    }
+
+    .header .btn {
+        border-radius: 0 5px 5px 0;
+    }
+
+/* Main content styling */
+.main-content {
+    padding: 20px;
+}
+
+/* Section title and add button */
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .section-title h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #343a40;
+    }
+
+    .section-title .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        padding: 5px 15px;
+        font-size: 0.9rem;
+    }
+
+        .section-title .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+/* Search form styling */
+.search-form {
+    margin-bottom: 20px;
+    max-width: 400px;
+}
+
+    .search-form .form-control {
+        border-radius: 5px 0 0 5px;
+        border-right: none;
+    }
+
+    .search-form .btn {
+        border-radius: 0 5px 5px 0;
+    }
+
+/* Table styling */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .table th {
+        background-color: #343a40;
+        color: #fff;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td {
+        padding: 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table img {
+        max-width: 50px;
+        max-height: 50px;
+        border-radius: 5px;
+        object-fit: cover;
+    }
+
+    .table .actions a {
+        margin-right: 5px;
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .table .actions .btn-edit {
+        background-color: #ffc107;
+        color: #fff;
+    }
+
+    .table .actions .btn-delete {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .section-title {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+        .table th,
+        .table td {
+            padding: 8px;
+        }
+
+        .table img {
+            max-width: 40px;
+            max-height: 40px;
+        }
+}

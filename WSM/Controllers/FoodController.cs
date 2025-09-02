@@ -92,10 +92,21 @@ namespace WSM.Controllers
             return View(food);
         }
 
-        // POST: /Food/Edit
+        // GET: /Food/EditFood/{id}
+        public IActionResult EditFood(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+            var food = db.Foods.Find(id);
+            if (food == null) return NotFound();
+
+            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", food.CategoryId);
+            return View(food); // this looks for Views/Food/EditFood.cshtml
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Food model)
+        public IActionResult EditFood(Food model)
         {
             if (ModelState.IsValid)
             {
@@ -109,17 +120,15 @@ namespace WSM.Controllers
                 {
                     if (!db.Foods.Any(f => f.Id == model.Id))
                         return NotFound();
-
                     throw;
                 }
             }
-
             ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
-            return View(model);
+            return View("EditFood", model);
         }
 
-        // GET: /Food/Delete/{id}
-        public IActionResult Delete(string id)
+        // GET: /Food/DeleteFood/{id}
+        public IActionResult DeleteFood(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
@@ -132,3 +141,5 @@ namespace WSM.Controllers
         }
     }
 }
+
+
