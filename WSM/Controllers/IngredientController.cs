@@ -98,7 +98,7 @@ public class IngredientController : Controller
             foreach (var ingredient in vm)
             {
                 var ing = db.Ingredients
-                    .FirstOrDefault(i => i.Name == ingredient.Name);
+                    .FirstOrDefault(i => i.Name.ToLower() == ingredient.Name.ToLower());
 
                 if (ing != null)
                 {
