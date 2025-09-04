@@ -47,16 +47,18 @@ namespace WSM.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateFood(Food model)
         {
-            // 1️⃣ Check if input is valid
+            //Check if input is valid
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("; ", ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage));
                 Console.WriteLine("Validation Errors: " + errors);
+
+                // Return the view with validation errors
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
+                return View(model);
             }
-
-
 
             // 2️⃣ Get last Food ID from database
             var lastFood = db.Foods
@@ -104,27 +106,88 @@ namespace WSM.Controllers
             return View(food); // this looks for Views/Food/EditFood.cshtml
         }
 
+        // POST: /Food/EditFood/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditFood(Food model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    db.Foods.Update(model);
-                    db.SaveChanges();
-                    return RedirectToAction(nameof(Foods));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!db.Foods.Any(f => f.Id == model.Id))
-                        return NotFound();
-                    throw;
-                }
+                // Log validation errors for debugging
+                var errors = string.Join("; ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                Console.WriteLine("Validation Errors in EditFood: " + errors);
+
+                // Return the view with validation errors
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
+                return View("EditFood", model);
             }
-            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
-            return View("EditFood", model);
+
+            try
+            {
+                var f = db.Foods.Find(model.Id);
+
+                if (f == null)
+                {
+                    return RedirectToAction("Foods");
+                }
+
+                // Make sure the entity exists before updating
+                var existingFood = db.Foods.Find(model.Id);
+                if (existingFood == null)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    
+                    f.Name = model.Name.Trim().ToLower();
+                    f.Price = model.Price;
+                    f.Description = model.Description?.Trim();
+                    f.Image = model.Image?.Trim();
+                    f.CategoryId = model.CategoryId;
+
+                    db.SaveChanges();
+                    TempData["Info"] = "Food updated.";
+                    return RedirectToAction("Foods");
+                }
+
+                ViewBag.CategoryList = new SelectList(db.Categories, "Id", "Name");
+                return View(model);
+
+                //// Update the existing entity's properties
+                //existingFood.Name = model.Name;
+                //existingFood.Price = model.Price;
+                //existingFood.Description = model.Description;
+                //existingFood.Image = model.Image;
+                //existingFood.CategoryId = model.CategoryId;
+
+                //// Save changes
+                //db.SaveChanges();
+
+                //// Add success message (optional)
+                //TempData["SuccessMessage"] = "Food item updated successfully!";
+
+                //return RedirectToAction(nameof(Foods));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!db.Foods.Any(f => f.Id == model.Id))
+                    return NotFound();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Log the error for debugging
+                Console.WriteLine("Error updating food: " + ex.Message);
+
+                // Add error message
+                ModelState.AddModelError("", "An error occurred while updating the food item. Please try again.");
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
+                return View("EditFood", model);
+            }
         }
 
         // GET: /Food/DeleteFood/{id}
@@ -141,5 +204,3 @@ namespace WSM.Controllers
         }
     }
 }
-
-
