@@ -4,7 +4,7 @@
 
 @{
     ViewBag.Title = "Order History";
-    string[] fields = ["Id", "Total", "status", "Date",""];
+    string[] fields = ["Id", "Seat", "Total", "status", "Date",""];
 }
 
 <form>
@@ -41,11 +41,15 @@
         {
             <tr>
                 <td>@s.Id</td>
-                <td>@s.Status</td>
+                <td>@s.SeatNo</td>
                 <td>@s.TotalPrice</td>
+                <td>@s.Status</td>
                 <td>@s.OrderDate</td>
                 <td>
-                    <button data-get="/OrderHistory/Detail/@s.Id">Detail</button>
+                    <div class="detail-refund-btn">
+                        <button class="history-detail-btn" data-get="/OrderHistory/Detail/@s.Id">Detail</button>
+                        <button class="refund-page-btn" data-get="/OrderHistory/Refund/@s.Id">Refund</button>
+                    </div>
                 </td>
             </tr>
         }

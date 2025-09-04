@@ -13,11 +13,11 @@ public class SearchController : Controller
             case "Ingredient":
                 return RedirectToAction("ReadIngredient", "Ingredient", new { id = q });
 
-            case "OrderDetail":
+            case "OrderHistory": 
                 return RedirectToAction("OrderHistory", "OrderHistory", new { id = q });
 
             default:
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Both", "Home");
         }
     }
 }
