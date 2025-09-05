@@ -23,11 +23,33 @@ public class DB : DbContext
 public class Company
 {
     [Key]
-    public int CompanyId { get; set; }   // Primary Key
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(100)]
+    public string Owner { get; set; }
+
+    [Required]
+    [StringLength(200)]
     public string CompanyName { get; set; }
     public string Email { get; set; }
+
+    [Required]
+    [StringLength(200)]
     public string PasswordHash { get; set; }
+
+    [StringLength(300)]
+    public string? Address { get; set; }
+
+    [StringLength(20)]
+    public string? Phone { get; set; }
+
+    public string? Description { get; set; }
+
     public string? LogoPath { get; set; }
+
+    [Required]
+    public bool IsFirstLogin { get; set; } = true;
 }
 
 public class Food
