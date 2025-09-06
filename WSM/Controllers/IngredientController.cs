@@ -98,7 +98,7 @@ public class IngredientController : Controller
             foreach (var ingredient in vm)
             {
                 var ing = db.Ingredients
-                    .FirstOrDefault(i => i.Name == ingredient.Name);
+                    .FirstOrDefault(i => i.Name.Trim().ToLower() == ingredient.Name.Trim().ToLower());
 
                 if (ing != null)
                 {
@@ -177,8 +177,6 @@ public class IngredientController : Controller
     }
 
 
-
-    [HttpGet]
     public IActionResult UpdateIngredient(int? id)
     {
         var ingredient = db.Ingredients.Find(id);
@@ -199,7 +197,6 @@ public class IngredientController : Controller
         return View(vm);
     }
 
-    // POST
     [HttpPost]
     public IActionResult UpdateIngredient(IngredientVM vm, string CombinedInput)
     {

@@ -11,7 +11,7 @@
  </head>
     <body>
     <header>
-        <nav class="nav-bar">
+        @* <nav class="nav-bar">
             <a class="title">Restaurant Ordering System</a>
 
             <form class="searchBar" asp-controller="Search" asp-action="Global" method="get">
@@ -27,44 +27,42 @@
                 <a class="orderLogout" href="home/menu">Order</a>
                 <button class="orderLogout" onclick="window.location.href='@Url.Action("Login", "Authorization")'">Log Out </button>
                     
-                @* <ul class="header">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Order</a></li>
-                    <li><a href="#">Category</a></li>
-                    <li><a href="#">Menu</a></li>
-                    <li><a onclick="window.location.href='@Url.Action("Login", "Authorization")'">>Log Out</a></li>
-                </ul> *@
 
             </div> 
+        </nav> *@
+        <div class="left-header">
+            <div class="logo">Insert Logo</div>
+
+            <form class="search" asp-controller="Search" asp-action="Global" method="get">
+                <i>🔎</i>
+                <input type="search" id="search" name="q" placeholder="@ViewBag.SearchPlaceholder" />
+                <input type="hidden" name="context" value="@ViewBag.SearchContext" />
+            </form>
+
+        </div>
+
+        <nav class="header-navigation">
+            <a href="#">Home</a>
+            <a href="../Order/Cart.cshtml">Order</a>
+            <a href="../Food/Menu.cshtml">Menu</a>
+            <a href="#">...</a>
         </nav>
+
+        <div class="potrait" onclick="ToggleEventDropdown()">
+            <img src="...\images\BeePos.png" alt="User Potrait" />
+
+            <div class="dropdown" id="dropdownmenu">
+                <div class="view">
+                    <p><strong>empty</strong></p>
+                    <p><strong>empty</strong></p>
+                </div>
+                <a href="#">View Profile</a>
+                <a href="#">Logout</a>
+            </div>
+        </div>
 
 
     </header>
-
-    @* <header>
-        <nav class="nav-bar">
-            <!-- System Title -->
-            <a class="title">🍴 Restaurant Ordering System</a>
-
-            <!-- Search Bar -->
-            <form class="searchBar" asp-controller="Search" asp-action="Global" method="get">
-                <input type="search" id="search" name="q" placeholder="@ViewBag.SearchPlaceholder" />
-                <input type="hidden" name="context" value="@ViewBag.SearchContext" />
-                <button type="submit">🔍</button>
-            </form>
-
-            <!-- Navigation Links -->
-            <ul class="header-links">
-                <li><a href="#">🏠 Home</a></li>
-                <li><a href="#">🛒 Order</a></li>
-                <li><a href="#">🍔 Category</a></li>
-                <li><a href="#">📖 Menu</a></li>
-                <li>
-                    <a onclick="window.location.href='@Url.Action("Login", "Authorization")'">🚪 Log Out</a>
-                </li>
-            </ul>
-        </nav>
-    </header> *@
 
 
         <main>
@@ -79,3 +77,19 @@
         @RenderSection("scripts", required: false)
     </body>
 </html>
+
+<script>
+    function toggleDropdown() {
+      document.getElementById("dropdownMenu").classList.toggle("show");
+    }
+
+    // Close dropdown if clicked outside
+    window.onclick = function(event) {
+      if (!event.target.matches('.profile img')) {
+        let dropdown = document.getElementById("dropdownMenu");
+        if (dropdown.classList.contains('show')) {
+          dropdown.classList.remove('show');
+        }
+      }
+    }
+</script>

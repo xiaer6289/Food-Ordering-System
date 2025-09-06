@@ -1,0 +1,106 @@
+﻿@using WSM.Models
+@model OrderDetail
+
+@{
+    ViewBag.Title = "Refund";
+    Layout = "_LayoutIngredient";
+}
+
+
+<div id="refund-container">
+    <div style="text-align:center;" class="read-details-header">
+        <h1><strong>Food Restaurant</strong></h1>
+        <h4>Address</h4>
+    </div>
+    <div class="order-info">
+        <h2>Order ID: @Model.Id</h2>
+        <p>Date: @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+    </div>
+
+    <form method="post" action="/OrderHistory/Refund" id="refundForm">
+        <input type="hidden" name="orderId" value="@Model.Id" />
+        
+        <table class="detail-table">
+            <tr style="border-top:2px solid black;">
+                <th><h3></h3></th>
+                <th><h3>No.</h3></th>
+                <th><h3>Food Ordered</h3></th>
+                <th><h3>Quantity</h3></th>
+                <th><h3>Unit Price (RM)</h3></th>
+                <th><h3>Subtotal (RM)</h3></th>
+                <th></th>
+            </tr>
+
+            @for (int i = 0; i < Model.OrderItems.Count; i++)
+            {
+                var item = Model.OrderItems.ElementAt(i);
+                <tr>
+                    @if (item.SubTotal == 0)
+                    {
+                        <td></td>
+                        <td>@(i + 1)</td>
+                        <td>@item.Food?.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Food?.Price.ToString("F2")</td>
+                        <td>0.00</td>
+                        <td><span style="color:gray;">Refunded</span></td>
+                    }
+                    else
+                    {
+                        <td>
+                            <input type="checkbox" name="itemIds" value="@item.Id" class="refund-checkbox" />
+                        </td>
+                        <td>@(i + 1)</td>
+                        <td>@item.Food?.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Food?.Price.ToString("F2")</td>
+                        <td>@item.SubTotal.ToString("F2")</td>
+                    }
+                </tr>
+            }
+
+            <tr>
+                <td colspan="5" style="text-align:right">
+                    <strong>Original Total:</strong>
+                </td>
+                <td>
+                    <strong>RM @((Model.OrderItems.Sum(x => x.SubTotal) * 1.06M).ToString("F2"))</strong>
+                </td>
+            </tr>
+        </table>
+
+        <div class="check-btn-actions">
+            <button type="button" class="check-all-btn">Check All</button>
+            <button type="button" class="uncheck-all-btn">Uncheck All</button>
+        </div>
+        <div class="refund-cancel">
+            <button type="submit" class="refund-btn">Refund</button>
+            <a href="/OrderHistory/OrderHistory" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.check-all-btn').click(function() {
+                $('.refund-checkbox').prop('checked', true);
+            });
+
+            $('.uncheck-all-btn').click(function() {
+                $('.refund-checkbox').prop('checked', false);
+            });
+
+            $('#refundForm').submit(function(e) {
+                var checkedBoxes = $('.refund-checkbox:checked');
+                if (checkedBoxes.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one item to refund.');
+                    return false;
+                }
+
+                return confirm('Are you sure you want to refund the selected items?');
+            });
+        });
+    </script>
+}

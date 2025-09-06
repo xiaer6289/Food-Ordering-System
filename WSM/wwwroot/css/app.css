@@ -17,38 +17,112 @@
 
 
 header {
-    background-color: #e4e8f0;
-    padding: 15px 30px;
-    position: relative;
-}
-
-.nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
-    flex-wrap: wrap;
+    padding: 12px 40px;
 }
 
-.title {
-    font-size: 22px;
-    font-weight: bold;
-    white-space: nowrap;
+.left-header{
+    display: flex;
+    align-items: center;
+    gap: 35px;
 }
 
-.searchBar {
+
+/*.searchBar {
     display: flex;
     align-items: center;
     gap: 10px;
+}*/
+
+.search{
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    padding: 8px 14px;
+    width: 400px;
 }
 
-#search {
-    padding: 5px 10px;
+.search input{
+    border: none;
+    outline: none;
+    flex: 1;
     font-size: 14px;
-    width: 300px;
 }
 
-.orderLogout,
+.search i{
+    color: gray;
+    margin-right: 8px;
+}
+
+.header-navigation{
+    display: flex;
+    gap: 24px;
+    font-size: 15px;
+    color: #333;
+}
+
+.header-navigation a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.header-navigation a:hover{
+    color: #000;
+}
+
+.potrait{
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.potrait img{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+}
+
+.dropdown{
+    display: none;
+    position: absolute;
+    top: 70%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-width: 200px;
+    z-index: 100;
+}
+
+.dropdown .details{
+    padding: 112px;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown .details p{
+    margin: 4px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.dropdown a{
+    display: block;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown a:hover{
+    background: #f5f5f5;
+}
+/*.orderLogout,
 .searchBar button {
     padding: 6px 12px;
     background-color: #258cfb;
@@ -63,7 +137,7 @@ header {
     .orderLogout:hover,
     .searchBar button:hover {
         background-color: #1a6fd0;
-    }
+    }*/
 
 .button-group {
     display: flex;
@@ -343,7 +417,7 @@ header {
 .remove-ingredient-purchase-form {
     font-size: 18px;
     padding: 6px 12px;
-    background-color: ##66bb6a;
+    background-color: #66bb6a;
     color: white;
     border: none;
     border-radius: 6px;
@@ -404,7 +478,8 @@ header {
 }
 
     .cancel-po:hover,
-    .edit-cancel-btn {
+    .edit-cancel-btn,
+    .cancel-btn{
         background-color: #e88888;
     }
 
@@ -545,3 +620,169 @@ header {
     background-color: #0056b3;
 }
 
+#savepdf {
+    display: block;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 14px 25px;
+    border-radius: 6px;
+    background-color: #d91a1a;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+    #savepdf:hover {
+        background-color: #ba1111;
+    }
+
+.return-orderhistory {
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 20px;
+    background-color: #492ee6;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    display: inline-block;
+}
+
+    .return-orderhistory:hover {
+        background-color: #3119bd;
+    }
+.order-info{
+    text-align: right;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.additional-info {
+    text-align: left;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.detail-table {
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: fixed; 
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+    .detail-table th,
+    .detail-table td {
+        padding: 12px 16px;
+        text-align: left;
+        white-space: nowrap; 
+    }
+
+    .detail-table th {
+        border-bottom: 2px solid black; 
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .detail-table td {
+        border: none; 
+    }
+
+.payment-info {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-top: 1.5px solid black;
+}
+
+.history-detail-btn,
+.refund-page-btn{
+
+    color: white;
+    padding: 14px 12px;
+    font-size: 12px;
+    font-family: 'Lora', sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 160px;
+    text-align: center;
+}
+
+.history-detail-btn {
+    background-color: #1862d9;
+}
+    .history-detail-btn:hover {
+        background-color: #0c47a6;
+    }
+
+.refund-page-btn {
+    background-color: #66bb6a;
+}
+
+.refund-page-btn {
+    background-color: #57a65c;
+}
+
+.footer-container{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.refund-btn {
+    padding: 18px 42px;
+    background-color: #66bb6a;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.refund.btn:hover {
+    background-color: #57a65c;
+}
+
+.cancel-btn {
+    padding: 16px 42px;
+    background-color: #ff9999;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 19px;
+    cursor: pointer;
+}
+
+
+.check-btn-actions{
+    display: flex;
+    gap: 20px;
+}
+
+.refund-cancel {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+}
+
+.detail-refund-btn {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
