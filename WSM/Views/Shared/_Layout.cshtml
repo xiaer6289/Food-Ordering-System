@@ -14,11 +14,11 @@
 
         <div class="left-header">
             <div class="logo">
-                <img src="@(
-                     string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
-                         ? Url.Content("~/images/default-logo.png")
-                         : Url.Content(Context.Session.GetString("CompanyLogo"))
-        )" alt="Company Logo" style="max-height:50px; " />
+                 <img src="@Url.Content(
+                                 string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                                     ? "~/images/default-logo.png"
+                                     : Context.Session.GetString("CompanyLogo")
+                             )" alt="Company Logo" style="max-height:50px;" />
             </div>
 
 
@@ -33,7 +33,7 @@
         </div>
 
         <nav class="header-navigation">
-            <a href="#">Home</a>
+            <a href="../Home/Both">Home</a>
             <a href="../Order/Cart.cshtml">Order</a>
             <a href="../Food/Menu.cshtml">Menu</a>
             <a href="#">...</a>

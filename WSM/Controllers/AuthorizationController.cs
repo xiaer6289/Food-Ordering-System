@@ -43,11 +43,19 @@ public class AuthorizationController : Controller
             // Set session for logged-in company
             HttpContext.Session.SetString("CompanyId", company.Id);
 
+           
+
+            // Save logo in session
+            if (!string.IsNullOrEmpty(company.LogoPath))
+            {
+                HttpContext.Session.SetString("CompanyLogo", company.LogoPath);
+            }
+
             // Redirect based on first login
             if (company.IsFirstLogin)
                 return RedirectToAction("FillCompanyProfile"); // first login → fill profile
             else
-                return RedirectToAction("Both", "Home"); // normal login → dashboard/home
+                return RedirectToAction("Both", "Home"); // normal login > dashboard/home
         }
         else
         {
@@ -125,6 +133,10 @@ public class AuthorizationController : Controller
             PasswordHash = hashedPassword,
             LogoPath = null,
             Phone = " " ,
+            Street = " ",
+            City = "",
+            State = "",
+            Postcode = "",
         };
 
         _db.Companies.Add(company);
@@ -178,7 +190,8 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
-    public IActionResult FillCompanyProfile(IFormFile Logo, [Bind("Address,Phone,Description")] Company updatedCompany)
+    public IActionResult FillCompanyProfile(IFormFile Logo,
+    [Bind("Street,City,State,Postcode,Phone,Description")] Company updatedCompany)
     {
         string? companyId = HttpContext.Session.GetString("CompanyId");
         if (string.IsNullOrEmpty(companyId)) return RedirectToAction("Login");
@@ -186,19 +199,22 @@ public class AuthorizationController : Controller
         var company = _db.Companies.Find(companyId);
         if (company == null) return RedirectToAction("Login");
 
-        // Update Company fields
-        company.Address = updatedCompany.Address;
-        company.Phone = updatedCompany.Phone; // user input
+        // Update fields
+        company.Street = updatedCompany.Street;
+        company.City = updatedCompany.City;
+        company.State = updatedCompany.State;
+        company.Postcode = updatedCompany.Postcode;
+        company.Phone = updatedCompany.Phone;
         company.Description = updatedCompany.Description;
 
-        // Update Admin.PhoneNo
+        // Sync with admin phone
         var admin = _db.Admins.FirstOrDefault(a => a.Email == company.Email);
         if (admin != null)
         {
-            admin.PhoneNo = company.Phone; // overwrite placeholder
+            admin.PhoneNo = company.Phone;
         }
 
-        // Upload Logo if provided
+        // Upload logo
         if (Logo != null && Logo.Length > 0)
         {
             string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
@@ -217,7 +233,7 @@ public class AuthorizationController : Controller
         }
 
         company.IsFirstLogin = false;
-        _db.SaveChanges(); // saves both Company and Admin changes
+        _db.SaveChanges();
 
         return RedirectToAction("Both", "Home");
     }

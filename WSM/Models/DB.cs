@@ -62,9 +62,11 @@ public class Company
     [Required]
     [StringLength(200)]
     public string PasswordHash { get; set; }
-
-    [StringLength(300)]
-    public string? Address { get; set; }
+    // Instead of single Address, break it down
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    public string Postcode { get; set; }
 
     [StringLength(20)]
     public string? Phone { get; set; }
@@ -79,7 +81,9 @@ public class Company
 
 public class Food
 {
-    [Key][DatabaseGenerated(DatabaseGeneratedOption.None)] public string Id { get; set; }
+    [Key][DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [MaxLength(6)]
+    public string Id { get; set; }
 
     public string Name { get; set; }
 
@@ -132,8 +136,6 @@ public class Admin
         ErrorMessage = "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).")]
     public string Password { get; set; }
 
-  
-
     [Required]
     [MaxLength(50)]
     public string Name { get; set; }
@@ -149,18 +151,19 @@ public class Admin
 
 public class Staff
 {
-    [Key, MaxLength(4)]
+    [Key, MaxLength(6)]
     public string Id { get; set; }
 
     [Required]
     [MaxLength(100)]
     [EmailAddress]
+    public string Email { get; set; }
 
-    public string AdminId { get; set; }
 
     [ForeignKey("AdminId")]
+    [MaxLength(6)]
+    public string AdminId { get; set; }
     public Admin Admin { get; set; }
-    public string Email { get; set; }
 
     [MaxLength(20)]
     [Required]
@@ -177,8 +180,6 @@ public class Staff
     [Required]
     public string PhoneNo { get; set; }
 
-    
-
     [Required, MaxLength(8)]
     public string CompanyId { get; set; }
 
@@ -190,7 +191,7 @@ public class OrderDetail
 {
     [Key, MaxLength(20)]
     public string Id { get; set; }
-
+    
     [MaxLength(4)]
     public string SeatNo { get; set; }
 
