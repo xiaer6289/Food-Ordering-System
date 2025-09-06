@@ -37,8 +37,14 @@ public class AuthorizationController : Controller
         var result = _passwordHasher.VerifyHashedPassword(Email, company.PasswordHash, Password);
         if (result == PasswordVerificationResult.Success)
         {
-            // TODO: Set session or cookie for logged-in user
-            return RedirectToAction("Both", "Home");
+            // Set session for logged-in company
+            HttpContext.Session.SetInt32("CompanyId", company.Id);
+
+            // Redirect based on first login
+            if (company.IsFirstLogin)
+                return RedirectToAction("FillCompanyProfile"); // first login go to fill profile
+            else
+                return RedirectToAction("Both", "Home"); // normal login go to  dashboard/home
         }
         else
         {
@@ -66,7 +72,15 @@ public class AuthorizationController : Controller
             return RedirectToAction("Register");
         }
 
-        // 2. Check if email already exists
+        // 2. Validate password strength
+        var passwordPattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        if (!Regex.IsMatch(Password, passwordPattern))
+        {
+            TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain a letter, a number, and a special character.";
+            return RedirectToAction("Register");
+        }
+
+        // 3. Check if email already exists
         if (_db.Companies.Any(c => c.Email == Email))
         {
             TempData["ErrorMessage"] = "Email is already registered.";

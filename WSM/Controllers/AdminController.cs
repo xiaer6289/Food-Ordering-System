@@ -88,7 +88,7 @@ public class AdminController : Controller
         return View(model);
     }
 
-    // GET: /Admin/EditAdmin/{id}
+   
     public IActionResult EditAdmin(string id)
     {
         var admin = db.Admins.Find(id);
@@ -96,7 +96,7 @@ public class AdminController : Controller
         return View(admin);
     }
 
-    // POST: /Admin/EditAdmin
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult EditAdmin(Admin model)
