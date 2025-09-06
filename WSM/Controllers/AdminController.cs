@@ -29,7 +29,10 @@ public class AdminController : Controller
         return View(model);
     }
 
+    
+
     // GET: /Admin/CreateAdmin
+
     public IActionResult CreateAdmin()
     {
         return View();

@@ -28,6 +28,11 @@ namespace WMS.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -40,8 +45,8 @@ namespace WMS.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PhoneNo")
                         .IsRequired()
@@ -49,6 +54,8 @@ namespace WMS.Migrations
                         .HasColumnType("nvarchar(15)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Admins");
                 });
@@ -71,28 +78,48 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Company", b =>
                 {
-                    b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"));
+                    b.Property<string>("Address")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsFirstLogin")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LogoPath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Owner")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.HasKey("CompanyId");
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Companies");
                 });
@@ -291,6 +318,11 @@ namespace WMS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(6)");
 
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -318,7 +350,20 @@ namespace WMS.Migrations
 
                     b.HasIndex("AdminId");
 
+                    b.HasIndex("CompanyId");
+
                     b.ToTable("Staff");
+                });
+
+            modelBuilder.Entity("WSM.Models.Admin", b =>
+                {
+                    b.HasOne("WSM.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("WSM.Models.Food", b =>
@@ -385,7 +430,15 @@ namespace WMS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WSM.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Admin");
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("WSM.Models.Admin", b =>

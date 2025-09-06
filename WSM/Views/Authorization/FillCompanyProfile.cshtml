@@ -1,0 +1,49 @@
+﻿@model WSM.Models.Company
+
+@{
+    ViewData["Title"] = "Restaurant POS System";
+    Layout = null;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm p-4">
+                <h3 class="text-center">Complete Your Company Profile</h3>
+                <form method="post" enctype="multipart/form-data" asp-action="FillCompanyProfile" asp-controller="Authorization">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Address">Address</label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                   
+                    <div class="form-group mb-3">
+                        <label asp-for="Phone" value="@Model.Phone">Phone</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                 
+                    <div class="form-group mb-3">
+                        <label asp-for="Description">Description (optional)</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="LogoPath">Upload Logo</label>
+                        <input type="file" name="Logo" class="form-control" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Save & Continue</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

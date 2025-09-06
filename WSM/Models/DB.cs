@@ -18,12 +18,33 @@ public class DB : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Admin → Company: cascade delete
+        modelBuilder.Entity<Admin>()
+            .HasOne(a => a.Company)
+            .WithMany()
+            .HasForeignKey(a => a.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Staff → Company: restrict delete (avoid multiple cascade paths)
+        modelBuilder.Entity<Staff>()
+            .HasOne(s => s.Company)
+            .WithMany()
+            .HasForeignKey(s => s.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }
 
 public class Company
 {
     [Key]
-    public int Id { get; set; }
+    [Required]
+    [MaxLength(8)]
+    public string Id { get; set; }
 
     [Required]
     [StringLength(100)]
@@ -32,6 +53,10 @@ public class Company
     [Required]
     [StringLength(200)]
     public string CompanyName { get; set; }
+
+    [Required]
+    [EmailAddress]
+    [StringLength(200)]
     public string Email { get; set; }
 
     [Required]
@@ -102,12 +127,20 @@ public class Admin
 {
     [Key, MaxLength(6)]
     public string Id { get; set; }
+
+    // Foreign key to Company
+    [Required, MaxLength(8)]
+    public string CompanyId { get; set; }
+
+    [ForeignKey("CompanyId")]
+    public Company Company { get; set; }
+
     [Required]
     [MaxLength(100)]
     [EmailAddress]
     public string Email { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(200)] 
     [Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$",
         ErrorMessage = "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).")]
@@ -120,8 +153,9 @@ public class Admin
     [MaxLength(15)]
     [Required]
     [RegularExpression(@"^01[0-9]{8,13}$", ErrorMessage = "Phone number must start with '01' and be 10 to 15 digits long.")]
-    public string PhoneNo { get; set; }
+    public string PhoneNo { get; set; } = "N/A";
 
+    
     public ICollection<Staff> Staffs { get; set; } = new List<Staff>();
 }
 
@@ -133,6 +167,11 @@ public class Staff
     [Required]
     [MaxLength(100)]
     [EmailAddress]
+
+    public string AdminId { get; set; }
+
+    [ForeignKey("AdminId")]
+    public Admin Admin { get; set; }
     public string Email { get; set; }
 
     [MaxLength(20)]
@@ -150,10 +189,13 @@ public class Staff
     [Required]
     public string PhoneNo { get; set; }
 
-    public string AdminId { get; set; }
+    
 
-    [ForeignKey("AdminId")]
-    public Admin Admin { get; set; }
+    [Required, MaxLength(8)]
+    public string CompanyId { get; set; }
+
+    [ForeignKey("CompanyId")]
+    public Company Company { get; set; }
 }
 
 public class OrderDetail

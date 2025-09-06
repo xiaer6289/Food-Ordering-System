@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
 
@@ -8,6 +9,8 @@ public class AuthorizationController : Controller
     private readonly DB _db;
     private readonly IWebHostEnvironment _env;
 
+
+
     public AuthorizationController(DB db, IPasswordHasher<string> passwordHasher, IWebHostEnvironment env)
     {
         _db = db;
@@ -15,14 +18,14 @@ public class AuthorizationController : Controller
         _env = env;
     }
 
-    // GET: /Authorization/Login
+    
     [HttpGet]
     public IActionResult Login()
     {
         return View();
     }
 
-    // POST: /Authorization/Login
+
     [HttpPost]
     public IActionResult Login(string Email, string Password)
     {
@@ -38,13 +41,13 @@ public class AuthorizationController : Controller
         if (result == PasswordVerificationResult.Success)
         {
             // Set session for logged-in company
-            HttpContext.Session.SetInt32("CompanyId", company.Id);
+            HttpContext.Session.SetString("CompanyId", company.Id);
 
             // Redirect based on first login
             if (company.IsFirstLogin)
-                return RedirectToAction("FillCompanyProfile"); // first login go to fill profile
+                return RedirectToAction("FillCompanyProfile"); // first login → fill profile
             else
-                return RedirectToAction("Both", "Home"); // normal login go to  dashboard/home
+                return RedirectToAction("Both", "Home"); // normal login → dashboard/home
         }
         else
         {
@@ -54,18 +57,18 @@ public class AuthorizationController : Controller
     }
 
 
-    // GET: /Authorization/Register
+
+
     [HttpGet]
     public IActionResult Register()
     {
         return View();
     }
 
-    // POST: /Authorization/Register
     [HttpPost]
-    public IActionResult Register(string CompanyName, string Email, string Password, string ConfirmPassword, IFormFile Logo)
+    public IActionResult Register(string Owner, string CompanyName, string Email, string Password, string ConfirmPassword)
     {
-        // 1. Validate passwords
+        // 1. Validate passwords match
         if (Password != ConfirmPassword)
         {
             TempData["ErrorMessage"] = "Passwords do not match.";
@@ -73,7 +76,7 @@ public class AuthorizationController : Controller
         }
 
         // 2. Validate password strength
-        var passwordPattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        string passwordPattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         if (!Regex.IsMatch(Password, passwordPattern))
         {
             TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain a letter, a number, and a special character.";
@@ -87,40 +90,136 @@ public class AuthorizationController : Controller
             return RedirectToAction("Register");
         }
 
-        // 3. Hash password
+        // 4. Hash password
         string hashedPassword = _passwordHasher.HashPassword(Email, Password);
 
-        // 4. Save logo (optional)
-        string logoPath = null;
+        // 5. Generate new CompanyId
+        var lastCompany = _db.Companies
+            .OrderByDescending(c => c.Id)
+            .FirstOrDefault();
+
+        string newCompanyId = "COM00001"; // default if no company yet
+
+        if (lastCompany != null)
+        {
+            try
+            {
+                // Extract numeric part safely
+                int lastNumber = int.Parse(lastCompany.Id.Substring(3));
+                newCompanyId = "COM" + (lastNumber + 1).ToString("D5");
+            }
+            catch
+            {
+                // fallback in case Id is corrupted
+                newCompanyId = "COM00001";
+            }
+        }
+
+        // 5. Save to DB
+        var company = new Company
+        {
+            Id = newCompanyId,
+            Owner = Owner,
+            CompanyName = CompanyName,
+            Email = Email,
+            PasswordHash = hashedPassword,
+            LogoPath = null,
+            Phone = " " ,
+        };
+
+        _db.Companies.Add(company);
+        _db.SaveChanges();
+
+        
+
+        // Get the last Admin Id in DB
+        var lastAdmin = _db.Admins
+            .OrderByDescending(a => a.Id)
+            .FirstOrDefault();
+
+        string newId = "A00001"; // default if no admin exists
+
+        if (lastAdmin != null)
+        {
+            // Extract numeric part (after 'A')
+            int lastNumber = int.Parse(lastAdmin.Id.Substring(1));
+            newId = "A" + (lastNumber + 1).ToString("D5");
+        }
+
+        var admin = new Admin
+        {
+            Id = newId,
+            Email = company.Email,
+            Password = hashedPassword, // make sure column length is big enough!
+            Name = company.Owner,
+            PhoneNo = company.Phone,
+            CompanyId = company.Id
+
+        };
+
+        _db.Admins.Add(admin);
+        _db.SaveChanges();
+
+        TempData["SuccessMessage"] = "Registration successful! You can now login.";
+        return RedirectToAction("Login");
+    }
+
+    
+    [HttpGet]
+    public IActionResult FillCompanyProfile()
+    {
+        string? companyId = HttpContext.Session.GetString("CompanyId");
+        if (string.IsNullOrEmpty(companyId)) return RedirectToAction("Login");
+
+        var company = _db.Companies.Find(companyId); //  matches string type
+        if (company == null) return RedirectToAction("Login");
+
+        return View(company);
+    }
+
+    [HttpPost]
+    public IActionResult FillCompanyProfile(IFormFile Logo, [Bind("Address,Phone,Description")] Company updatedCompany)
+    {
+        string? companyId = HttpContext.Session.GetString("CompanyId");
+        if (string.IsNullOrEmpty(companyId)) return RedirectToAction("Login");
+
+        var company = _db.Companies.Find(companyId);
+        if (company == null) return RedirectToAction("Login");
+
+        // Update Company fields
+        company.Address = updatedCompany.Address;
+        company.Phone = updatedCompany.Phone; // user input
+        company.Description = updatedCompany.Description;
+
+        // Update Admin.PhoneNo
+        var admin = _db.Admins.FirstOrDefault(a => a.Email == company.Email);
+        if (admin != null)
+        {
+            admin.PhoneNo = company.Phone; // overwrite placeholder
+        }
+
+        // Upload Logo if provided
         if (Logo != null && Logo.Length > 0)
         {
             string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(Logo.FileName);
+            string fileName = Guid.NewGuid() + Path.GetExtension(Logo.FileName);
             string filePath = Path.Combine(uploadsFolder, fileName);
+
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 Logo.CopyTo(stream);
             }
-            logoPath = "/uploads/" + fileName;
+
+            company.LogoPath = "/uploads/" + fileName;
         }
 
-        // 5. Save to DB
-        var company = new Company
-        {
-            CompanyName = CompanyName,
-            Email = Email,
-            PasswordHash = hashedPassword,
-            LogoPath = logoPath
-        };
-        _db.Companies.Add(company);
-        _db.SaveChanges();
+        company.IsFirstLogin = false;
+        _db.SaveChanges(); // saves both Company and Admin changes
 
-        // 6. Success message
-        TempData["SuccessMessage"] = "Registration successful! You can now login.";
-        return RedirectToAction("Register");
+        return RedirectToAction("Both", "Home");
     }
 
 }

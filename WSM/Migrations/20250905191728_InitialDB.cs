@@ -6,26 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WMS.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class InitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Admins",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PhoneNo = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admins", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
@@ -42,16 +27,20 @@ namespace WMS.Migrations
                 name: "Companies",
                 columns: table => new
                 {
-                    CompanyId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LogoPath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    Owner = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsFirstLogin = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.CompanyId);
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,24 +61,23 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Staff",
+                name: "Admins",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Salary = table.Column<double>(type: "float", nullable: false),
                     PhoneNo = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    AdminId = table.Column<string>(type: "nvarchar(6)", nullable: false)
+                    CompanyId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Staff", x => x.Id);
+                    table.PrimaryKey("PK_Admins", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Staff_Admins_AdminId",
-                        column: x => x.AdminId,
-                        principalTable: "Admins",
+                        name: "FK_Admins_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -120,6 +108,36 @@ namespace WMS.Migrations
                         column: x => x.IngredientId,
                         principalTable: "Ingredients",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Staff",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Salary = table.Column<double>(type: "float", nullable: false),
+                    PhoneNo = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    AdminId = table.Column<string>(type: "nvarchar(6)", nullable: false),
+                    CompanyId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Staff", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Staff_Admins_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admins",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Staff_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -197,6 +215,11 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Admins_CompanyId",
+                table: "Admins",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Foods_CategoryId",
                 table: "Foods",
                 column: "CategoryId");
@@ -231,14 +254,16 @@ namespace WMS.Migrations
                 name: "IX_Staff_AdminId",
                 table: "Staff",
                 column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Staff_CompanyId",
+                table: "Staff",
+                column: "CompanyId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Companies");
-
             migrationBuilder.DropTable(
                 name: "OrderItems");
 
@@ -262,6 +287,9 @@ namespace WMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Admins");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
         }
     }
 }
