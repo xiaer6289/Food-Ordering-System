@@ -121,14 +121,6 @@ public class Admin
     [ForeignKey("CompanyId")]
     public Company Company { get; set; }
 
-
-    // Foreign key to Company
-    [Required, MaxLength(8)]
-    public string CompanyId { get; set; }
-
-    [ForeignKey("CompanyId")]
-    public Company Company { get; set; }
-
     [Required]
     [MaxLength(100)]
     [EmailAddress]
@@ -140,11 +132,7 @@ public class Admin
         ErrorMessage = "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).")]
     public string Password { get; set; }
 
-    [MaxLength(200)] 
-    [Required]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$",
-        ErrorMessage = "Password must be 8 to 20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character (!@#$%^&*).")]
-   
+  
 
     [Required]
     [MaxLength(50)]

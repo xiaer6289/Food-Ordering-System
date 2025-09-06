@@ -16,7 +16,7 @@ public class AdminController : Controller
     }
 
     // GET: /Admin/Admins
-    public IActionResult Admins(string searchString, string sortOrder)
+                                                                                                                                                            public IActionResult Admins(string searchString, string sortOrder)
     {
         searchString = searchString?.Trim();
 

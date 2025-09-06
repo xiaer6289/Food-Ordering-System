@@ -31,7 +31,15 @@
             </div> 
         </nav> *@
         <div class="left-header">
-            <div class="logo">Insert Logo</div>
+            <div class="logo">
+                <img src="@(
+                     string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                         ? Url.Content("~/images/default-logo.png")
+                         : Url.Content(Context.Session.GetString("CompanyLogo"))
+        )" alt="Company Logo" style="max-height:50px; " />
+            </div>
+
+
 
             <form class="search" asp-controller="Search" asp-action="Global" method="get">
                 <i>🔎</i>
