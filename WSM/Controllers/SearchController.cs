@@ -11,10 +11,12 @@ public class SearchController : Controller
         switch (context)
         {
             case "Ingredient":
-                return RedirectToAction("ReadIngredient", "Ingredient", new { id = q });
+                return ((q == "" || q == null) ? RedirectToAction("ReadIngredient", "Ingredient") : 
+                    RedirectToAction("ReadIngredient", "Ingredient", new { id = q }));
 
             case "OrderHistory": 
-                return RedirectToAction("OrderHistory", "OrderHistory", new { id = q });
+                return ((q == "" || q == null) ? RedirectToAction("OrderHistory", "OrderHistory") : 
+                    RedirectToAction("OrderHistory", "OrderHistory", new { id = q }));
 
             default:
                 return RedirectToAction("Both", "Home");

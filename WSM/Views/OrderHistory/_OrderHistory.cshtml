@@ -1,0 +1,83 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.OrderDetail>
+@{
+    ViewBag.Title = "Order History";
+    string[] fields = ["Id", "Seat", "Total", "status", "Date", ""];
+}
+
+<form>
+    @Html.Hidden("sort")
+    @Html.Hidden("dir")
+
+    <div class="status">
+        <label for="status">Filter by Status:</label>
+        <select name="status" id="status" onchange="document.getElementById('filterForm').submit();">
+    </div>
+</form>
+
+<p>
+    @Model.Count() of @Model.TotalItemCount orders |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
+<div id="target">
+    <table class="record-table">
+        <tr>
+            @foreach (var f in fields)
+            {
+                string d = "asc";
+                string c = "";
+
+                if (f == ViewBag.Sort)
+                {
+                    d = ViewBag.Dir == "des" ? "asc" : "des";
+                    c = ViewBag.Dir;
+                }
+
+                <th>
+                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                </th>
+            }
+        </tr>
+
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.SeatNo</td>
+                <td>@s.TotalPrice</td>
+                <td>@s.Status</td>
+                <td>@s.OrderDate</td>
+                <td>
+                    <div class="detail-refund-btn">
+                        <button class="history-detail-btn" data-get="/OrderHistory/Detail/@s.Id">Detail</button>
+                        <button class="refund-page-btn" data-get="/OrderHistory/Refund/@s.Id">Refund</button>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </table>
+
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+
+        var ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "get",
+            UpdateTargetId = "target",
+            LoadingElementId = "#loader",
+        };
+    }
+
+    @Html.PagedListPager(
+    Model,
+    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
+        )
+</div> 

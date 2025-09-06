@@ -155,14 +155,16 @@ header {
 
 .restock-button {
     display: flex;
+    justify-content: flex-end;
     flex-direction: column;
     align-items: center;
+    text-align: right;
     gap: 20px;
     margin-top: 40px;
 }
 
 
-.update-ingredient {
+.create-ingredient {
     background-color: #66bb6a;
     color: white;
     padding: 20px 32px;
@@ -176,9 +178,10 @@ header {
     transition: background-color 0.2s ease;
     width: 215px;
     text-align: center;
+    text-decoration: none;
 }
 
-    .update-ingredient:hover {
+    .create-ingredient:hover {
         background-color: #57a65c;
     }
 
@@ -222,6 +225,7 @@ header {
     transition: background-color 0.2s ease;
     width: 160px;
     text-align: center;
+    text-decoration: none;
 }
 
     .edit-ingredient:hover {
@@ -538,6 +542,29 @@ header {
 
 .pagination-wrapper {
     margin-top: 30px;
+}
+
+    .pagination-wrapper ul,
+    .pagination-wrapper .pagination,
+    ul.pagination {
+        list-style: none !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        margin-top: 30px !important;
+        gap: 0 !important;
+        width: 100% !important;
+    }
+
+#target {
+    width: 100% !important;
+    display: block !important;
+}
+
+.restock-container {
+    width: 100% !important;
+    display: block !important;
 }
 
 

@@ -35,6 +35,7 @@ public class OrderHistoryController : Controller
             "Id" => s => s.Id,
             "Total" => s => s.TotalPrice,
             "Date" => s => s.OrderDate,
+            "Status" => s => s.Status,
             _ => s => s.Id
         };
 
@@ -78,7 +79,6 @@ public class OrderHistoryController : Controller
         return View(order);
     }
 
-    // GET: Refund page for a specific order
     public IActionResult Refund(string? id)
     {
         if (string.IsNullOrEmpty(id)) return RedirectToAction("OrderHistory");

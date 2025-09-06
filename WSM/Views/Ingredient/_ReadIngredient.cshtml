@@ -1,0 +1,89 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.Ingredient>
+
+@{
+    string[] fields = ["", "Id", "Name", "Quantity", "Weight(kg)", "Unit Price", ""];
+
+}
+
+<form>
+    @Html.Hidden("sort")
+    @Html.Hidden("dir")
+</form>
+
+
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount orders |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
+<div style="display: flex; align-items: flex-start; gap: 20px;">
+    <table class="restock-table">
+        <tr>
+            @foreach (var f in fields)
+            {
+                string d = "asc";
+                string c = "";
+
+                if (f == ViewBag.Sort)
+                {
+                    d = ViewBag.Dir == "des" ? "asc" : "des";
+                    c = ViewBag.Dir;
+                }
+
+                <th>
+                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                </th>
+            }
+        </tr>
+
+        @foreach (var s in Model)
+        {
+            <tr data-checkable data-id="@s.Id">
+                <td>
+                    <input type="checkbox" name="ids" value="@s.Id" class="ingredient-checkbox" />
+                </td>
+                <td>@s.Id</td>
+                <td>@s.Name</td>
+                <td>@s.Quantity</td>
+                <td>@s.Kilogram</td>
+                <td>@s.Price</td>
+                <td>
+                    <div class="edit-remove-group">
+                        <a asp-controller="Ingredient" asp-action="UpdateIngredient" asp-route-id="@s.Id" class="edit-ingredient">Update</a>
+                        <button type="button" class="remove-ingredient" data-id="@s.Id">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
+
+<div class="restock-button">
+    <a asp-controller="Ingredient" asp-action="CreateIngredient" class="create-ingredient">Add New</a>
+    <button type="submit" class="remove-check-ingredient">Delete Selected</button>
+</div>
+</div>
+
+<div class="pagination-wrapper">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+
+        var ajaxOptions = new AjaxOptions
+        {
+            HttpMethod = "get",
+            UpdateTargetId = "target",
+            LoadingElementId = "#loader",
+        };
+    }
+
+    @Html.PagedListPager(
+        Model,
+        page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+        options
+    )
+</div>
