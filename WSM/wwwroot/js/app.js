@@ -57,6 +57,14 @@ $(document).on('click', '[data-checkable]', e => {
         .prop('checked', (i, v) => !v);
 });
 
+window.onclick = function (event) {
+    if (!event.target.matches('.profile img')) {
+        let dropdown = document.getElementById("dropdownMenu");
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+        }
+    }
+}
 
 function generatePDF() {
     const pdf = document.getElementById("PDF");

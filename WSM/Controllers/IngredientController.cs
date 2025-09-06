@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WMS;
 using WSM.Models;
 using X.PagedList.Extensions;
 
@@ -73,8 +74,10 @@ public class IngredientController : Controller
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
-            return PartialView("ReadIngredient", m);
+            return PartialView("_ReadIngredient", m);
         }
+
+
 
         ViewBag.Ingredients = db.Ingredients.ToList();
         return View(m);

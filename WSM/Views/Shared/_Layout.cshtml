@@ -11,25 +11,7 @@
  </head>
     <body>
     <header>
-        @* <nav class="nav-bar">
-            <a class="title">Restaurant Ordering System</a>
 
-            <form class="searchBar" asp-controller="Search" asp-action="Global" method="get">
-                <input type="search" id="search" name="q" placeholder="@ViewBag.SearchPlaceholder" />
-                <input type="hidden" name="context" value="@ViewBag.SearchContext" />
-                <button type="submit">Search</button>
-            </form>
-
-            
-
-
-             <div class="button-group">
-                <a class="orderLogout" href="home/menu">Order</a>
-                <button class="orderLogout" onclick="window.location.href='@Url.Action("Login", "Authorization")'">Log Out </button>
-                    
-
-            </div> 
-        </nav> *@
         <div class="left-header">
             <div class="logo">
                 <img src="@(
@@ -41,7 +23,8 @@
 
 
 
-            <form class="search" asp-controller="Search" asp-action="Global" method="get">
+            <form data-ajax="true" data-ajax-update="#target"
+            class="search" asp-controller="Search" asp-action="Global" method="get">
                 <i>🔎</i>
                 <input type="search" id="search" name="q" placeholder="@ViewBag.SearchPlaceholder" />
                 <input type="hidden" name="context" value="@ViewBag.SearchContext" />
@@ -61,8 +44,8 @@
 
             <div class="dropdown" id="dropdownmenu">
                 <div class="view">
-                    <p><strong>empty</strong></p>
-                    <p><strong>empty</strong></p>
+                    <p><strong>Name: </strong></p>
+                    <p><strong>Id: </strong></p>
                 </div>
                 <a href="#">View Profile</a>
                 <a href="#">Logout</a>
@@ -91,13 +74,11 @@
       document.getElementById("dropdownMenu").classList.toggle("show");
     }
 
-    // Close dropdown if clicked outside
-    window.onclick = function(event) {
-      if (!event.target.matches('.profile img')) {
-        let dropdown = document.getElementById("dropdownMenu");
-        if (dropdown.classList.contains('show')) {
-          dropdown.classList.remove('show');
-        }
-      }
-    }
+    let timer = null;
+
+    $('#search').on('input', s => {
+        clearTimeout(timer);
+        timer = setTimeout(() => $(s.target.form).submit(), 500);
+    });
+
 </script>
