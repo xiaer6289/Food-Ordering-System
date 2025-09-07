@@ -77,6 +77,9 @@ public class Company
 
     [Required]
     public bool IsFirstLogin { get; set; } = true;
+
+    public string? ResetToken { get; set; }
+    public DateTime? TokenExpiry { get; set; }
 }
 
 public class Food
@@ -145,7 +148,9 @@ public class Admin
     [RegularExpression(@"^01[0-9]{8,13}$", ErrorMessage = "Phone number must start with '01' and be 10 to 15 digits long.")]
     public string PhoneNo { get; set; } = "N/A";
 
-    
+    public string? ResetToken { get; set; }
+    public DateTime? TokenExpiry { get; set; }
+
     public ICollection<Staff> Staffs { get; set; } = new List<Staff>();
 }
 
@@ -185,6 +190,9 @@ public class Staff
 
     [ForeignKey("CompanyId")]
     public Company Company { get; set; }
+
+    public string? ResetToken { get; set; }
+    public DateTime? TokenExpiry { get; set; }
 }
 
 public class OrderDetail
@@ -294,4 +302,15 @@ public class Ingredient
     public decimal TotalPrice { get; set; }
 
     public ICollection<Food> Foods { get; set; } = new List<Food>();
+}
+
+
+public class PasswordResetToken
+{
+    [Key]
+    public int Id { get; set; }
+    public string UserId { get; set; }
+    public string UserType { get; set; } // "Company", "Staff", "Admin"
+    public string Token { get; set; }
+    public DateTime ExpiryDate { get; set; }
 }

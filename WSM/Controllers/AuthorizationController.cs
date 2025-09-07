@@ -2,20 +2,24 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
+namespace WSM.Services;
 
 public class AuthorizationController : Controller
 {
     private readonly IPasswordHasher<string> _passwordHasher;
     private readonly DB _db;
     private readonly IWebHostEnvironment _env;
+    private readonly IEmailSender _emailSender;
 
 
 
-    public AuthorizationController(DB db, IPasswordHasher<string> passwordHasher, IWebHostEnvironment env)
+    public AuthorizationController(DB db, IPasswordHasher<string> passwordHasher, IWebHostEnvironment env, IEmailSender emailSender)
     {
         _db = db;
         _passwordHasher = passwordHasher;
         _env = env;
+        _emailSender = emailSender;
     }
 
     
@@ -84,10 +88,10 @@ public class AuthorizationController : Controller
         }
 
         // 2. Validate password strength
-        string passwordPattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         if (!Regex.IsMatch(Password, passwordPattern))
         {
-            TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain a letter, a number, and a special character.";
+            TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.";
             return RedirectToAction("Register");
         }
 
@@ -238,4 +242,128 @@ public class AuthorizationController : Controller
         return RedirectToAction("Both", "Home");
     }
 
+    //Forgot Password
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ForgotPassword(string Email)
+    {
+        var company = _db.Companies.FirstOrDefault(c => c.Email == Email);
+
+        if (company == null)
+        {
+            ViewBag.ErrorMessage = "Email not found."; // use ViewBa
+            return View();
+        }
+
+        // Generate reset token
+        string resetToken = Guid.NewGuid().ToString();
+
+        company.ResetToken = resetToken;
+        company.TokenExpiry = DateTime.Now.AddHours(1);
+        _db.SaveChanges();
+
+        // Build reset link
+        string resetLink = Url.Action("ResetPassword", "Authorization",
+            new { token = resetToken, email = Email }, Request.Scheme);
+
+        // Send email
+        string subject = "Food Ordering System Password Reset";
+        string body = $"<p>Click the link below to reset your password:</p>" +
+                      $"<a href='{resetLink}'>Reset Password</a>" +
+                      "<p>If you didn't request this, ignore this email.</p>";
+
+        await _emailSender.SendEmailAsync(Email, subject, body);
+
+        return RedirectToAction("ResetPasswordConfirm");
+    }
+
+    public IActionResult ResetPasswordConfirm()
+    {
+        return View();
+    }
+
+
+
+    [HttpGet]
+    public IActionResult ResetPassword(string token, string email)
+    {
+        var company = _db.Companies.FirstOrDefault(c => c.Email == email && c.ResetToken == token && c.TokenExpiry > DateTime.Now);
+        var admin = _db.Admins.FirstOrDefault(a => a.Email == email && a.ResetToken == token && a.TokenExpiry > DateTime.Now);
+        var staff = _db.Staff.FirstOrDefault(s => s.Email == email && s.ResetToken == token && s.TokenExpiry > DateTime.Now);
+
+        if (company == null && admin == null && staff == null)
+        {
+            TempData["ErrorMessage"] = "Invalid or expired token.";
+            return RedirectToAction("Login");
+        }
+
+        ViewBag.Email = email;
+        ViewBag.Token = token;
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ResetPassword(string token, string email, string newPassword, string confirmPassword)
+    {
+        if (newPassword != confirmPassword)
+        {
+            TempData["ErrorMessage"] = "Passwords do not match.";
+            ViewBag.Email = email;
+            ViewBag.Token = token;
+            return View();
+        }
+
+        // Password format validation (same as Register)
+        string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        if (!Regex.IsMatch(newPassword, passwordPattern))
+        {
+            TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.";
+            ViewBag.Email = email;
+            ViewBag.Token = token;
+            return View();
+        }
+
+        var company = _db.Companies.FirstOrDefault(c => c.Email == email && c.ResetToken == token && c.TokenExpiry > DateTime.Now);
+        var admin = _db.Admins.FirstOrDefault(a => a.Email == email && a.ResetToken == token && a.TokenExpiry > DateTime.Now);
+        var staff = _db.Staff.FirstOrDefault(s => s.Email == email && s.ResetToken == token && s.TokenExpiry > DateTime.Now);
+
+        if (company != null)
+        {
+            company.PasswordHash = _passwordHasher.HashPassword(email, newPassword);
+            company.ResetToken = null;
+            company.TokenExpiry = null;
+        }
+        else if (admin != null)
+        {
+            admin.Password = _passwordHasher.HashPassword(email, newPassword);
+            admin.ResetToken = null;
+            admin.TokenExpiry = null;
+        }
+        else if (staff != null)
+        {
+            staff.Password = _passwordHasher.HashPassword(email, newPassword);
+            staff.ResetToken = null;
+            staff.TokenExpiry = null;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Invalid or expired token.";
+            return RedirectToAction("ForgotPassword");
+        }
+
+        _db.SaveChanges();
+        TempData["SuccessMessage"] = "Password has been reset successfully. Please login.";
+        return RedirectToAction("Login");
+    }
+
+
+    public IActionResult Reset()
+    {
+        return View();
+    }
 }
