@@ -236,6 +236,16 @@ public class AuthorizationController : Controller
             company.LogoPath = "/uploads/" + fileName;
         }
 
+        HttpContext.Session.SetString("CompanyId", company.Id);
+
+
+
+        // Save logo in session
+        if (!string.IsNullOrEmpty(company.LogoPath))
+        {
+            HttpContext.Session.SetString("CompanyLogo", company.LogoPath);
+        }
+
         company.IsFirstLogin = false;
         _db.SaveChanges();
 
