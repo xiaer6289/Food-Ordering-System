@@ -126,7 +126,7 @@ public class Admin
     public string CompanyId { get; set; }
 
     [ForeignKey("CompanyId")]
-    public Company Company { get; set; }
+    public Company? Company { get; set; }
 
     [Required]
     [MaxLength(100)]
@@ -189,7 +189,7 @@ public class Staff
     public string CompanyId { get; set; }
 
     [ForeignKey("CompanyId")]
-    public Company Company { get; set; }
+    public Company? Company { get; set; }
 
     public string? ResetToken { get; set; }
     public DateTime? TokenExpiry { get; set; }

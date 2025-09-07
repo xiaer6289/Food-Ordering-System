@@ -150,7 +150,8 @@ public class AuthorizationController : Controller
 
         // Get the last Admin Id in DB
         var lastAdmin = _db.Admins
-            .OrderByDescending(a => a.Id)
+            .Where(a => a.Id.StartsWith("A") && a.Id.Length == 6)
+            .OrderByDescending(a => Convert.ToInt32(a.Id.Substring(1, 5)))
             .FirstOrDefault();
 
         string newId = "A00001"; // default if no admin exists
