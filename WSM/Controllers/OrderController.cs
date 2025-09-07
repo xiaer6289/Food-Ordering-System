@@ -16,13 +16,37 @@ namespace WSM.Controllers
             _db = db;
         }
 
-        // Display all foods and shopping cart
-        public IActionResult FoodDetail()
+        public IActionResult FoodListing(string categoryId = "All")
         {
-            ViewBag.Cart = _helper.GetCart(); 
-            var foods = _db.Foods.ToList();
-            return View(foods);
+            var categories = _db.Categories.ToList();
+            ViewBag.Categories = categories;
+            ViewBag.SelectedCategory = categoryId;
+
+            IQueryable<Food> foods = _db.Foods;
+
+            if (categoryId != "All")
+                foods = foods.Where(f => f.CategoryId == categoryId);
+
+            return View(foods.ToList());
         }
+
+
+        public IActionResult FoodDetail(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var food = _db.Foods
+                          .Where(f => f.Id == id)
+                          .FirstOrDefault();
+
+            if (food == null)
+                return NotFound();
+
+            ViewBag.Cart = _helper.GetCart();
+            return View(food);
+        }
+
 
         public IActionResult Cart()
         {
@@ -31,7 +55,7 @@ namespace WSM.Controllers
 
             var foods = _db.Foods.ToList();
 
-            return View(foods); 
+            return View(foods);
         }
 
 
@@ -42,11 +66,11 @@ namespace WSM.Controllers
             var cart = _helper.GetCart();
 
             if (quantity <= 0)
-                cart.Remove(foodId); 
+                cart.Remove(foodId);
             else
-                cart[foodId] = quantity; 
+                cart[foodId] = quantity;
 
-            _helper.SetCart(cart); 
+            _helper.SetCart(cart);
             return RedirectToAction("FoodDetail");
         }
     }
