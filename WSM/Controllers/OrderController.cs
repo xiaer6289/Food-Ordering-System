@@ -22,7 +22,7 @@ namespace WSM.Controllers
             ViewBag.Categories = categories;
             ViewBag.SelectedCategory = categoryId;
 
-            IQueryable<Food> foods = _db.Foods;
+            IQueryable<WSM.Models.Food> foods = _db.Foods;
 
             if (categoryId != "All")
                 foods = foods.Where(f => f.CategoryId == categoryId);

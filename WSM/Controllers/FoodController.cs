@@ -14,27 +14,25 @@ namespace WSM.Controllers
         {
             this.db = db;
         }
-
         // GET: /Food/Foods
         public IActionResult Foods(string searchString)
         {
-            searchString = searchString?.Trim();
+            // Get all foods including their categories
+            var foods = db.Foods.Include(f => f.Category).AsQueryable();
 
-            var foods = db.Foods
-                          .Include(f => f.Category)
-                          .AsQueryable();
+            // Pass the current search string back to the view for display
+            ViewData["CurrentFilter"] = searchString;
 
+            // If there is a search term, filter the results
             if (!string.IsNullOrEmpty(searchString))
             {
-                foods = foods.Where(f =>
-                    f.Name.Contains(searchString) ||
-                    f.Description.Contains(searchString));
+                foods = foods.Where(f => f.Name.Contains(searchString) ||
+                                         f.Description.Contains(searchString));
             }
 
-            ViewData["CurrentFilter"] = searchString;
+            // Return filtered or full list
             return View(foods.ToList());
         }
-
         // GET: /Food/CreateFood
         public IActionResult CreateFood()
         {
@@ -45,9 +43,9 @@ namespace WSM.Controllers
         // POST: /Food/CreateFood
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateFood(Food model)
+        public IActionResult CreateFood(WSM.Models.Food model)
         {
-            // 1️⃣ Check if input is valid
+            //Check if input is valid
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("; ", ModelState.Values
@@ -55,15 +53,11 @@ namespace WSM.Controllers
                     .Select(e => e.ErrorMessage));
                 Console.WriteLine("Validation Errors: " + errors);
             }
-
-
-
-            // 2️⃣ Get last Food ID from database
+            //Get last Food ID from database
             var lastFood = db.Foods
                              .OrderByDescending(f => f.Id)
                              .FirstOrDefault();
-
-            // 3️⃣ Generate new ID
+            //Generate new ID
             if (lastFood == null)
                 model.Id = "F0001"; // first food
             else
@@ -71,64 +65,71 @@ namespace WSM.Controllers
                 int lastNum = int.Parse(lastFood.Id.Substring(1)); // remove 'F' and parse number
                 model.Id = "F" + (lastNum + 1).ToString("D4"); // pad with zeros
             }
-
-            // 4️⃣ Add to database
+            //Add to database
             db.Foods.Add(model);
             db.SaveChanges();
 
             // 5️⃣ Redirect to Foods list
             return RedirectToAction(nameof(Foods));
         }
-
-        // GET: /Food/Edit/{id}
-        public IActionResult Edit(string id)
-        {
-            if (string.IsNullOrEmpty(id)) return NotFound();
-
-            var food = db.Foods.Find(id);
-            if (food == null) return NotFound();
-
-            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", food.CategoryId);
-            return View(food);
-        }
-
-        // GET: /Food/EditFood/{id}
+        // GET: Edit Food
+        [HttpGet]
         public IActionResult EditFood(string id)
         {
-            if (string.IsNullOrEmpty(id)) return NotFound();
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
 
-            var food = db.Foods.Find(id);
-            if (food == null) return NotFound();
+            var food = db.Foods.FirstOrDefault(f => f.Id == id);
+            if (food == null)
+                return NotFound();
+            // Map database entity to ViewModel
+            var model = new FoodEditVM
+            {
+                Id = food.Id,
+                Name = food.Name,
+                Price = food.Price,
+                Description = food.Description,
+                Image = food.Image,
+                CategoryId = food.CategoryId
+            };
+            // Populate dropdown
+            ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name", food.CategoryId);
 
-            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", food.CategoryId);
-            return View(food); // this looks for Views/Food/EditFood.cshtml
+            return View(model);
         }
-
+        // POST: Edit Food
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditFood(Food model)
+        public IActionResult EditFood(FoodEditVM model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    db.Foods.Update(model);
-                    db.SaveChanges();
-                    return RedirectToAction(nameof(Foods));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!db.Foods.Any(f => f.Id == model.Id))
-                        return NotFound();
-                    throw;
-                }
+                ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name", model.CategoryId);
+                return View(model);
             }
-            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
-            return View("EditFood", model);
-        }
 
-        // GET: /Food/DeleteFood/{id}
-        public IActionResult DeleteFood(string id)
+            var existingFood = db.Foods.FirstOrDefault(f => f.Id == model.Id);
+            if (existingFood == null)
+                return NotFound();
+
+            // If CategoryId is null or empty, keep the old category
+            var finalCategoryId = string.IsNullOrEmpty(model.CategoryId) ? existingFood.CategoryId : model.CategoryId;
+
+            // Update only editable fields
+            existingFood.Name = model.Name;
+            existingFood.Price = model.Price;
+            existingFood.Description = model.Description;
+            existingFood.Image = model.Image;
+            existingFood.CategoryId = finalCategoryId;
+
+            db.Foods.Update(existingFood);
+            db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Food updated successfully!";
+            return RedirectToAction(nameof(Foods));
+        }
+// GET: /Food/DeleteFood/{id}
+public IActionResult DeleteFood(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
