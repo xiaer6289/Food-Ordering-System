@@ -813,3 +813,12 @@ header {
     justify-content: center;
     gap: 20px;
 }
+
+
+.page-logo {
+    margin: 0 auto; /* center horizontally */
+    width: 80px; 
+    height: 80px;
+    border-radius: 50%; 
+    object-fit: cover; 
+}

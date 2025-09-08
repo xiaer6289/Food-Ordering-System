@@ -1,14 +1,12 @@
 ﻿@using WSM.Models
-@model OrderDetail
+@model DetailVM
 
 @{
     ViewBag.Title = "Print Order Details";
     Layout = null;
 }
 
-@*
-    <p>implement logo here</P
-*@
+
 
 <link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -16,18 +14,26 @@
 
 <div id="PDF">
     <div style="text-align:center;" class="read-details-header">
-        <h1><strong>Food Restaurant</strong></h1>
-        <h4>Address</h4>
+        <div class="page-logo">
+            <img src="@Url.Content(
+                     string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                           ? "~/images/default-logo.png"
+                           : Context.Session.GetString("CompanyLogo")
+                )" alt="Company Logo" style="max-height:50px;" />
+        </div>
+        <h1><strong>@Model.company.CompanyName</strong></h1>
+        <h4>@Model.company.Street, @Model.company.Postcode</h4>
+        <h4>@Model.company.City, @Model.company.State</h4>
 
         <div class="order-info">
-            <span>Date: @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+            <span>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
             <br>
-            <span>Order ID: @Model.Id</span>
+            <span>Order ID: @Model.orderDetail.Id</span>
         </div>
         <div class="additional-info">
-            <span>Table No: @Model.SeatNo</span>
+            <span>Table No: @Model.orderDetail.SeatNo</span>
             <br>
-            <span>Status: @Model.Status</span>
+            <span>Status: @Model.orderDetail.Status</span>
             <br>
         </div>
     </div>
@@ -41,9 +47,9 @@
             <th><h3>Subtotal (RM)</h3></th>
         </tr>
 
-        @for (int i = 0; i < Model.OrderItems.Count; i++)
+        @for (int i = 0; i < Model.orderDetail.OrderItems.Count; i++)
         {
-            var item = Model.OrderItems.ElementAt(i);
+            var item = Model.orderDetail.OrderItems.ElementAt(i);
             <tr>
                 <td>@(i + 1)</td>
                 <td>@item.Food?.Name</td>
@@ -58,7 +64,7 @@
                 <strong>Subtotal:</strong>
             </td>
             <td>
-                RM @Model.TotalPrice.ToString("F2")
+                RM @Model.orderDetail.TotalPrice.ToString("F2")
             </td>
         </tr>
         <tr>
@@ -66,7 +72,7 @@
                 <strong>Service charge (6%):</strong>
             </td>
             <td>
-                RM @((Model.TotalPrice * 0.06M).ToString("F2"))
+                RM @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
             </td>
         </tr>
         <tr>
@@ -74,25 +80,25 @@
                 <strong>Total:</strong>
             </td>
             <td>
-                <strong>RM @((Model.TotalPrice * 1.06M).ToString("F2"))</strong>
+                <strong>RM @((Model.orderDetail.TotalPrice * 1.06M).ToString("F2"))</strong>
             </td>
         </tr>
     </table>
 
-    @if (Model.Payment != null)
+    @if (Model.orderDetail.Payment != null)
     {
         <div class="payment-info">
             <p>Payment Details:</p>
-            <p>Payment Method: @Model.Payment.PaymentMethod</p>
-            <p>Amount Paid: RM @Model.Payment.AmountPaid.ToString("F2")</p>
-            @if (Model.Payment.PaymentMethod == "Cash" && Model.Payment.AmountPaid >= (Model.TotalPrice * 1.06M))
+            <p>Payment Method: @Model.orderDetail.Payment.PaymentMethod</p>
+            <p>Amount Paid: RM @Model.orderDetail.Payment.AmountPaid.ToString("F2")</p>
+            @if (Model.orderDetail.Payment.PaymentMethod == "Cash" && Model.orderDetail.Payment.AmountPaid >= (Model.orderDetail.TotalPrice * 1.06M))
             {
-                decimal change = Model.Payment.AmountPaid - (Model.TotalPrice * 1.06M);
+                decimal change = Model.orderDetail.Payment.AmountPaid - (Model.orderDetail.TotalPrice * 1.06M);
                 <p>Change: RM @change.ToString("F2")</p>
             }
-            @if (!string.IsNullOrEmpty(Model.Payment.StripeTransactionId))
+            @if (!string.IsNullOrEmpty(Model.orderDetail.Payment.StripeTransactionId))
             {
-                <p>Transaction ID: @Model.Payment.StripeTransactionId</p>
+                <p>Transaction ID: @Model.orderDetail.Payment.StripeTransactionId</p>
             }
         </div>
     }

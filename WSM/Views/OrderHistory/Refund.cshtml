@@ -1,5 +1,5 @@
 ﻿@using WSM.Models
-@model OrderDetail
+@model DetailVM
 
 @{
     ViewBag.Title = "Refund";
@@ -9,16 +9,24 @@
 
 <div id="refund-container">
     <div style="text-align:center;" class="read-details-header">
-        <h1><strong>Food Restaurant</strong></h1>
-        <h4>Address</h4>
+        <div class="page-logo">
+            <img src="@Url.Content(
+                          string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                          ? "~/images/default-logo.png"
+                          : Context.Session.GetString("CompanyLogo")
+                )" alt="Company Logo" style="max-height:50px;" />
+        </div>
+        <h1><strong>@Model.company.CompanyName</strong></h1>
+        <h4>@Model.company.Street, @Model.company.Postcode</h4>
+        <h4>@Model.company.City, @Model.company.State</h4>
     </div>
     <div class="order-info">
-        <h2>Order ID: @Model.Id</h2>
-        <p>Date: @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <h2>Order ID: @Model.orderDetail.Id</h2>
+        <p>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
     </div>
 
     <form method="post" action="/OrderHistory/Refund" id="refundForm">
-        <input type="hidden" name="orderId" value="@Model.Id" />
+        <input type="hidden" name="orderId" value="@Model.orderDetail.Id" />
         
         <table class="detail-table">
             <tr style="border-top:2px solid black;">
@@ -31,9 +39,9 @@
                 <th></th>
             </tr>
 
-            @for (int i = 0; i < Model.OrderItems.Count; i++)
+            @for (int i = 0; i < Model.orderDetail.OrderItems.Count; i++)
             {
-                var item = Model.OrderItems.ElementAt(i);
+                var item = Model.orderDetail.OrderItems.ElementAt(i);
                 <tr>
                     @if (item.SubTotal == 0)
                     {
@@ -64,7 +72,7 @@
                     <strong>Original Total:</strong>
                 </td>
                 <td>
-                    <strong>RM @((Model.OrderItems.Sum(x => x.SubTotal) * 1.06M).ToString("F2"))</strong>
+                    <strong>RM @((Model.orderDetail.OrderItems.Sum(x => x.SubTotal) * 1.06M).ToString("F2"))</strong>
                 </td>
             </tr>
         </table>

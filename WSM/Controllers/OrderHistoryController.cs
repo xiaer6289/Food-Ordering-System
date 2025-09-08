@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WSM.Models;
 using X.PagedList.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WMS.Controllers;
 
@@ -35,7 +36,14 @@ public class OrderHistoryController : Controller
             "Id" => s => s.Id,
             "Total" => s => s.TotalPrice,
             "Date" => s => s.OrderDate,
-            "Status" => s => s.Status,
+            "Status" => s => s.Status switch
+            {
+                "Paid" => 1,
+                "Unpaid" => 2,
+                "Refund" => 3,
+                "Partially Refunded" => 4,
+                _ => 5
+            },
             _ => s => s.Id
         };
 
@@ -76,7 +84,15 @@ public class OrderHistoryController : Controller
             return RedirectToAction("OrderHistory");
         }
 
-        return View(order);
+        var company = db.Companies.FirstOrDefault();
+
+        var vm = new DetailVM
+        {
+            orderDetail = order,
+            company = company
+        };
+
+        return View(vm);
     }
 
     public IActionResult Refund(string? id)
@@ -92,7 +108,16 @@ public class OrderHistoryController : Controller
             TempData["Error"] = "Order not found.";
             return RedirectToAction("OrderHistory");
         }
-        return View(order);
+
+        var company = db.Companies.FirstOrDefault();
+
+        var vm = new DetailVM
+        {
+            orderDetail = order,
+            company = company
+        };
+
+        return View(vm);
     }
 
     // POST: Refund selected items
