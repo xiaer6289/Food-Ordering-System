@@ -1,4 +1,7 @@
-﻿body {
+﻿/* ========================
+   Global Styles
+======================== */
+body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f7fa;
     color: #333;
@@ -12,8 +15,12 @@ h1, h2, h3 {
 
 * {
     transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
 }
 
+/* ========================
+   Header
+======================== */
 .header {
     background: linear-gradient(90deg, #f8f9fa, #e9ecef);
     padding: 15px 20px;
@@ -30,35 +37,14 @@ h1, h2, h3 {
         color: #495057;
     }
 
-    .header .input-group {
-        max-width: 320px;
-        display: flex;
-        align-items: center;
-    }
-
-    .header .form-control {
-        border-radius: 6px 0 0 6px;
-        border: 1px solid #ced4da;
-        border-right: none;
-        padding: 8px 12px;
-    }
-
-    .header .btn {
-        border-radius: 0 6px 6px 0;
-        background-color: #0d6efd;
-        border: none;
-        color: #fff;
-        padding: 8px 15px;
-    }
-
-        .header .btn:hover {
-            background-color: #0b5ed7;
-        }
-
+/* ========================
+   Main Content
+======================== */
 .main-content {
     padding: 20px;
 }
 
+/* Section Title with Add Button */
 .section-title {
     display: flex;
     justify-content: space-between;
@@ -81,36 +67,70 @@ h1, h2, h3 {
         font-size: 0.95rem;
         border-radius: 6px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        color: #fff;
     }
 
         .section-title .btn-success:hover {
             background-color: #157347;
         }
 
+/* ========================
+   Search Bar
+======================== */
 .search-form {
     margin-bottom: 20px;
     max-width: 420px;
+    display: flex;
 }
 
     .search-form .form-control {
         border-radius: 6px 0 0 6px;
-        border-right: none;
         border: 1px solid #ced4da;
-        padding: 8px 12px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        flex: 1;
     }
 
-    .search-form .btn {
-        border-radius: 0 6px 6px 0;
-        background-color: #ffc107;
+    /* Consistent Button Styling */
+    .search-form .btn,
+    .search-form .btn-clear {
         border: none;
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border-radius: 0 6px 6px 0;
+        transition: background-color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    /* Search Button */
+    .search-form .btn {
+        background-color: #ffc107;
         color: #212529;
-        padding: 8px 15px;
     }
 
         .search-form .btn:hover {
             background-color: #e0a800;
         }
 
+    /* Clear Button (keeps same size as search button) */
+    .search-form .btn-clear {
+        background-color: #6c757d;
+        color: #fff;
+        margin-left: 5px;
+        border-radius: 6px;
+    }
+
+        .search-form .btn-clear:hover {
+            background-color: #5a6268;
+        }
+
+/* ========================
+   Table Styling
+======================== */
 .table-responsive {
     background-color: #fff;
     border-radius: 8px;
@@ -155,7 +175,7 @@ h1, h2, h3 {
             background-color: #f8f9fa;
         }
 
-        /* Ensure column spacing is consistent */
+        /* Column width consistency */
         .table th:nth-child(1),
         .table td:nth-child(1) {
             width: 80px;
@@ -195,6 +215,9 @@ h1, h2, h3 {
         background-color: #f8f9fa;
     }
 
+    /* ========================
+   Action Buttons in Table
+======================== */
     .table .actions a {
         margin: 0 4px;
         text-decoration: none;
@@ -224,6 +247,9 @@ h1, h2, h3 {
             background-color: #c82333;
         }
 
+/* ========================
+   Responsive Design
+======================== */
 @media (max-width: 992px) {
     .header {
         flex-direction: column;
@@ -264,6 +290,9 @@ h1, h2, h3 {
     }
 }
 
+/* ========================
+   Transitions
+======================== */
 .btn,
 .table img,
 .table .actions a {

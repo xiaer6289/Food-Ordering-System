@@ -141,6 +141,7 @@ public class AuthorizationController : Controller
             City = "",
             State = "",
             Postcode = "",
+            IsFirstLogin = true,
         };
 
         _db.Companies.Add(company);
@@ -178,7 +179,16 @@ public class AuthorizationController : Controller
         _db.SaveChanges();
 
         TempData["SuccessMessage"] = "Registration successful! You can now login.";
-        return RedirectToAction("Login");
+
+        HttpContext.Session.SetString("CompanyId", company.Id);
+
+        if (!string.IsNullOrEmpty(company.LogoPath))
+        {
+            HttpContext.Session.SetString("CompanyLogo", company.LogoPath);
+        }
+
+        // Redirect directly to FillCompanyProfile
+        return RedirectToAction("FillCompanyProfile");
     }
 
     
@@ -253,55 +263,62 @@ public class AuthorizationController : Controller
         return RedirectToAction("Both", "Home");
     }
 
-    //Forgot Password
+
+    //Forgot password
     [HttpGet]
-    public IActionResult ForgotPassword()
+    public IActionResult ForgotPassword(string role)
     {
+        ViewBag.Role = role; // Pass role to view
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> ForgotPassword(string Email)
+    public async Task<IActionResult> ForgotPassword(string Email, string role)
     {
         var company = _db.Companies.FirstOrDefault(c => c.Email == Email);
+        var admin = _db.Admins.FirstOrDefault(a => a.Email == Email);
+        var staff = _db.Staff.FirstOrDefault(s => s.Email == Email);
 
-        if (company == null)
+        if (company == null && admin == null && staff == null)
         {
-            ViewBag.ErrorMessage = "Email not found."; // use ViewBa
+            ViewBag.ErrorMessage = "Email not found.";
             return View();
         }
 
-        // Generate reset token
         string resetToken = Guid.NewGuid().ToString();
+        DateTime expiry = DateTime.Now.AddHours(1);
 
-        company.ResetToken = resetToken;
-        company.TokenExpiry = DateTime.Now.AddHours(1);
+        if (company != null)
+        {
+            company.ResetToken = resetToken;
+            company.TokenExpiry = expiry;
+        }
+        else if (admin != null)
+        {
+            admin.ResetToken = resetToken;
+            admin.TokenExpiry = expiry;
+        }
+        else if (staff != null)
+        {
+            staff.ResetToken = resetToken;
+            staff.TokenExpiry = expiry;
+        }
         _db.SaveChanges();
 
-        // Build reset link
         string resetLink = Url.Action("ResetPassword", "Authorization",
-            new { token = resetToken, email = Email }, Request.Scheme);
+            new { token = resetToken, email = Email, role = role }, Request.Scheme);
 
-        // Send email
-        string subject = "Food Ordering System Password Reset";
+        string subject = "Password Reset";
         string body = $"<p>Click the link below to reset your password:</p>" +
-                      $"<a href='{resetLink}'>Reset Password</a>" +
-                      "<p>If you didn't request this, ignore this email.</p>";
+                      $"<a href='{resetLink}'>Reset Password</a>";
 
         await _emailSender.SendEmailAsync(Email, subject, body);
 
         return RedirectToAction("ResetPasswordConfirm");
     }
 
-    public IActionResult ResetPasswordConfirm()
-    {
-        return View();
-    }
-
-
-
-    [HttpGet]
-    public IActionResult ResetPassword(string token, string email)
+  
+    public IActionResult ResetPassword(string token, string email, string role)
     {
         var company = _db.Companies.FirstOrDefault(c => c.Email == email && c.ResetToken == token && c.TokenExpiry > DateTime.Now);
         var admin = _db.Admins.FirstOrDefault(a => a.Email == email && a.ResetToken == token && a.TokenExpiry > DateTime.Now);
@@ -310,71 +327,107 @@ public class AuthorizationController : Controller
         if (company == null && admin == null && staff == null)
         {
             TempData["ErrorMessage"] = "Invalid or expired token.";
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", role == "company" ? "Authorization" : "Home");
         }
 
         ViewBag.Email = email;
         ViewBag.Token = token;
+        ViewBag.Role = role;
         return View();
     }
 
     [HttpPost]
-    public IActionResult ResetPassword(string token, string email, string newPassword, string confirmPassword)
+    public IActionResult ResetPassword(string token, string email, string newPassword, string confirmPassword, string role)
     {
         if (newPassword != confirmPassword)
         {
             TempData["ErrorMessage"] = "Passwords do not match.";
             ViewBag.Email = email;
             ViewBag.Token = token;
+            ViewBag.Role = role;
             return View();
         }
 
-        // Password format validation (same as Register)
         string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         if (!Regex.IsMatch(newPassword, passwordPattern))
         {
-            TempData["ErrorMessage"] = "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.";
+            TempData["ErrorMessage"] = "Password must meet complexity requirements.";
             ViewBag.Email = email;
             ViewBag.Token = token;
+            ViewBag.Role = role;
             return View();
         }
 
+        // Fetch all accounts linked to the email
         var company = _db.Companies.FirstOrDefault(c => c.Email == email && c.ResetToken == token && c.TokenExpiry > DateTime.Now);
         var admin = _db.Admins.FirstOrDefault(a => a.Email == email && a.ResetToken == token && a.TokenExpiry > DateTime.Now);
         var staff = _db.Staff.FirstOrDefault(s => s.Email == email && s.ResetToken == token && s.TokenExpiry > DateTime.Now);
 
+        if (company == null && admin == null && staff == null)
+        {
+            TempData["ErrorMessage"] = "Invalid or expired token.";
+            return RedirectToAction("ForgotPassword", new { role = role });
+        }
+
+        string hashedPassword = _passwordHasher.HashPassword(email, newPassword);
+
+        // Update company password and sync with admin
         if (company != null)
         {
-            company.PasswordHash = _passwordHasher.HashPassword(email, newPassword);
+            company.PasswordHash = hashedPassword;
             company.ResetToken = null;
             company.TokenExpiry = null;
+
+            var linkedAdmin = _db.Admins.FirstOrDefault(a => a.Email == company.Email);
+            if (linkedAdmin != null)
+            {
+                linkedAdmin.Password = hashedPassword;
+                linkedAdmin.ResetToken = null;
+                linkedAdmin.TokenExpiry = null;
+            }
         }
-        else if (admin != null)
+
+        // If admin only exists without company
+        if (admin != null && company == null)
         {
-            admin.Password = _passwordHasher.HashPassword(email, newPassword);
+            admin.Password = hashedPassword;
             admin.ResetToken = null;
             admin.TokenExpiry = null;
+
+            var linkedCompany = _db.Companies.FirstOrDefault(c => c.Email == admin.Email);
+            if (linkedCompany != null)
+            {
+                linkedCompany.PasswordHash = hashedPassword;
+                linkedCompany.ResetToken = null;
+                linkedCompany.TokenExpiry = null;
+            }
         }
-        else if (staff != null)
+
+        // Update staff normally
+        if (staff != null)
         {
-            staff.Password = _passwordHasher.HashPassword(email, newPassword);
+            staff.Password = hashedPassword;
             staff.ResetToken = null;
             staff.TokenExpiry = null;
         }
-        else
-        {
-            TempData["ErrorMessage"] = "Invalid or expired token.";
-            return RedirectToAction("ForgotPassword");
-        }
 
         _db.SaveChanges();
-        TempData["SuccessMessage"] = "Password has been reset successfully. Please login.";
-        return RedirectToAction("Login");
-    }
+        TempData["SuccessMessage"] = "Password reset successfully.";
 
+        if (role == "company")
+            return RedirectToAction("Login", "Authorization");
+        else
+            return RedirectToAction("Both", "Home");
+    }
 
     public IActionResult Reset()
     {
         return View();
     }
+
+    public IActionResult ResetPasswordConfirm()
+    {
+        return View();
+    }
+
 }

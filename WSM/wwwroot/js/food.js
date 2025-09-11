@@ -5,18 +5,14 @@
     const preview = document.getElementById("previewImage");
     const resizedImageField = document.getElementById("ResizedImage");
 
-    /* =========================================================
-       SEARCH BOX HIGHLIGHT
-    ========================================================= */
+    /*SEARCH BOX HIGHLIGHT*/
     if (searchBox) {
         searchBox.addEventListener("input", function () {
             this.style.borderColor = this.value.trim() !== "" ? "#0d6efd" : "";
         });
     }
 
-    /* =========================================================
-       SMOOTH SCROLL AFTER FORM SUBMIT
-    ========================================================= */
+    /*SMOOTH SCROLL AFTER FORM SUBMIT*/
     if (form) {
         form.addEventListener("submit", function () {
             setTimeout(() => {
@@ -29,9 +25,7 @@
         });
     }
 
-    /* =========================================================
-       IMAGE PREVIEW + CLIENT-SIDE RESIZE
-    ========================================================= */
+    /*IMAGE PREVIEW + CLIENT-SIDE RESIZE*/
     if (imageInput && preview && resizedImageField) {
         imageInput.addEventListener("change", function (event) {
             const file = event.target.files[0];
@@ -82,9 +76,7 @@
         });
     }
 
-    /* =========================================================
-       CATEGORY DROPDOWN STYLING
-    ========================================================= */
+    /*CATEGORY DROPDOWN STYLING*/
     const categoryDropdown = document.querySelector("select[name='categoryId']");
     if (categoryDropdown) {
         categoryDropdown.addEventListener("change", function () {

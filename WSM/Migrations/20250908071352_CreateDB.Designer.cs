@@ -12,7 +12,7 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250908042930_CreateDB")]
+    [Migration("20250908071352_CreateDB")]
     partial class CreateDB
     {
         /// <inheritdoc />

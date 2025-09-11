@@ -825,3 +825,12 @@ header {
     border-radius: 50%; 
     object-fit: cover; 
 }
+
+.company-logo {
+    width: 60px; /* fixed size */
+    height: 60px;
+    border-radius: 50%; /* makes it circular */
+    object-fit: cover; /* ensures image fills the circle */
+    border: 2px solid #ddd; /* optional: adds a border */
+    background-color: #fff; /* fallback if image has transparency */
+}

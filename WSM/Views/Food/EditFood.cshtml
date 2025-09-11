@@ -1,7 +1,9 @@
-﻿@model WSM.Models.Food
+﻿@model WSM.Models.FoodEditVM
+
 @{
     ViewData["Title"] = "Edit Food";
 }
+
 <link rel="stylesheet" href="~/css/food.css" />
 
 @if (TempData["SuccessMessage"] != null)
@@ -19,7 +21,6 @@
 
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <!-- Hidden ID -->
     <input type="hidden" asp-for="Id" />
 
     <!-- Food Name -->
@@ -48,7 +49,6 @@
         <label asp-for="Image" class="form-label">Image URL</label>
         <input asp-for="Image" id="ImageUrl" class="form-control" placeholder="Enter image URL (optional)" />
         <span asp-validation-for="Image" class="text-danger"></span>
-        <!-- Live preview -->
         <div class="mt-2">
             <img id="previewImage"
                  src="@Model?.Image"
@@ -60,14 +60,13 @@
 
     <!-- Category -->
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category <span class="text-danger">*</span></label>
+        <label asp-for="CategoryId" class="form-label">Category</label>
         <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-            <option value="">-- Select Category --</option>
+            <option value="">-- Keep Current Category --</option>
         </select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
-    <!-- Submit buttons -->
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">Save Changes</button>
         <a asp-action="Foods" class="btn btn-secondary">Cancel</a>
@@ -76,7 +75,7 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const imageInput = document.getElementById('ImageUrl');
             const preview = document.getElementById('previewImage');
 
@@ -87,8 +86,7 @@
                         preview.src = url;
                         preview.style.display = 'block';
 
-                        // Test if image loads
-                        preview.onload = function() {
+                        preview.onload = function () {
                             preview.style.display = 'block';
                         };
 
@@ -101,7 +99,6 @@
                     }
                 });
 
-                // Handle existing image error
                 preview.onerror = function () {
                     preview.style.display = 'none';
                 };

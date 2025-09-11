@@ -62,7 +62,9 @@
                     <a asp-controller="Authorization" asp-action="Register">Register here</a>
                 </p>
                 <p class="text-center mt-4">
-                    <a href="@Url.Action("ForgotPassword", "Authorization")">Forgot password?</a>
+                    <a href="@Url.Action("ForgotPassword", "Authorization", new { role = "company" })">
+                        Forgot password?
+                    </a>
                 </p>
 
                 
