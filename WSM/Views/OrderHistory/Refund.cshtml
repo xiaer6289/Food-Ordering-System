@@ -14,15 +14,23 @@
                           string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
                           ? "~/images/default-logo.png"
                           : Context.Session.GetString("CompanyLogo")
-                )" alt="Company Logo" style="max-height:50px;" />
+                )" alt="Company Logo" class="page-logo"/>
         </div>
-        <h1><strong>@Model.company.CompanyName</strong></h1>
-        <h4>@Model.company.Street, @Model.company.Postcode</h4>
-        <h4>@Model.company.City, @Model.company.State</h4>
-    </div>
-    <div class="order-info">
-        <h2>Order ID: @Model.orderDetail.Id</h2>
-        <p>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+            <h1><strong>@Model.company.CompanyName</strong></h1>
+            <h4>@Model.company.Street, @Model.company.Postcode</h4>
+            <h4>@Model.company.City, @Model.company.State</h4>
+
+            <div class="order-info">
+            <span>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+            <br>
+            <span>Order ID: @Model.orderDetail.Id</span>
+        </div>
+        <div class="additional-info">
+        <span>Table No: @Model.orderDetail.SeatNo</span>
+        <br>
+        <span>Status: @Model.orderDetail.Status</span>
+        <br>
+        </div>
     </div>
 
     <form method="post" action="/OrderHistory/Refund" id="refundForm">

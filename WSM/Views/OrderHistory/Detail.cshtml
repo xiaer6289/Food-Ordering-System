@@ -16,10 +16,10 @@
     <div style="text-align:center;" class="read-details-header">
         <div class="page-logo">
             <img src="@Url.Content(
-                     string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
-                           ? "~/images/default-logo.png"
-                           : Context.Session.GetString("CompanyLogo")
-                )" alt="Company Logo" style="max-height:50px;" />
+                      string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                      ? "~/images/default-logo.png"
+                      : Context.Session.GetString("CompanyLogo")
+            )" alt="Company Logo" class="page-logo" />
         </div>
         <h1><strong>@Model.company.CompanyName</strong></h1>
         <h4>@Model.company.Street, @Model.company.Postcode</h4>

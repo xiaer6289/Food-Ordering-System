@@ -14,6 +14,7 @@
 
         <div class="left-header">
             <div class="logo">
+                <a href="../Home/Both">
                 <img src="@Url.Content(
                                          string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
                                              ? "~/images/default-logo.png"
@@ -21,6 +22,7 @@
                                      )"
                      alt="Company Logo"
                      class="company-logo" />
+                </a>
             </div>
 
 

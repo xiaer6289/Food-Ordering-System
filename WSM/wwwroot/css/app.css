@@ -722,6 +722,7 @@ header {
 
     .detail-table td {
         border: none; 
+        font-size: 16px;
     }
 
 .payment-info {
@@ -819,11 +820,13 @@ header {
 
 
 .page-logo {
-    margin: 0 auto; /* center horizontally */
-    width: 80px; 
-    height: 80px;
+    margin: 0 auto; 
+    width: 120px;
+    height: 120px;
     border-radius: 50%; 
     object-fit: cover; 
+    border: 2px solid #ddd; 
+    background-color: #fff; 
 }
 
 .company-logo {
@@ -833,4 +836,8 @@ header {
     object-fit: cover; /* ensures image fills the circle */
     border: 2px solid #ddd; /* optional: adds a border */
     background-color: #fff; /* fallback if image has transparency */
+}
+
+.logo{
+    cursor: pointer;
 }
