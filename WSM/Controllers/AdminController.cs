@@ -21,17 +21,17 @@ namespace WSM.Controllers
         {
             searchString = searchString?.Trim();
 
+            // ViewData for sorting and searching
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentSort"] = sortOrder;
             ViewData["IdSortParm"] = sortOrder == "Id" ? "id_desc" : "Id";
             ViewData["NameSortParm"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["EmailSortParm"] = sortOrder == "Email" ? "email_desc" : "Email";
-            ViewData["PhoneSortParm"] = sortOrder == "Phone" ? "phone_desc" : "Phone";
 
             var companyId = HttpContext.Session.GetString("CompanyId");
 
             var admins = db.Admins.Where(a => a.CompanyId == companyId).AsQueryable();
 
+            // Filtering by search string
             if (!string.IsNullOrEmpty(searchString))
             {
                 admins = admins.Where(a =>
@@ -40,15 +40,12 @@ namespace WSM.Controllers
                     a.Email.Contains(searchString));
             }
 
+            // Sorting only by ID or Name
             admins = sortOrder switch
             {
                 "id_desc" => admins.OrderByDescending(a => a.Id),
                 "Id" => admins.OrderBy(a => a.Id),
                 "name_desc" => admins.OrderByDescending(a => a.Name),
-                "Email" => admins.OrderBy(a => a.Email),
-                "email_desc" => admins.OrderByDescending(a => a.Email),
-                "Phone" => admins.OrderBy(a => a.PhoneNo),
-                "phone_desc" => admins.OrderByDescending(a => a.PhoneNo),
                 _ => admins.OrderBy(a => a.Name),
             };
 
@@ -75,6 +72,7 @@ namespace WSM.Controllers
             model.Id = GenerateSequentialId();
             model.CompanyId = companyId;
 
+            // Clear validation errors for auto-generated fields
             if (ModelState.ContainsKey("Id"))
             {
                 ModelState["Id"].Errors.Clear();
@@ -87,16 +85,20 @@ namespace WSM.Controllers
                 ModelState["CompanyId"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
             }
 
+            // Phone number validation
             if (!string.IsNullOrEmpty(model.PhoneNo) && !Regex.IsMatch(model.PhoneNo, @"^01[0-9]{8,13}$"))
             {
                 ModelState.AddModelError("PhoneNo", "Phone number must start with '01' and be 10 to 15 digits long.");
             }
 
-            if (!string.IsNullOrEmpty(model.Password) && !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
+            // Password validation
+            if (!string.IsNullOrEmpty(model.Password) &&
+                !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
             {
                 ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase, one lowercase, one digit, and one special character (!@#$%^&*).");
             }
 
+            // Email validation
             if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
                 ModelState.AddModelError("Email", "Please enter a valid email address.");
@@ -106,11 +108,14 @@ namespace WSM.Controllers
             {
                 try
                 {
+                    // Hash password before saving
                     var hasher = new PasswordHasher<Admin>();
                     model.Password = hasher.HashPassword(model, model.Password);
 
                     db.Admins.Add(model);
                     db.SaveChanges();
+
+                    TempData["SuccessMessage"] = $"Admin '{model.Name}' added successfully.";
                     return RedirectToAction("Admins");
                 }
                 catch (DbUpdateException ex)
@@ -161,12 +166,11 @@ namespace WSM.Controllers
                 var admin = db.Admins.FirstOrDefault(a => a.Id == model.Id && a.CompanyId == companyId);
                 if (admin == null) return NotFound();
 
-                // Update profile fields without needing a password
                 admin.Name = model.Name;
                 admin.Email = model.Email;
                 admin.PhoneNo = model.PhoneNo;
 
-                // Only hash & update password if a new one was provided
+                // If password was updated
                 if (!string.IsNullOrWhiteSpace(model.NewPassword))
                 {
                     var hasher = new PasswordHasher<Admin>();
@@ -174,13 +178,13 @@ namespace WSM.Controllers
                 }
 
                 db.SaveChanges();
+
+                TempData["SuccessMessage"] = $"Admin '{admin.Name}' updated successfully.";
                 return RedirectToAction("Admins");
             }
 
             return View(model);
         }
-
-
 
         // GET: /Admin/DeleteAdmin/{id}
         public IActionResult DeleteAdmin(string id)
@@ -192,14 +196,17 @@ namespace WSM.Controllers
 
             if (admin == null) return NotFound();
 
+            // Prevent deletion if linked to staff
             if (admin.Staffs.Any())
             {
-                ModelState.AddModelError("", "Cannot delete admin because they are linked to staff records.");
-                return View("Admins", db.Admins.Where(a => a.CompanyId == companyId).ToList());
+                TempData["ErrorMessage"] = $"Cannot delete admin '{admin.Name}' because they are linked to staff records.";
+                return RedirectToAction("Admins");
             }
 
             db.Admins.Remove(admin);
             db.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Admin '{admin.Name}' deleted successfully.";
             return RedirectToAction("Admins");
         }
 
