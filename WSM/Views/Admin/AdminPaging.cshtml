@@ -1,6 +1,6 @@
-﻿@using X.PagedList
-@using X.PagedList.Mvc.Core
-@model IPagedList<WSM.Models.Admin>
+﻿@model X.PagedList.IPagedList<WSM.Models.Admin>
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
 
 @{
     ViewData["Title"] = "Admin List";
@@ -39,11 +39,6 @@
 }
 else
 {
-    <p class="pagination-count">
-        Showing @Model.Count of @Model.TotalItemCount admins |
-        Page @Model.PageNumber of @Model.PageCount
-    </p>
-
     <table class="table table-bordered table-hover">
         <thead class="table-dark">
             <tr>
@@ -72,40 +67,29 @@ else
                     <td>@admin.PhoneNo</td>
                     <td>
                         <a asp-action="EditAdmin" asp-route-id="@admin.Id" class="btn btn-sm btn-warning">Edit</a>
-                        <a asp-action="DeleteAdmin"
-                           asp-route-id="@admin.Id"
-                           data-admin-name="@admin.Name"
-                           class="btn btn-sm btn-danger delete-admin">
-                            Delete
-                        </a>
+                        <a asp-action="DeleteAdmin" asp-route-id="@admin.Id" class="btn btn-sm btn-danger delete-admin" data-admin-name="@admin.Name">Delete</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <!-- Pagination Controls -->
-    <div class="pagination-wrapper">
-        @{
-            var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
-            options.LinkToFirstPageFormat = "First";
-            options.LinkToLastPageFormat = "Last";
-            options.LinkToPreviousPageFormat = "Previous";
-            options.LinkToNextPageFormat = "Next";
-        }
-
-        @Html.PagedListPager(
-            Model,
-            page => Url.Action("Admins", new { 
-                page,
-                sortOrder = ViewData["CurrentSort"], 
-                searchString = ViewData["CurrentFilter"] 
-            }),
-            options
-        )
-    </div>
+    <!-- Pagination Control -->
+    <div class="d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Admins", new {
+        pageNumber = page,
+        searchString = ViewData["CurrentFilter"],
+        sortOrder = ViewData["CurrentSort"]
+        }), new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>
 }
-
-<!-- Include JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/admin.js"></script>

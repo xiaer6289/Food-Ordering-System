@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using System.Text.RegularExpressions;
 using WSM.Models;
+using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
@@ -17,7 +18,7 @@ namespace WSM.Controllers
         }
 
         // GET: /Admin/Admins
-        public IActionResult Admins(string searchString, string sortOrder)
+        public IActionResult Admins(string searchString, string sortOrder, int? page)
         {
             searchString = searchString?.Trim();
 
@@ -29,7 +30,9 @@ namespace WSM.Controllers
 
             var companyId = HttpContext.Session.GetString("CompanyId");
 
-            var admins = db.Admins.Where(a => a.CompanyId == companyId).AsQueryable();
+            var admins = db.Admins
+                           .Where(a => a.CompanyId == companyId)
+                           .AsQueryable();
 
             // Filtering by search string
             if (!string.IsNullOrEmpty(searchString))
@@ -40,7 +43,7 @@ namespace WSM.Controllers
                     a.Email.Contains(searchString));
             }
 
-            // Sorting only by ID or Name
+            // Sorting
             admins = sortOrder switch
             {
                 "id_desc" => admins.OrderByDescending(a => a.Id),
@@ -49,7 +52,13 @@ namespace WSM.Controllers
                 _ => admins.OrderBy(a => a.Name),
             };
 
-            return View(admins.ToList());
+            // Paging
+            int pageSize = 10; // Items per page
+            int pageNumber = page ?? 1;
+
+            var pagedAdmins = admins.ToPagedList(pageNumber, pageSize);
+
+            return View(pagedAdmins);
         }
 
         // GET: /Admin/CreateAdmin
