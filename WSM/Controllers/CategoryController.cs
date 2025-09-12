@@ -88,19 +88,21 @@ namespace WSM.Controllers
         [HttpPost]
         public IActionResult EditCategory(CategoryVM model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var category = _db.Categories.FirstOrDefault(c => c.Id == model.Id);
-                if (category == null) return NotFound();
-
-                category.Name = model.Name;
-
-                _db.Categories.Update(category);
-                _db.SaveChanges();
-
-                return RedirectToAction("Categories");
+                return View("EditCategory", model);
             }
-            return View("EditCategory", model);
+
+            var category = _db.Categories.FirstOrDefault(c => c.Id == model.Id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            category.Name = model.Name;
+            _db.SaveChanges(); // EF will update tracked entity
+
+            return RedirectToAction("Categories");
         }
 
         // =============================

@@ -841,3 +841,33 @@ header {
 .logo{
     cursor: pointer;
 }
+
+.btn-back {
+    background-color: #6c757d; /* gray */
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+}
+
+    .btn-back:hover {
+        background-color: #5a6268;
+        color: #fff;
+    }
+
+.btn-add-category {
+    background-color: #28a745; /* green */
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+}
+
+    .btn-add-category:hover {
+        background-color: #218838;
+        color: #fff;
+    }
