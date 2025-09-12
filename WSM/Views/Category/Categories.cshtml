@@ -1,0 +1,66 @@
+﻿@model IEnumerable<WSM.Models.CategoryVM>
+
+@{
+    ViewData["Title"] = "Category Management";
+}
+
+<div class="container mt-4">
+    <div class="section-title d-flex justify-content-between align-items-center">
+        <h2>Category Management</h2>
+        <div>
+            <a asp-controller="Food" asp-action="Foods" class="btn btn-secondary me-2">← Back to Food</a>
+            <a asp-action="CreateCategory" class="btn btn-success">+ Add Category</a>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <form asp-action="Categories" method="get" class="search-form">
+        <div class="input-group">
+            <input type="text" name="searchString" class="form-control search-box"
+                   placeholder="Search by name" value="@ViewData["CurrentFilter"]" />
+            <button type="submit" class="btn btn-warning">Search</button>
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+            {
+                <a asp-action="Categories" class="btn btn-warning">Clear</a>
+            }
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No category records found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var category in Model)
+                    {
+                        <tr>
+                            <td>@category.Id</td>
+                            <td>@category.Name</td>
+                            <td class="actions">
+                                <a asp-action="EditCategory" asp-route-id="@category.Id" class="btn btn-primary">Edit</a>
+                                <form asp-action="DeleteConfirmed" asp-route-id="@category.Id" method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
