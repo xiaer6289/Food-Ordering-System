@@ -6,15 +6,36 @@
     string[] fields = ["Id", "Seat", "Total", "status", "Date", ""];
 }
 
+<div class="select-list">
+@using (Html.BeginForm("OrderHistory", "OrderHistory"))
+{
+    @Html.DropDownList(
+    "status",
+    new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Paid", Value = "Paid" },
+        new SelectListItem { Text = "Pending", Value = "Pending" },
+        new SelectListItem { Text = "Partially Refunded", Value = "Partially Refunded" },
+        new SelectListItem { Text = "Refunded", Value = "Refunded" }
+    },
+    "------ All ------",
+    new { @class="select-status", onchange = "this.form.submit()", @value = ViewBag.Status }
+)
+
 <form>
     @Html.Hidden("sort")
     @Html.Hidden("dir")
 </form>
 
+}
+</div>
+
 <p>
     @Model.Count() of @Model.TotalItemCount orders |
     Page @Model.PageNumber of @Model.PageCount
 </p>
+
+
 
 <div id="target">
     <table class="record-table">
@@ -31,7 +52,7 @@
                 }
 
                 <th>
-                    <a href="?name=@ViewBag.Name&sort=@f&dir=@d" class="@c">@f</a>
+                    <a href="?name=@ViewBag.Name&status=@ViewBag.Status&sort=@f&dir=@d" class="@c">@f</a>
                 </th>
             }
         </tr>

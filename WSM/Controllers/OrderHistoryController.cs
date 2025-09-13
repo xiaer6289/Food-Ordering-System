@@ -15,7 +15,7 @@ public class OrderHistoryController : Controller
         this.db = db;
     }
 
-    public IActionResult OrderHistory(string? id, string? sort, string? dir, int page = 1)
+    public IActionResult OrderHistory(string? id, string? sort, string? dir, string? status, int page = 1)
     {
         // For Layout.cshtml search bar
         ViewBag.SearchContext = "OrderHistory";
@@ -26,6 +26,13 @@ public class OrderHistoryController : Controller
         var searched = db.OrderDetails
                          .Include(o => o.Payment)
                          .Where(s => s.Id.Contains(id));
+
+        // Filtering
+        ViewBag.Status = status;
+        if (!string.IsNullOrEmpty(status) && status != "--All--")
+        {
+            searched = searched.Where(s => s.Status == status);
+        }
 
         //sorting
         ViewBag.Sort = sort;
@@ -39,9 +46,9 @@ public class OrderHistoryController : Controller
             "Status" => s => s.Status switch
             {
                 "Paid" => 1,
-                "Unpaid" => 2,
-                "Refund" => 3,
-                "Partially Refunded" => 4,
+                "Pending" => 2,
+                "Partially Refunded" => 3,
+                "Refunded" => 4,
                 _ => 5
             },
             _ => s => s.Id

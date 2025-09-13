@@ -2,7 +2,7 @@
 
 namespace WSM.Models;
 
-public class DetailVM
+public class DetailVM      //wrap multiple table
 {
     public OrderDetail orderDetail { get; set; }
     public Company company { get; set; }

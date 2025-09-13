@@ -69,7 +69,7 @@ window.onclick = function (event) {
 function generatePDF() {
     const pdf = document.getElementById("PDF");
 
-    // You can dynamically set the filename here
+    //dynamically set the filename with date
     const fileName = "Order_" + new Date().toISOString().slice(0, 10) + ".pdf";
 
     html2pdf().from(pdf).save(fileName);
