@@ -83,7 +83,7 @@ namespace WSM.Controllers
             if (food == null)
                 return NotFound();
             // Map database entity to ViewModel
-            var model = new FoodEditVM
+            var model = new EditFoodVM
             {
                 Id = food.Id,
                 Name = food.Name,
@@ -100,7 +100,7 @@ namespace WSM.Controllers
         // POST: Edit Food
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditFood(FoodEditVM model)
+        public IActionResult EditFood(EditFoodVM model)
         {
             if (!ModelState.IsValid)
             {

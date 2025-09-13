@@ -1,0 +1,26 @@
+﻿@model WSM.Models.Category
+
+<div class="edit-ingredient-form">
+    <h2 class="edit-ingredient-title">Add Category</h2>
+
+    <form asp-action="CreateCategory" method="post" class="edit-ingredient-wrapper">
+        <div>
+            <label asp-for="Id"></label>
+            <input asp-for="Id" type="text" class="form-control" />
+            <span asp-validation-for="Id" class="text-danger"></span>
+            <small class="form-text text-muted">Example: C01</small>
+        </div>
+
+        <div>
+            <label asp-for="Name"></label>
+            <input asp-for="Name" type="text" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <small class="form-text text-muted">Example: Drinks, Dessert, Fast Food</small>
+        </div>
+
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Save</button>
+            <a asp-action="Categories" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
