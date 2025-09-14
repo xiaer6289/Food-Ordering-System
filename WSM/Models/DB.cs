@@ -18,6 +18,7 @@ public class DB : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    //seat table
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -195,6 +196,7 @@ public class Staff
     public DateTime? TokenExpiry { get; set; }
 }
 
+ //seat table {}
 public class OrderDetail
 {
     [Key, MaxLength(20)]
