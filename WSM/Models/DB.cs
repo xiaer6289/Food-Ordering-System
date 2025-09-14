@@ -18,7 +18,8 @@ public class DB : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
-    //seat table
+
+    public DbSet<Seat> Seat { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +38,13 @@ public class DB : DbContext
             .WithMany()
             .HasForeignKey(s => s.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Seat)
+            .WithMany()
+            .HasForeignKey(od => od.SeatNo)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
 }
 
@@ -196,14 +204,24 @@ public class Staff
     public DateTime? TokenExpiry { get; set; }
 }
 
- //seat table {}
+public class Seat
+{
+    [Key]
+    public int SeatNo { get; set; }
+
+    [Required]
+    [MaxLength(20)]
+    public string Status { get; set; }
+}
+
 public class OrderDetail
 {
     [Key, MaxLength(20)]
     public string Id { get; set; }
-    
-    [MaxLength(4)]
-    public string SeatNo { get; set; }
+
+    [Required]
+    public int SeatNo { get; set; }
+    public Seat Seat { get; set; }
 
     [Required]
     public int Quantity { get; set; }
@@ -219,7 +237,6 @@ public class OrderDetail
     [Required]
     public DateTime OrderDate { get; set; }
 
-    [ForeignKey("Staff")]
     public string StaffId { get; set; }
     public Staff Staff { get; set; }
 

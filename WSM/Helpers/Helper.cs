@@ -54,7 +54,7 @@ namespace WSM.Helpers
             var orderDetail = new OrderDetail
             {
                 Id = orderId,
-                SeatNo = "N/A",
+                SeatNo = 0,
                 Quantity = cart.Sum(x => x.Value),
                 TotalPrice = CalculateTotal(),
                 Status = "Completed",
