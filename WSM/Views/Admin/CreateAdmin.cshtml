@@ -2,67 +2,60 @@
 @{
     ViewData["Title"] = "Add Admin";
 }
-<link rel="stylesheet" href="~/css/admin.css" />
 
-<div class="company-info">
-    <h2>Add Admin</h2>
-</div>
+<div class="edit-ingredient-form">
+    <h2 class="edit-ingredient-title">Add Admin</h2>
 
-<!-- Success Message -->
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success text-center">
-        @TempData["SuccessMessage"]
-    </div>
-}
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        <ul>
-            @foreach (var error in ViewData.ModelState.Where(m => m.Key != "PhoneNo").SelectMany(v => v.Value.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
-    </div>
-}
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Where(m => m.Key != "PhoneNo").SelectMany(v => v.Value.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
 
-<div class="card-container">
-    <form asp-action="CreateAdmin" method="post">
+    <form asp-action="CreateAdmin" method="post" class="edit-ingredient-wrapper">
         @Html.AntiForgeryToken()
 
-        <!-- Name -->
-        <div class="form-group">
+        <div>
             <label asp-for="Name">Name</label>
-            <input asp-for="Name" placeholder="Enter admin name" />
+            <input asp-for="Name" placeholder="Enter admin name" class="edit-ingredient-quantity" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
-        <!-- Email -->
-        <div class="form-group">
+        <div>
             <label asp-for="Email">Email</label>
-            <input asp-for="Email" type="email" placeholder="e.g., admin@example.com" maxlength="100" required />
+            <input asp-for="Email" type="email" placeholder="e.g., admin@example.com" maxlength="100" class="edit-ingredient-quantity" required />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
-        <!-- Phone Number -->
-        <div class="form-group">
+        <div>
             <label asp-for="PhoneNo">Phone Number</label>
-            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" required />
+            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" class="edit-ingredient-quantity" required />
             <span asp-validation-for="PhoneNo" class="text-danger"></span>
         </div>
 
-        <!-- Password -->
-        <div class="form-group">
+        <div>
             <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" placeholder="Enter password" />
+            <input asp-for="Password" type="password" placeholder="Enter password" class="edit-ingredient-quantity" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
-        <div class="login-selection">
-            <button type="submit" class="role-card role-admin">Add Admin</button>
-            <a asp-action="Admins" class="role-card role-staff">Cancel</a>
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Add Admin</button>
+            <a asp-action="Admins" class="cancel-btn">Cancel</a>
         </div>
     </form>
 </div>

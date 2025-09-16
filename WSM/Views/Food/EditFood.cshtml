@@ -4,74 +4,74 @@
     ViewData["Title"] = "Edit Food";
 }
 
-<link rel="stylesheet" href="~/css/food.css" />
-
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success">
         @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<h2>Edit Food</h2>
+<div class="edit-ingredient-form">
+    <h2 class="edit-ingredient-title">Edit Food</h2>
 
-<form asp-controller="Food" asp-action="EditFood" method="post">
-    @Html.AntiForgeryToken()
+    <form asp-controller="Food" asp-action="EditFood" method="post" class="edit-ingredient-wrapper">
+        @Html.AntiForgeryToken()
 
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="Id" />
 
-    <input type="hidden" asp-for="Id" />
-
-    <!-- Food Name -->
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Food Name <span class="text-danger">*</span></label>
-        <input asp-for="Name" class="form-control" placeholder="Enter food name" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <!-- Price -->
-    <div class="mb-3">
-        <label asp-for="Price" class="form-label">Price <span class="text-danger">*</span></label>
-        <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.10" max="9999.99" placeholder="e.g., 10.50" />
-        <span asp-validation-for="Price" class="text-danger"></span>
-    </div>
-
-    <!-- Description -->
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter description (optional)"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <!-- Image URL -->
-    <div class="mb-3">
-        <label asp-for="Image" class="form-label">Image URL</label>
-        <input asp-for="Image" id="ImageUrl" class="form-control" placeholder="Enter image URL (optional)" />
-        <span asp-validation-for="Image" class="text-danger"></span>
-        <div class="mt-2">
-            <img id="previewImage"
-                 src="@Model?.Image"
-                 alt="Preview"
-                 class="img-thumbnail"
-                 style="max-width:150px; @(string.IsNullOrEmpty(Model?.Image) ? "display:none;" : "")" />
+        <!-- Food Name -->
+        <div>
+            <label asp-for="Name">Food Name <span class="text-danger">*</span></label>
+            <input asp-for="Name" placeholder="Enter food name" class="edit-ingredient-quantity" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    </div>
 
-    <!-- Category -->
-    <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-            <option value="">-- Keep Current Category --</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
+        <!-- Price -->
+        <div>
+            <label asp-for="Price">Price <span class="text-danger">*</span></label>
+            <input asp-for="Price" type="number" step="0.01" min="0.10" max="9999.99"
+                   placeholder="e.g., 10.50" class="edit-ingredient-quantity" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
 
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Foods" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
+        <!-- Description -->
+        <div>
+            <label asp-for="Description">Description</label>
+            <textarea asp-for="Description" class="edit-ingredient-quantity" rows="3"
+                      placeholder="Enter description (optional)"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <!-- Image URL with Preview -->
+        <div>
+            <label asp-for="Image">Image URL</label>
+            <input asp-for="Image" id="ImageUrl" class="edit-ingredient-quantity" placeholder="Enter image URL (optional)" />
+            <span asp-validation-for="Image" class="text-danger"></span>
+
+            <div class="mt-2">
+                <img id="previewImage"
+                     src="@Model?.Image"
+                     alt="Preview"
+                     style="max-width:150px; @(string.IsNullOrEmpty(Model?.Image) ? "display:none;" : "")" />
+            </div>
+        </div>
+
+        <!-- Category -->
+        <div>
+            <label asp-for="CategoryId">Category</label>
+            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="edit-ingredient-quantity">
+                <option value="">-- Keep Current Category --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Save Changes</button>
+            <a asp-action="Foods" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <script>
@@ -85,15 +85,6 @@
                     if (url) {
                         preview.src = url;
                         preview.style.display = 'block';
-
-                        preview.onload = function () {
-                            preview.style.display = 'block';
-                        };
-
-                        preview.onerror = function () {
-                            preview.style.display = 'none';
-                            console.log('Image failed to load: ' + url);
-                        };
                     } else {
                         preview.style.display = 'none';
                     }
