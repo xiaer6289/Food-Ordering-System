@@ -18,13 +18,14 @@ namespace WSM.Controllers
         }
 
         // GET: /Admin/Admins
-        public IActionResult Admins(string id, string sort, string dir, int page = 1)
+        public IActionResult Admins(string? id, string? sort, string? dir, int page = 1)
         {
+            // Setup for search bar in Layout
             ViewBag.SearchContext = "Admin";
-            ViewBag.SearchPlaceholder = "Search by Name, Email, or Phone";
+            ViewBag.SearchPlaceholder = "Search by Admin ID or Name";
 
-            // Trim search input
-            id = id?.Trim() ?? "";
+            // Trim input
+            ViewBag.Name = id = id?.Trim() ?? "";
 
             var companyId = HttpContext.Session.GetString("CompanyId");
             if (string.IsNullOrEmpty(companyId))
@@ -32,19 +33,25 @@ namespace WSM.Controllers
                 return RedirectToAction("Login", "Authorization");
             }
 
+            // Base query
             var admins = db.Admins
                            .Where(a => a.CompanyId == companyId)
                            .AsQueryable();
 
+            // Searching
             if (!string.IsNullOrEmpty(id))
             {
-                string lowerId = id.ToLower();
-                admins = admins.Where(a =>
-                    a.Name.ToLower().Contains(lowerId) ||
-                    a.PhoneNo.ToLower().Contains(lowerId) ||
-                    a.Email.ToLower().Contains(lowerId));
+                // If input matches an exact Admin ID
+                if (admins.Any(a => a.Id == id))
+                {
+                    admins = admins.Where(a => a.Id == id);
+                }
+                else
+                {
+                    // Otherwise, search by partial Name
+                    admins = admins.Where(a => a.Name.Contains(id));
+                }
             }
-
 
             // Sorting
             ViewBag.Sort = sort;
@@ -55,7 +62,7 @@ namespace WSM.Controllers
                 "Id" => a => a.Id,
                 "Name" => a => a.Name,
                 "Email" => a => a.Email,
-                _ => a => a.Name
+                _ => a => a.Id // default sort by Id
             };
 
             var sorted = dir == "des"
@@ -75,8 +82,15 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = pagedAdmins.PageCount });
             }
 
+            // Support for AJAX partial rendering
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_AdminsPartial", pagedAdmins);
+            }
+
             return View(pagedAdmins);
         }
+
 
 
         // GET: /Admin/CreateAdmin

@@ -105,6 +105,8 @@ public class Food
     public string? Description { get; set; }
 
     public string? Image { get; set; }
+    [NotMapped]
+    public IFormFile? Photo { get; set; }
 
     [ForeignKey("Category")]
     public string CategoryId { get; set; }
