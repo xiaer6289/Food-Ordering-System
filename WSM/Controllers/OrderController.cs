@@ -16,38 +16,6 @@ namespace WSM.Controllers
             _db = db;
         }
 
-        public IActionResult FoodListing(string categoryId = "All")
-        {
-            var categories = _db.Categories.ToList();
-            ViewBag.Categories = categories;
-            ViewBag.SelectedCategory = categoryId;
-
-            IQueryable<WSM.Models.Food> foods = _db.Foods;
-
-            if (categoryId != "All")
-                foods = foods.Where(f => f.CategoryId == categoryId);
-
-            return View(foods.ToList());
-        }
-
-
-        public IActionResult FoodDetail(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-                return NotFound();
-
-            var food = _db.Foods
-                          .Where(f => f.Id == id)
-                          .FirstOrDefault();
-
-            if (food == null)
-                return NotFound();
-
-            ViewBag.Cart = _helper.GetCart();
-            return View(food);
-        }
-
-
         public IActionResult Cart()
         {
 

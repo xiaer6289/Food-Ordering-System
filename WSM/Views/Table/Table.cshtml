@@ -1,0 +1,36 @@
+﻿@model List<WSM.Models.Seat>
+
+@{
+    ViewData["Title"] = "Table Management";
+}
+
+<link rel="stylesheet" href="~/css/app.css" />
+
+<div class="container mt-4">
+    <h3>Table Management</h3>
+    <div class="three-column-layout">
+        <div class="table-area">
+            <p>Total Seats: <strong>@Model.Count</strong></p>
+            <div class="table-grid">
+                @foreach (var seat in Model)
+                {
+                    <a asp-controller="Menu" asp-action="FoodListing" asp-route-SeatNo="@seat.SeatNo" class="table-link">
+                        <div class="table-square @(seat.Status == "Available" ? "available" : "occupied")">
+                            <span class="seat-badge">@seat.SeatNo</span>
+                            <div class="seat-center">
+                                <div class="seat-status">
+                                    @seat.Status
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="action-area">
+            <a asp-controller="Table" asp-action="Create" class="btn btn-success mb-2">Add Table</a>
+            <a asp-controller="Table" asp-action="Delete" class="btn btn-danger">Delete Table</a>
+        </div>
+    </div>
+</div>

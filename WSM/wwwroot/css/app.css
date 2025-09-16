@@ -916,3 +916,63 @@ select.select-status option {
     padding-left: 15px;
     padding-bottom: 15px;
 }
+
+.three-column-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.table-area {
+    flex: 1 1 70%; 
+}
+
+.action-area {
+    flex: 0 0 20%; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Table square style */
+.table-square {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+.seat-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.table-square.available {
+    background: #2ecc71;
+}
+
+.table-square.occupied {
+    background: #e74c3c;
+}
+
+.seat-status {
+    font-size: 18px;
+    text-align: center;
+}

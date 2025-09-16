@@ -207,6 +207,7 @@ public class Staff
 public class Seat
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int SeatNo { get; set; }
 
     [Required]

@@ -59,7 +59,7 @@ namespace WSM.Controllers
                 {
                     HttpContext.Session.SetString("StaffAdminId", admin.Id);
                     HttpContext.Session.SetString("Role", "Admin");
-                    return RedirectToAction("Admins","Admin");
+                    return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
             }
 
@@ -78,7 +78,7 @@ namespace WSM.Controllers
                 {
                     HttpContext.Session.SetString("StaffAdminId", staff.Id);
                     HttpContext.Session.SetString("Role", "Staff");
-                    return RedirectToAction("Staff");
+                    return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
             }
 

@@ -329,10 +329,7 @@ namespace WMS.Migrations
             modelBuilder.Entity("WSM.Models.Seat", b =>
                 {
                     b.Property<int>("SeatNo")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SeatNo"));
 
                     b.Property<string>("Status")
                         .IsRequired()
