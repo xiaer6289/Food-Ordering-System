@@ -140,7 +140,27 @@ public IActionResult DeleteFood(string id)
             db.SaveChanges();
             return RedirectToAction(nameof(Foods));
         }
+
+        public IActionResult FoodListing(string categoryId = "All")
+        {
+            var categories = db.Categories.ToList();
+            ViewBag.Categories = categories;
+            ViewBag.SelectedCategory = categoryId;
+
+            IQueryable<WSM.Models.Food> foods = db.Foods;
+
+            if (categoryId != "All")
+                foods = foods.Where(f => f.CategoryId == categoryId);
+
+            return View(foods.ToList());
+        }
+
+
+      
+
     }
 }
+
+
 
 

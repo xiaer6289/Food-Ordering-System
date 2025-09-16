@@ -68,30 +68,4 @@
             timer: 2000
         });
     }
-
-    /* 5. Password Strength Checker */
-    const passwordInput = document.querySelector("input[name='Password'], input[name='NewPassword']");
-    if (passwordInput) {
-        const strengthBar = document.createElement("div");
-        strengthBar.style.height = "6px";
-        strengthBar.style.borderRadius = "4px";
-        strengthBar.style.marginTop = "5px";
-        passwordInput.parentElement.appendChild(strengthBar);
-
-        passwordInput.addEventListener("input", function () {
-            const value = passwordInput.value;
-            let strength = 0;
-
-            if (value.length >= 8) strength++;
-            if (/[A-Z]/.test(value)) strength++;
-            if (/[0-9]/.test(value)) strength++;
-            if (/[^A-Za-z0-9]/.test(value)) strength++;
-
-            const colors = ["#dc3545", "#ffc107", "#17a2b8", "#28a745"];
-            const widths = ["25%", "50%", "75%", "100%"];
-
-            strengthBar.style.width = widths[strength - 1] || "0%";
-            strengthBar.style.backgroundColor = colors[strength - 1] || "transparent";
-        });
-    }
 });

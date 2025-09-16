@@ -18,6 +18,10 @@ public class SearchController : Controller
                 return ((q == "" || q == null) ? RedirectToAction("OrderHistory", "OrderHistory") : 
                     RedirectToAction("OrderHistory", "OrderHistory", new { id = q }));
 
+            case "Admin":
+                return ((q == "" || q == null)? RedirectToAction("Admins", "Admin") :
+                    RedirectToAction("Admins", "Admin", new { id = q }));
+
             default:
                 return RedirectToAction("Both", "Home");
         }
