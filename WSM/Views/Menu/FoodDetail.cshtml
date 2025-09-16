@@ -5,14 +5,12 @@
 }
 
 <div>
-    <!-- Food Image -->
     <img src="@(!string.IsNullOrEmpty(Model.Image) ? Model.Image : Url.Content("~/images/default.png"))"
          alt="@Model.Name"
          style="width:250px; height:250px; object-fit:contain;" />
 </div>
 
 <div>
-    <!-- Food Details -->
     <p><strong>Price:</strong> RM @Model.Price</p>
     <p><strong>Description:</strong> @Model.Description</p>
     <p><strong>Category:</strong> @Model.CategoryId</p>
@@ -20,23 +18,19 @@
 
 <hr />
 
-<!-- Add to Cart Form -->
-<form asp-controller="Order" asp-action="AddToCart" method="post">
-    <!-- Hidden foodId -->
+<form asp-controller="Cart" asp-action="AddToCart" method="post">
+    <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
     <input type="hidden" name="foodId" value="@Model.Id" />
 
-    <!-- Quantity input -->
     <div class="mb-3">
         <label for="quantity"><strong>Quantity:</strong></label>
         <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="form-control" style="width:120px;" />
     </div>
 
-    <!-- Extra detail input -->
     <div class="mb-3">
         <label for="extraDetail"><strong>Extra Detail (optional):</strong></label>
         <textarea id="extraDetail" name="extraDetail" class="form-control" rows="3"></textarea>
     </div>
 
-    <!-- Submit button -->
     <button type="submit" class="btn btn-primary">Add to Cart</button>
 </form>

@@ -942,7 +942,7 @@ select.select-status option {
     margin-top: 20px;
 }
 
-/* Table square style */
+/* Table css start */
 .table-square {
     position: relative;
     width: 120px;
@@ -953,6 +953,7 @@ select.select-status option {
     justify-content: center;
     color: #fff;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .seat-badge {
@@ -976,3 +977,8 @@ select.select-status option {
     font-size: 18px;
     text-align: center;
 }
+
+.table-link {
+    text-decoration: none;
+}
+/* Table css start */

@@ -9,6 +9,8 @@ namespace WSM.Helpers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DB _db;
+        private const string CartKey = "Cart";
+
 
         public Helper(IHttpContextAccessor httpContextAccessor, DB db)
         {
@@ -17,36 +19,51 @@ namespace WSM.Helpers
         }
 
         // Get cart from session, key is string (FoodId)
-        public Dictionary<string, int> GetCart()
+        public Dictionary<string, int> GetCart(string seatNo)
         {
             var session = _httpContextAccessor.HttpContext.Session;
-            string cartJson = session.GetString("Cart") ?? "{}";
-            return JsonSerializer.Deserialize<Dictionary<string, int>>(cartJson) ?? new Dictionary<string, int>();
+            string cartJson = session.GetString(CartKey) ?? "{}";
+
+            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, int>>>(cartJson)
+                           ?? new Dictionary<string, Dictionary<string, int>>();
+
+            if (!allCarts.ContainsKey(seatNo))
+                allCarts[seatNo] = new Dictionary<string, int>();
+
+            return allCarts[seatNo];
         }
 
         // Save cart to session
-        public void SetCart(Dictionary<string, int> cart)
+        public void SetCart(string seatNo, Dictionary<string, int> cart)
         {
             var session = _httpContextAccessor.HttpContext.Session;
-            session.SetString("Cart", JsonSerializer.Serialize(cart));
+            string cartJson = session.GetString(CartKey) ?? "{}";
+
+            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, int>>>(cartJson)
+                           ?? new Dictionary<string, Dictionary<string, int>>();
+
+            allCarts[seatNo] = cart;
+
+            session.SetString(CartKey, JsonSerializer.Serialize(allCarts));
         }
 
+
         // Calculate total price of current cart
-        public decimal CalculateTotal()
+        public decimal CalculateTotal(string seatNo)
         {
-            var cart = GetCart();
+            var cart = GetCart(seatNo);
             decimal total = cart.Sum(item =>
                 _db.Foods
-                    .Where(f => f.Id.ToString() == item.Key)
+                    .Where(f => f.Id == item.Key) 
                     .Select(f => f.Price * item.Value)
                     .FirstOrDefault());
             return total;
         }
 
         // Create OrderDetail and OrderItems based on current cart
-        public OrderDetail CreateOrderDetail(string staffId = "S001")
+        public OrderDetail CreateOrderDetail(string seatNo, string staffId = "S001")
         {
-            var cart = GetCart();
+            var cart = GetCart(seatNo);
             if (!cart.Any()) return null;
 
             string orderId = "ORD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
@@ -54,9 +71,9 @@ namespace WSM.Helpers
             var orderDetail = new OrderDetail
             {
                 Id = orderId,
-                SeatNo = 0,
+                SeatNo = int.Parse(seatNo),
                 Quantity = cart.Sum(x => x.Value),
-                TotalPrice = CalculateTotal(),
+                TotalPrice = CalculateTotal(seatNo),
                 Status = "Completed",
                 OrderDate = DateTime.Now,
                 StaffId = staffId,

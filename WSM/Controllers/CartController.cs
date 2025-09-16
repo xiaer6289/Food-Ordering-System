@@ -7,67 +7,65 @@ namespace WSM.Controllers;
 
 public class CartController : Controller
 {
-    private readonly DB db;
-    private readonly Helper hp;
+    private readonly Helper _helper;
+    private readonly DB _db;
 
-    // Constructor to inject DB and Helper
-
-
-    public CartController(DB db, Helper hp)
+    public CartController(Helper helper, DB db)
     {
-        this.db = db;
-        this.hp = hp;
+        _helper = helper;
+        _db = db;
     }
 
-    // GET: /Cart/FakeOrder
-    // Display the food list and pass the current cart to the view
-    public IActionResult FakeOrder()
+    public IActionResult Cart(string seatNo)
     {
-        
-        var foodList = db.Foods
-            .Include(f => f.Category) 
-            .ToList();
+        var cart = _helper.GetCart(seatNo) ?? new Dictionary<string, int>();
+        var cartItems = new List<dynamic>();
 
-        var cart = hp.GetCart();
-
-        var cartItems = cart.Select(item => new
+        foreach (var item in cart)
         {
-            Food = db.Foods.FirstOrDefault(f => f.Id == item.Key),
-            Quantity = item.Value
-        }).Where(item => item.Food != null).ToList();
+            var food = _db.Foods.FirstOrDefault(f => f.Id.ToString() == item.Key);
+            if (food != null)
+            {
+                cartItems.Add(new { Food = food, Quantity = item.Value });
+            }
+        }
 
-        var totalAmount = cartItems.Sum(item => item.Food.Price * item.Quantity);
-
-        ViewBag.Cart = cart;
         ViewBag.CartItems = cartItems;
-        ViewBag.TotalAmount = totalAmount;
-
-        return View(foodList);
+        ViewBag.TotalAmount = _helper.CalculateTotal(seatNo);
+        ViewBag.SeatNo = seatNo;
+        return View();
     }
 
-    // POST: /Cart/UpdateCart
-    // Add or update food item in the cart
+
+    // Update cart with foodId and quantity
     [HttpPost]
-    public IActionResult UpdateCart(string foodId, int quantity)
+    public IActionResult AddToCart(string seatNo, string foodId, int quantity)
     {
-        if (!db.Foods.Any(f => f.Id == foodId))
-        {
-            return BadRequest("Invalid Food ID"); 
-        }
+        var cart = _helper.GetCart(seatNo);
 
-        var cart = hp.GetCart();
-
-        if (quantity >= 1 && quantity <= 100)
-        {
-            cart[foodId] = quantity; 
-        }
+        if (quantity <= 0)
+            cart.Remove(foodId);
         else
         {
-            cart.Remove(foodId); 
+            if (cart.ContainsKey(foodId))
+            {
+                cart[foodId] += quantity;
+            }
+            else
+            {
+                cart[foodId] = quantity;
+            }
         }
 
-        hp.SetCart(cart);
+        _helper.SetCart(seatNo, cart);
+        return RedirectToAction("Cart", new { seatNo });
+    }
 
-        return RedirectToAction("FakeOrder");
+    public IActionResult Remove(string seatNo, string foodId)
+    {
+        var cart = _helper.GetCart(seatNo);
+        cart.Remove(foodId);
+        _helper.SetCart(seatNo, cart);
+        return RedirectToAction("Cart", new { seatNo });
     }
 }

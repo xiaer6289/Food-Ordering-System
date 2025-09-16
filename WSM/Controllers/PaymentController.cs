@@ -25,17 +25,16 @@ namespace WSM.Controllers
 
         // Create Stripe Checkout session
         [HttpPost]
-        public IActionResult CreateCheckoutSession(string email)
+        public IActionResult CreateCheckoutSession(string seatNo)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-            var orderDetail = _helper.CreateOrderDetail();
+            var orderDetail = _helper.CreateOrderDetail(seatNo, "S001");
             if (orderDetail == null)
                 return BadRequest("Cart is empty.");
 
             var options = new SessionCreateOptions
             {
-                CustomerEmail = email,
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
                 {
@@ -57,7 +56,7 @@ namespace WSM.Controllers
                 Mode = "payment",
                 SuccessUrl = Url.Action("Success", "Payment", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}",
                 CancelUrl = Url.Action("Cancel", "Payment", null, Request.Scheme),
-                Metadata = new Dictionary<string, string> { { "order_id", orderDetail.Id } }
+                Metadata = new Dictionary<string, string> { { "order_id", orderDetail.Id } },
             };
 
             var service = new SessionService();
@@ -67,7 +66,7 @@ namespace WSM.Controllers
         }
 
         // Payment success callback
-        public async Task<IActionResult> Success(string session_id)
+        public async Task<IActionResult> Success(string seatNo, string session_id)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
             var service = new SessionService();
@@ -102,7 +101,7 @@ namespace WSM.Controllers
                                 .ToList();
 
             // clear cart
-            _helper.SetCart(new Dictionary<string, int>());
+            _helper.SetCart(seatNo, new Dictionary<string, int>());
 
             // Pass everything to the view
             var model = new OrderConfirmationViewModel
@@ -111,6 +110,8 @@ namespace WSM.Controllers
                 OrderItems = orderItems,
                 Payment = payment
             };
+
+            _helper.SetCart(seatNo, new Dictionary<string, int>());
 
             return View("OrderConfirmation", model);
 

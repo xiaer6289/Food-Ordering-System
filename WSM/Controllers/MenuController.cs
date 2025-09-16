@@ -12,11 +12,12 @@ namespace WMS.Controllers
         {
             _db = db;
         }
-        public IActionResult FoodListing(string categoryId = "All")
+        public IActionResult FoodListing(string categoryId = "All", string SeatNo = null)
         {
             var categories = _db.Categories.ToList();
             ViewBag.Categories = categories;
             ViewBag.SelectedCategory = categoryId;
+            ViewBag.SeatNo = SeatNo;
 
             IQueryable<WSM.Models.Food> foods = _db.Foods;
 
@@ -27,7 +28,7 @@ namespace WMS.Controllers
         }
 
 
-        public IActionResult FoodDetail(string id)
+        public IActionResult FoodDetail(string id, string seatNo)
         {
             if (string.IsNullOrEmpty(id))
                 return NotFound();
@@ -39,7 +40,7 @@ namespace WMS.Controllers
             if (food == null)
                 return NotFound();
 
-            //ViewBag.Cart = _helper.GetCart();
+            ViewBag.SeatNo = seatNo;
             return View(food);
         }
 
