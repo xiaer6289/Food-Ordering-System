@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WMS.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,6 +63,18 @@ namespace WMS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ingredients", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Seat",
+                columns: table => new
+                {
+                    SeatNo = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Seat", x => x.SeatNo);
                 });
 
             migrationBuilder.CreateTable(
@@ -154,7 +166,7 @@ namespace WMS.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    SeatNo = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    SeatNo = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
@@ -164,6 +176,12 @@ namespace WMS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Seat_SeatNo",
+                        column: x => x.SeatNo,
+                        principalTable: "Seat",
+                        principalColumn: "SeatNo",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_OrderDetails_Staff_StaffId",
                         column: x => x.StaffId,
@@ -239,6 +257,11 @@ namespace WMS.Migrations
                 column: "IngredientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_SeatNo",
+                table: "OrderDetails",
+                column: "SeatNo");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_StaffId",
                 table: "OrderDetails",
                 column: "StaffId");
@@ -290,6 +313,9 @@ namespace WMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Ingredients");
+
+            migrationBuilder.DropTable(
+                name: "Seat");
 
             migrationBuilder.DropTable(
                 name: "Staff");

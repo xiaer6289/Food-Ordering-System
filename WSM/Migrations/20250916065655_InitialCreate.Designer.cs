@@ -12,8 +12,8 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250908071352_CreateDB")]
-    partial class CreateDB
+    [Migration("20250916065655_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,10 +229,8 @@ namespace WMS.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("SeatNo")
-                        .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                    b.Property<int>("SeatNo")
+                        .HasColumnType("int");
 
                     b.Property<string>("StaffId")
                         .IsRequired()
@@ -248,6 +246,8 @@ namespace WMS.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SeatNo");
 
                     b.HasIndex("StaffId");
 
@@ -327,6 +327,21 @@ namespace WMS.Migrations
                         .IsUnique();
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("WSM.Models.Seat", b =>
+                {
+                    b.Property<int>("SeatNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("SeatNo");
+
+                    b.ToTable("Seat");
                 });
 
             modelBuilder.Entity("WSM.Models.Staff", b =>
@@ -411,11 +426,19 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
+                    b.HasOne("WSM.Models.Seat", "Seat")
+                        .WithMany()
+                        .HasForeignKey("SeatNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("WSM.Models.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Seat");
 
                     b.Navigation("Staff");
                 });
