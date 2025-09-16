@@ -18,48 +18,66 @@ namespace WSM.Controllers
         }
 
         // GET: /Admin/Admins
-        public IActionResult Admins(string searchString, string sortOrder, int? page)
+        public IActionResult Admins(string id, string sort, string dir, int page = 1)
         {
-            searchString = searchString?.Trim();
+            ViewBag.SearchContext = "Admin";
+            ViewBag.SearchPlaceholder = "Search by Name, Email, or Phone";
 
-            // ViewData for sorting and searching
-            ViewData["CurrentFilter"] = searchString;
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["IdSortParm"] = sortOrder == "Id" ? "id_desc" : "Id";
-            ViewData["NameSortParm"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            // Trim search input
+            id = id?.Trim() ?? "";
 
             var companyId = HttpContext.Session.GetString("CompanyId");
+            if (string.IsNullOrEmpty(companyId))
+            {
+                return RedirectToAction("Login", "Authorization");
+            }
 
             var admins = db.Admins
                            .Where(a => a.CompanyId == companyId)
                            .AsQueryable();
 
-            // Filtering by search string
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(id))
             {
+                string lowerId = id.ToLower();
                 admins = admins.Where(a =>
-                    a.Name.Contains(searchString) ||
-                    a.PhoneNo.Contains(searchString) ||
-                    a.Email.Contains(searchString));
+                    a.Name.ToLower().Contains(lowerId) ||
+                    a.PhoneNo.ToLower().Contains(lowerId) ||
+                    a.Email.ToLower().Contains(lowerId));
             }
 
+
             // Sorting
-            admins = sortOrder switch
+            ViewBag.Sort = sort;
+            ViewBag.Dir = dir;
+
+            Func<Admin, object> fn = sort switch
             {
-                "id_desc" => admins.OrderByDescending(a => a.Id),
-                "Id" => admins.OrderBy(a => a.Id),
-                "name_desc" => admins.OrderByDescending(a => a.Name),
-                _ => admins.OrderBy(a => a.Name),
+                "Id" => a => a.Id,
+                "Name" => a => a.Name,
+                "Email" => a => a.Email,
+                _ => a => a.Name
             };
 
-            // Paging
-            int pageSize = 10; // Items per page
-            int pageNumber = page ?? 1;
+            var sorted = dir == "des"
+                ? admins.OrderByDescending(fn)
+                : admins.OrderBy(fn);
 
-            var pagedAdmins = admins.ToPagedList(pageNumber, pageSize);
+            // Paging
+            if (page < 1)
+            {
+                return RedirectToAction(null, new { id, sort, dir, page = 1 });
+            }
+
+            var pagedAdmins = sorted.ToPagedList(page, 10);
+
+            if (page > pagedAdmins.PageCount && pagedAdmins.PageCount > 0)
+            {
+                return RedirectToAction(null, new { id, sort, dir, page = pagedAdmins.PageCount });
+            }
 
             return View(pagedAdmins);
         }
+
 
         // GET: /Admin/CreateAdmin
         public IActionResult CreateAdmin()

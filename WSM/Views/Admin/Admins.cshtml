@@ -3,35 +3,23 @@
 @model IPagedList<WSM.Models.Admin>
 
 @{
-    ViewData["Title"] = "Admin List";
+    ViewData["Title"] = "Admin";
     string currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
 }
-<link rel="stylesheet" href="~/css/admin.css" />
 
 <h2>Admin List</h2>
 
 <!-- Success Message -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success text-center">
+    <div class="alert-success-message">
         @TempData["SuccessMessage"]
     </div>
 }
 
-<div class="mb-3">
-    <a asp-action="CreateAdmin" class="btn btn-warning">Add New Admin</a>
+<div class="button-group">
+    <a asp-action="CreateAdmin" class="create-ingredient">Add New Admin</a>
 </div>
-
-<form asp-action="Admins" method="get" class="mb-3">
-    <div class="input-group">
-        <input name="searchString" class="form-control" placeholder="Search by name, email, or phone number" value="@ViewData["CurrentFilter"]" />
-        <button type="submit" class="btn btn-warning">Search</button>
-        @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
-        {
-            <a asp-action="Admins" class="btn btn-primary ms-2">Clear</a>
-        }
-    </div>
-</form>
 
 @if (!Model.Any())
 {
@@ -44,16 +32,16 @@ else
         Page @Model.PageNumber of @Model.PageCount
     </p>
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
+    <table class="record-table">
+        <thead>
             <tr>
                 <th>
-                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" class="text-light">
+                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">
                         Admin ID @(currentSort == "Id" ? "↑" : currentSort == "id_desc" ? "↓" : "")
                     </a>
                 </th>
                 <th>
-                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]" class="text-light">
+                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">
                         Name @(currentSort == "" ? "↑" : currentSort == "name_desc" ? "↓" : "")
                     </a>
                 </th>
@@ -70,12 +58,12 @@ else
                     <td>@admin.Name</td>
                     <td>@admin.Email</td>
                     <td>@admin.PhoneNo</td>
-                    <td>
-                        <a asp-action="EditAdmin" asp-route-id="@admin.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <td class="edit-remove-group">
+                        <a asp-action="EditAdmin" asp-route-id="@admin.Id" class="edit-ingredient">Edit</a>
                         <a asp-action="DeleteAdmin"
                            asp-route-id="@admin.Id"
                            data-admin-name="@admin.Name"
-                           class="btn btn-sm btn-danger delete-admin">
+                           class="remove-ingredient delete-admin">
                             Delete
                         </a>
                     </td>
