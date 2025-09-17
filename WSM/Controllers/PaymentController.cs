@@ -23,7 +23,7 @@ namespace WSM.Controllers
             _db = db;
         }
 
-        // Create Stripe Checkout session
+        [HttpPost]
         [HttpPost]
         public IActionResult CreateCheckoutSession(string seatNo)
         {
@@ -54,8 +54,8 @@ namespace WSM.Controllers
                     }
                 },
                 Mode = "payment",
-                SuccessUrl = Url.Action("Success", "Payment", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}",
-                CancelUrl = Url.Action("Cancel", "Payment", null, Request.Scheme),
+                SuccessUrl = $"{Request.Scheme}://{Request.Host}/Payment/Success?seatNo={seatNo}&session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/Cancel",
                 Metadata = new Dictionary<string, string> { { "order_id", orderDetail.Id } },
             };
 
@@ -64,6 +64,7 @@ namespace WSM.Controllers
 
             return Redirect(session.Url);
         }
+
 
         // Payment success callback
         public async Task<IActionResult> Success(string seatNo, string session_id)
