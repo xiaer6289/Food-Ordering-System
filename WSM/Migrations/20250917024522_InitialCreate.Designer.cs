@@ -12,7 +12,7 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250916090106_InitialCreate")]
+    [Migration("20250917024522_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -223,6 +223,9 @@ namespace WMS.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(6)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -233,7 +236,6 @@ namespace WMS.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("StaffId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Status")
@@ -246,6 +248,8 @@ namespace WMS.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
 
                     b.HasIndex("SeatNo");
 
@@ -426,6 +430,10 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
+                    b.HasOne("WSM.Models.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
                     b.HasOne("WSM.Models.Seat", "Seat")
                         .WithMany()
                         .HasForeignKey("SeatNo")
@@ -434,9 +442,9 @@ namespace WMS.Migrations
 
                     b.HasOne("WSM.Models.Staff", "Staff")
                         .WithMany()
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StaffId");
+
+                    b.Navigation("Admin");
 
                     b.Navigation("Seat");
 

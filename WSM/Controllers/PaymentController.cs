@@ -29,7 +29,19 @@ namespace WSM.Controllers
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-            var orderDetail = _helper.CreateOrderDetail(seatNo, "S001");
+            string role = HttpContext.Session.GetString("Role");
+            string staffAdminId = HttpContext.Session.GetString("StaffAdminId");
+
+            OrderDetail orderDetail = null;
+            if (role == "Staff")
+            {
+                orderDetail = _helper.CreateOrderDetail(seatNo, staffId: staffAdminId);
+            }
+            else if (role == "Admin")
+            {
+                orderDetail = _helper.CreateOrderDetail(seatNo, adminId: staffAdminId);
+            }
+
             if (orderDetail == null)
                 return BadRequest("Cart is empty.");
 
@@ -66,7 +78,6 @@ namespace WSM.Controllers
         }
 
 
-        // Payment success callback
         public async Task<IActionResult> Success(string seatNo, string session_id)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
@@ -91,29 +102,29 @@ namespace WSM.Controllers
             _db.Payments.Add(payment);
             _db.SaveChanges();
 
-            // Get order details
             var orderDetail = _db.OrderDetails
-                                 .FirstOrDefault(o => o.Id == orderId);
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Food)
+                .FirstOrDefault(o => o.Id == orderId);
 
-            // Get list of foods in this order (Include Food for FoodName)
+
             var orderItems = _db.OrderItems
                                 .Include(i => i.Food)
                                 .Where(i => i.OrderDetailId == orderId)
                                 .ToList();
 
-            // clear cart
-            _helper.SetCart(seatNo, new Dictionary<string, int>());
+      
 
             // Pass everything to the view
             var model = new OrderConfirmationViewModel
             {
                 OrderDetail = orderDetail,
-                OrderItems = orderItems,
+                OrderItems = orderDetail.OrderItems.ToList(),
                 Payment = payment
             };
 
-            _helper.SetCart(seatNo, new Dictionary<string, int>());
-
+            // clear cart
+            _helper.SetCart(seatNo, new Dictionary<string, Helper.CartItem>());
             return View("OrderConfirmation", model);
 
         }

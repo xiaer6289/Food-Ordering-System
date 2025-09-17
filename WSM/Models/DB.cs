@@ -240,8 +240,11 @@ public class OrderDetail
     [Required]
     public DateTime OrderDate { get; set; }
 
-    public string StaffId { get; set; }
-    public Staff Staff { get; set; }
+    public string? StaffId { get; set; }
+    public Staff? Staff { get; set; }
+
+    public string? AdminId { get; set; }
+    public Admin? Admin { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WMS.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -171,11 +171,17 @@ namespace WMS.Migrations
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StaffId = table.Column<string>(type: "nvarchar(6)", nullable: false)
+                    StaffId = table.Column<string>(type: "nvarchar(6)", nullable: true),
+                    AdminId = table.Column<string>(type: "nvarchar(6)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Admins_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admins",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_OrderDetails_Seat_SeatNo",
                         column: x => x.SeatNo,
@@ -186,8 +192,7 @@ namespace WMS.Migrations
                         name: "FK_OrderDetails_Staff_StaffId",
                         column: x => x.StaffId,
                         principalTable: "Staff",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -255,6 +260,11 @@ namespace WMS.Migrations
                 name: "IX_Foods_IngredientId",
                 table: "Foods",
                 column: "IngredientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_AdminId",
+                table: "OrderDetails",
+                column: "AdminId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_SeatNo",

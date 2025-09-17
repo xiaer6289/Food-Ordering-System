@@ -13,6 +13,7 @@
             <tr>
                 <th>Food</th>
                 <th>Quantity</th>
+                <th>Extra Detail</th>
                 <th>Price</th>
                 <th>Subtotal</th>
                 <th></th>
@@ -23,9 +24,10 @@
             {
                 <tr>
                     <td>@item.Food.Name</td>
-                    <td>@item.Quantity</td>
+                    <td>@item.Quantity.Quantity</td>
+                    <td>@item.Quantity.ExtraDetail</td>
                     <td>RM @item.Food.Price</td>
-                    <td>RM @(item.Food.Price* item.Quantity)</td>
+                    <td>RM @(item.Food.Price* item.Quantity.Quantity)</td>
                     <td>
                         <a asp-controller="Cart" asp-action="Remove" asp-route-seatNo="@ViewBag.SeatNo" asp-route-foodId="@item.Food.Id" class="btn btn-danger btn-sm">Remove</a>
                     </td>
