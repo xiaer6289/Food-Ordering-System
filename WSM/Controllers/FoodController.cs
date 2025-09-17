@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WSM.Models;
+using System.IO;
 using System.Linq;
 
 namespace WSM.Controllers
@@ -9,10 +11,12 @@ namespace WSM.Controllers
     public class FoodController : Controller
     {
         private readonly DB db;
+        private readonly IWebHostEnvironment _env;
 
-        public FoodController(DB db)
+        public FoodController(DB db, IWebHostEnvironment env)
         {
             this.db = db;
+            _env = env;
         }
         // GET: /Food/Foods
         public IActionResult Foods(string searchString)
@@ -43,35 +47,55 @@ namespace WSM.Controllers
         // POST: /Food/CreateFood
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateFood(WSM.Models.Food model)
+        public IActionResult CreateFood(Food model)
         {
-            //Check if input is valid
+            // Validate model
             if (!ModelState.IsValid)
             {
-                var errors = string.Join("; ", ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage));
-                Console.WriteLine("Validation Errors: " + errors);
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
+                return View(model);
             }
-            //Get last Food ID from database
-            var lastFood = db.Foods
-                             .OrderByDescending(f => f.Id)
-                             .FirstOrDefault();
-            //Generate new ID
-            if (lastFood == null)
-                model.Id = "F0001"; // first food
+
+            // Generate new Food ID
+            var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
+            model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
+
+            // *** Handle File Upload ***
+            if (model.Photo != null && model.Photo.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
+
+                // Create directory if it doesn't exist
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                // Generate unique file name
+                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save file to server
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.Photo.CopyTo(stream);
+                }
+
+                // Save relative path to DB
+                model.Image = "/uploads/foods/" + uniqueFileName;
+            }
             else
             {
-                int lastNum = int.Parse(lastFood.Id.Substring(1)); // remove 'F' and parse number
-                model.Id = "F" + (lastNum + 1).ToString("D4"); // pad with zeros
+                // If no image is uploaded, you can either set a default image or leave it null
+                model.Image = null;
             }
-            //Add to database
+
             db.Foods.Add(model);
             db.SaveChanges();
 
-            // 5️⃣ Redirect to Foods list
+            TempData["SuccessMessage"] = "Food created successfully!";
             return RedirectToAction(nameof(Foods));
         }
+
         // GET: Edit Food
         [HttpGet]
         public IActionResult EditFood(string id)

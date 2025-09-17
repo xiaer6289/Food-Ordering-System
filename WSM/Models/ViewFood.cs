@@ -22,4 +22,7 @@ public class FoodVM
 
     [StringLength(6, ErrorMessage = "Category ID cannot exceed 6 characters.")]
     public string CategoryId { get; set; }
+
+    [Display(Name = "Upload Image")]
+    public IFormFile? Photo { get; set; }
 }

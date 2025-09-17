@@ -7,7 +7,7 @@
 <div class="edit-ingredient-form">
     <h2 class="edit-ingredient-title">Add Food</h2>
 
-    <form asp-controller="Food" asp-action="CreateFood" method="post" class="edit-ingredient-wrapper">
+    <form asp-controller="Food" asp-action="CreateFood" method="post" enctype="multipart/form-data" class="edit-ingredient-wrapper">
         @Html.AntiForgeryToken()
 
         <!-- Food Name -->
@@ -33,16 +33,18 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <!-- Image URL with Preview -->
+        <!-- Image File Upload -->
         <div>
-            <label asp-for="Image">Image URL</label>
-            <input asp-for="Image" id="ImageUrl" class="edit-ingredient-quantity" placeholder="Enter image URL (optional)" />
-            <span asp-validation-for="Image" class="text-danger"></span>
+            <label asp-for="Photo">Upload Image</label>
+            <input asp-for="Photo" type="file" class="edit-ingredient-quantity" accept="image/*" />
+            <span asp-validation-for="Photo" class="text-danger"></span>
 
             <div class="mt-2">
                 <img id="previewImage" src="" alt="Preview" style="max-width:150px; display:none;" />
             </div>
         </div>
+
+
 
         <!-- Category -->
         <div>
