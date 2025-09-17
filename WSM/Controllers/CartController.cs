@@ -40,7 +40,7 @@ public class CartController : Controller
     [HttpPost]
     public IActionResult AddToCart(string seatNo, string foodId, int quantity, string extraDetail)
     {
-        var cart = _helper.GetCart(seatNo); 
+        var cart = _helper.GetCart(seatNo);
 
         if (quantity <= 0)
         {
@@ -50,8 +50,8 @@ public class CartController : Controller
         {
             if (cart.ContainsKey(foodId))
             {
-                cart[foodId].Quantity += quantity;       
-                cart[foodId].ExtraDetail = extraDetail; 
+                cart[foodId].Quantity += quantity;
+                cart[foodId].ExtraDetail = extraDetail;
             }
             else
             {

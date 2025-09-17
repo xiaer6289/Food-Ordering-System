@@ -12,8 +12,8 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250917024522_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250917150015_CreateDB")]
+    partial class CreateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,9 +151,12 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
@@ -274,6 +277,9 @@ namespace WMS.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
+                    b.Property<int>("FoodId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("OrderDetailId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -288,7 +294,7 @@ namespace WMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FoodId");
+                    b.HasIndex("FoodId1");
 
                     b.HasIndex("OrderDetailId");
 
@@ -345,7 +351,7 @@ namespace WMS.Migrations
 
                     b.HasKey("SeatNo");
 
-                    b.ToTable("Seat");
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("WSM.Models.Staff", b =>
@@ -455,7 +461,7 @@ namespace WMS.Migrations
                 {
                     b.HasOne("WSM.Models.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId")
+                        .HasForeignKey("FoodId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

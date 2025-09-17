@@ -1,43 +1,89 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using WSM.Helpers;
 using WSM.Models;
-using System.IO;
-using System.Linq;
+using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
     public class FoodController : Controller
     {
         private readonly DB db;
-        private readonly IWebHostEnvironment _env;
+        private readonly FoodHelper hp;
 
-        public FoodController(DB db, IWebHostEnvironment env)
+        public FoodController(DB db, FoodHelper hp)
         {
             this.db = db;
-            _env = env;
+            this.hp = hp;
         }
         // GET: /Food/Foods
-        public IActionResult Foods(string searchString)
+        public IActionResult Foods(string? id, string? sort, string? dir, int page = 1)
         {
-            // Get all foods including their categories
-            var foods = db.Foods.Include(f => f.Category).AsQueryable();
 
-            // Pass the current search string back to the view for display
-            ViewData["CurrentFilter"] = searchString;
+            // For Layout.cshtml search bar
+            ViewBag.SearchContext = "Food";
+            ViewBag.SearchPlaceholder = "Search by Food ID/Name";
 
-            // If there is a search term, filter the results
-            if (!string.IsNullOrEmpty(searchString))
+            // Searching
+            ViewBag.Name = id = id?.Trim() ?? "";
+            var searched = db.Foods.AsQueryable();
+
+            if (!string.IsNullOrEmpty(id))
             {
-                foods = foods.Where(f => f.Name.Contains(searchString) ||
-                                         f.Description.Contains(searchString));
+                // Try parse id as integer for Id search
+                if (int.TryParse(id, out int searchId))
+                {
+                    searched = searched.Where(s => s.Id == searchId || s.Name.Contains(id));
+                }
+                else
+                {
+                    searched = searched.Where(s => s.Name.Contains(id));
+                }
             }
 
-            // Return filtered or full list
-            return View(foods.ToList());
+
+            //sorting
+            ViewBag.Sort = sort;
+            ViewBag.Dir = dir;
+
+            Func<Food, object> fn = sort switch
+            {
+                "Id" => s => s.Id,
+                "Image" => s => s.Image,
+                "Name" => s => s.Name,
+                "Price" => s => s.Price,
+                "Description" => s => s.Description,
+                "Category" => s => s.Category,
+                _ => s => s.Id
+            };
+
+            var sorted = dir == "des" ?
+                    searched.OrderByDescending(fn) :
+                    searched.OrderBy(fn);
+
+            // Paging
+            if (page < 1)
+            {
+                return RedirectToAction(null, new { id, sort, dir, page = 1 });
+            }
+
+            var m = sorted.ToPagedList(page, 10);
+
+            if (page > m.PageCount && m.PageCount > 0)
+            {
+                return RedirectToAction(null, new { id, sort, dir, page = m.PageCount });
+            }
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_Foods", m);
+            }
+
+            ViewBag.Foods = db.Foods.ToList();
+            return View(m);
         }
-        // GET: /Food/CreateFood
+
+        //GET: /Food/CreateFood
         public IActionResult CreateFood()
         {
             ViewBag.Categories = new SelectList(db.Categories, "Id", "Name");
@@ -47,54 +93,77 @@ namespace WSM.Controllers
         // POST: /Food/CreateFood
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateFood(Food model)
+        public IActionResult CreateFood(FoodVM vm)
         {
             // Validate model
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
-                return View(model);
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", vm.CategoryId);
+                return View(vm);
             }
 
-            // Generate new Food ID
-            var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
-            model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
-
-            // *** Handle File Upload ***
-            if (model.Photo != null && model.Photo.Length > 0)
+            if (vm.Photo != null)
             {
-                string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
+                var e = hp.ValidatePhoto(vm.Photo);
+                if (e != "") ModelState.AddModelError("Photo", e);
+            }
 
-                // Create directory if it doesn't exist
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                // Generate unique file name
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
-
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                // Save file to server
-                using (var stream = new FileStream(filePath, FileMode.Create))
+            if (ModelState.IsValid)
+            {
+                db.Foods.Add(new()
                 {
-                    model.Photo.CopyTo(stream);
-                }
-
-                // Save relative path to DB
-                model.Image = "/uploads/foods/" + uniqueFileName;
+                    Name = vm.Name,
+                    Price = vm.Price,
+                    Description = vm.Description,
+                    Photo = hp.SavePhoto(vm.Photo, "uploads"),
+                    CategoryId = vm.CategoryId,
+                });
+                db.SaveChanges();
+                TempData["Info"] = "Food Created.";
+                return RedirectToAction("Foods");
             }
-            else
-            {
-                // If no image is uploaded, you can either set a default image or leave it null
-                model.Image = null;
-            }
 
-            db.Foods.Add(model);
-            db.SaveChanges();
-
-            TempData["SuccessMessage"] = "Food created successfully!";
-            return RedirectToAction(nameof(Foods));
+            return View(vm);
         }
+
+            //    // Generate new Food ID
+            //    var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
+            //    model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
+
+            //    // *** Handle File Upload ***
+            //    if (model.Photo != null && model.Photo.Length > 0)
+            //    {
+            //        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
+
+            //        // Create directory if it doesn't exist
+            //        if (!Directory.Exists(uploadsFolder))
+            //            Directory.CreateDirectory(uploadsFolder);
+
+            //        // Generate unique file name
+            //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+
+            //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            //        // Save file to server
+            //        using (var stream = new FileStream(filePath, FileMode.Create))
+            //        {
+            //            model.Photo.CopyTo(stream);
+            //        }
+
+            //        // Save relative path to DB
+            //        model.Image = "/uploads/foods/" + uniqueFileName;
+            //    }
+            //    else
+            //    {
+            //        // If no image is uploaded, you can either set a default image or leave it null
+            //        model.Image = null;
+            //    }
+
+            //    db.Foods.Add(model);
+            //    db.SaveChanges();
+
+            //    TempData["SuccessMessage"] = "Food created successfully!";
+            //    return RedirectToAction(nameof(Foods));
 
         // GET: Edit Food
         [HttpGet]
@@ -103,13 +172,16 @@ namespace WSM.Controllers
             if (string.IsNullOrEmpty(id))
                 return BadRequest();
 
-            var food = db.Foods.FirstOrDefault(f => f.Id == id);
+            if (!int.TryParse(id, out int foodId))
+                return BadRequest();
+
+            var food = db.Foods.FirstOrDefault(f => f.Id == foodId);
             if (food == null)
                 return NotFound();
             // Map database entity to ViewModel
             var model = new EditFoodVM
             {
-                Id = food.Id,
+                Id = food.Id.ToString(),
                 Name = food.Name,
                 Price = food.Price,
                 Description = food.Description,
@@ -132,7 +204,10 @@ namespace WSM.Controllers
                 return View(model);
             }
 
-            var existingFood = db.Foods.FirstOrDefault(f => f.Id == model.Id);
+            if (!int.TryParse(model.Id, out int foodId))
+                return BadRequest();
+
+            var existingFood = db.Foods.FirstOrDefault(f => f.Id == foodId);
             if (existingFood == null)
                 return NotFound();
 
@@ -152,14 +227,13 @@ namespace WSM.Controllers
             TempData["SuccessMessage"] = "Food updated successfully!";
             return RedirectToAction(nameof(Foods));
         }
-// GET: /Food/DeleteFood/{id}
-public IActionResult DeleteFood(string id)
+        // GET: /Food/DeleteFood/{id}
+        public IActionResult DeleteFood(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
-
-            var food = db.Foods.Find(id);
+            if (!int.TryParse(id, out int foodId)) return NotFound();
+            var food = db.Foods.Find(foodId);
             if (food == null) return NotFound();
-
             db.Foods.Remove(food);
             db.SaveChanges();
             return RedirectToAction(nameof(Foods));
@@ -180,7 +254,6 @@ public IActionResult DeleteFood(string id)
         }
 
 
-      
 
     }
 }

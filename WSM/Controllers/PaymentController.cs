@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
-using WMS.Models;
 using WSM.Helpers;
 using WSM.Models;
 using WSM.ViewModels;

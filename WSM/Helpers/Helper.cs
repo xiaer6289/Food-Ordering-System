@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using WMS.Models;
+﻿using System.Text.Json;
 using WSM.Models;
 
 namespace WSM.Helpers
@@ -59,10 +57,16 @@ namespace WSM.Helpers
         {
             var cart = GetCart(seatNo);
             decimal total = cart.Sum(item =>
-                _db.Foods
-                    .Where(f => f.Id == item.Key) 
-                    .Select(f => f.Price * item.Value.Quantity)
-                    .FirstOrDefault());
+            {
+                if (int.TryParse(item.Key, out int foodId))
+                {
+                    return _db.Foods
+                        .Where(f => f.Id == foodId)
+                        .Select(f => f.Price * item.Value.Quantity)
+                        .FirstOrDefault();
+                }
+                return 0;
+            });
             return total;
         }
 
@@ -89,10 +93,9 @@ namespace WSM.Helpers
                     OrderDetailId = orderId,
                     FoodId = x.Key,
                     Quantity = x.Value.Quantity,
-                    SubTotal = _db.Foods
-                        .Where(f => f.Id == x.Key)
-                        .Select(f => f.Price * x.Value.Quantity)
-                        .FirstOrDefault(),
+                    SubTotal = int.TryParse(x.Key, out int foodId)
+                        ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
+                        : 0,
                     ExtraDetail = x.Value.ExtraDetail
                 }).ToList()
             };

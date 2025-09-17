@@ -77,8 +77,6 @@ public class IngredientController : Controller
             return PartialView("_ReadIngredient", m);
         }
 
-
-
         ViewBag.Ingredients = db.Ingredients.ToList();
         return View(m);
     }

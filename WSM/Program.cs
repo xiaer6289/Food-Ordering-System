@@ -27,6 +27,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<DB>();
 builder.Services.AddScoped<WSM.Helpers.Helper>();
+builder.Services.AddScoped<WSM.Helpers.FoodHelper>();
 
 builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
 

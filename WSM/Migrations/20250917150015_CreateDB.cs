@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WMS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,7 +66,7 @@ namespace WMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Seat",
+                name: "Seats",
                 columns: table => new
                 {
                     SeatNo = table.Column<int>(type: "int", nullable: false),
@@ -74,7 +74,7 @@ namespace WMS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Seat", x => x.SeatNo);
+                    table.PrimaryKey("PK_Seats", x => x.SeatNo);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,7 +105,8 @@ namespace WMS.Migrations
                 name: "Foods",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Id = table.Column<int>(type: "int", maxLength: 6, nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -183,9 +184,9 @@ namespace WMS.Migrations
                         principalTable: "Admins",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Seat_SeatNo",
+                        name: "FK_OrderDetails_Seats_SeatNo",
                         column: x => x.SeatNo,
-                        principalTable: "Seat",
+                        principalTable: "Seats",
                         principalColumn: "SeatNo",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -202,6 +203,7 @@ namespace WMS.Migrations
                     Id = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     OrderDetailId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     FoodId = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    FoodId1 = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
                     ExtraDetail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
@@ -210,8 +212,8 @@ namespace WMS.Migrations
                 {
                     table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItems_Foods_FoodId",
-                        column: x => x.FoodId,
+                        name: "FK_OrderItems_Foods_FoodId1",
+                        column: x => x.FoodId1,
                         principalTable: "Foods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -277,9 +279,9 @@ namespace WMS.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_FoodId",
+                name: "IX_OrderItems_FoodId1",
                 table: "OrderItems",
-                column: "FoodId");
+                column: "FoodId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderDetailId",
@@ -325,7 +327,7 @@ namespace WMS.Migrations
                 name: "Ingredients");
 
             migrationBuilder.DropTable(
-                name: "Seat");
+                name: "Seats");
 
             migrationBuilder.DropTable(
                 name: "Staff");

@@ -33,8 +33,11 @@ namespace WMS.Controllers
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
+            if (!int.TryParse(id, out int foodId))
+                return NotFound();
+
             var food = _db.Foods
-                          .Where(f => f.Id == id)
+                          .Where(f => f.Id == foodId)
                           .FirstOrDefault();
 
             if (food == null)
