@@ -2,15 +2,31 @@
 
 <h2>Order Confirmation</h2>
 
-<p>Order ID: @Model.OrderDetail.Id</p>
-<p>Total Price: RM @Model.OrderDetail.TotalPrice</p>
-<p>Amount Paid: RM @Model.Payment.AmountPaid</p>
-<p>Payment Method: @Model.Payment.PaymentMethod</p>
+<p><strong>Order ID:</strong> @Model.OrderDetail.Id</p>
+<p><strong>Total Price:</strong> RM @Model.OrderDetail.TotalPrice</p>
+<p><strong>Amount Paid:</strong> RM @Model.Payment.AmountPaid</p>
+<p><strong>Payment Method:</strong> @Model.Payment.PaymentMethod</p>
 
-<h3>Ordered Items:</h3>
-<ul>
-    @foreach (var item in Model.OrderItems)
-    {
-        <li>@item.Food.Id - Quantity: @item.Quantity</li>
-    }
-</ul>
+<h3>Ordered Items</h3>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Food ID</th>
+            <th>Food Name</th>
+            <th>Quantity</th>
+            <th>Extra Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>@item.Food.Id</td>
+                <td>@item.Food.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.ExtraDetail</td>
+            </tr>
+        }
+    </tbody>
+</table>

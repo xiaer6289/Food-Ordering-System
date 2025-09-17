@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
-using System.Linq;
+
+namespace WSM.Controllers;
 
 public class TableController : Controller
 {
@@ -14,7 +15,7 @@ public class TableController : Controller
     // Show all tables
     public IActionResult Index()
     {
-        var seats = _context.Seat.ToList();
+        var seats = _context.Seats.ToList();
         return View("Table", seats);
     }
 
@@ -22,7 +23,7 @@ public class TableController : Controller
     {
         // Find the smallest available SeatNo starting from 1
         int newSeatNo = 1;
-        var existing = _context.Seat.Select(s => s.SeatNo).OrderBy(n => n);
+        var existing = _context.Seats.Select(s => s.SeatNo).OrderBy(n => n);
         foreach (var n in existing)
         {
             if (n == newSeatNo)
@@ -35,7 +36,7 @@ public class TableController : Controller
             }
         }
 
-        _context.Seat.Add(new Seat { SeatNo = newSeatNo, Status = "Available" });
+        _context.Seats.Add(new Seat { SeatNo = newSeatNo, Status = "Available" });
         _context.SaveChanges();
 
         return RedirectToAction("Index");
@@ -43,10 +44,10 @@ public class TableController : Controller
 
     public IActionResult Delete()
     {
-        var maxSeat = _context.Seat.OrderByDescending(s => s.SeatNo).FirstOrDefault();
+        var maxSeat = _context.Seats.OrderByDescending(s => s.SeatNo).FirstOrDefault();
         if (maxSeat != null)
         {
-            _context.Seat.Remove(maxSeat);
+            _context.Seats.Remove(maxSeat);
             _context.SaveChanges();
         }
 

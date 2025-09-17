@@ -148,9 +148,12 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.Food", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
@@ -220,6 +223,9 @@ namespace WMS.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(6)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -230,7 +236,6 @@ namespace WMS.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("StaffId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Status")
@@ -243,6 +248,8 @@ namespace WMS.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
 
                     b.HasIndex("SeatNo");
 
@@ -267,6 +274,9 @@ namespace WMS.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
+                    b.Property<int>("FoodId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("OrderDetailId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -281,7 +291,7 @@ namespace WMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FoodId");
+                    b.HasIndex("FoodId1");
 
                     b.HasIndex("OrderDetailId");
 
@@ -338,7 +348,7 @@ namespace WMS.Migrations
 
                     b.HasKey("SeatNo");
 
-                    b.ToTable("Seat");
+                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("WSM.Models.Staff", b =>
@@ -423,6 +433,10 @@ namespace WMS.Migrations
 
             modelBuilder.Entity("WSM.Models.OrderDetail", b =>
                 {
+                    b.HasOne("WSM.Models.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
                     b.HasOne("WSM.Models.Seat", "Seat")
                         .WithMany()
                         .HasForeignKey("SeatNo")
@@ -431,9 +445,9 @@ namespace WMS.Migrations
 
                     b.HasOne("WSM.Models.Staff", "Staff")
                         .WithMany()
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StaffId");
+
+                    b.Navigation("Admin");
 
                     b.Navigation("Seat");
 
@@ -444,7 +458,7 @@ namespace WMS.Migrations
                 {
                     b.HasOne("WSM.Models.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId")
+                        .HasForeignKey("FoodId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

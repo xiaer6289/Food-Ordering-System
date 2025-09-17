@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using WMS.Models;
+﻿using System.Text.Json;
 using WSM.Models;
 
 namespace WSM.Helpers
@@ -18,29 +16,35 @@ namespace WSM.Helpers
             _db = db;
         }
 
+        public class CartItem
+        {
+            public int Quantity { get; set; }
+            public string ExtraDetail { get; set; } = "N/A";
+        }
+
         // Get cart from session, key is string (FoodId)
-        public Dictionary<string, int> GetCart(string seatNo)
+        public Dictionary<string, CartItem> GetCart(string seatNo)
         {
             var session = _httpContextAccessor.HttpContext.Session;
             string cartJson = session.GetString(CartKey) ?? "{}";
 
-            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, int>>>(cartJson)
-                           ?? new Dictionary<string, Dictionary<string, int>>();
+            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, CartItem>>>(cartJson)
+                   ?? new Dictionary<string, Dictionary<string, CartItem>>();
 
             if (!allCarts.ContainsKey(seatNo))
-                allCarts[seatNo] = new Dictionary<string, int>();
+                allCarts[seatNo] = new Dictionary<string, CartItem>();
 
             return allCarts[seatNo];
         }
 
         // Save cart to session
-        public void SetCart(string seatNo, Dictionary<string, int> cart)
+        public void SetCart(string seatNo, Dictionary<string, CartItem> cart)
         {
             var session = _httpContextAccessor.HttpContext.Session;
             string cartJson = session.GetString(CartKey) ?? "{}";
 
-            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, int>>>(cartJson)
-                           ?? new Dictionary<string, Dictionary<string, int>>();
+            var allCarts = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, CartItem>>>(cartJson)
+                   ?? new Dictionary<string, Dictionary<string, CartItem>>();
 
             allCarts[seatNo] = cart;
 
@@ -53,15 +57,20 @@ namespace WSM.Helpers
         {
             var cart = GetCart(seatNo);
             decimal total = cart.Sum(item =>
-                _db.Foods
-                    .Where(f => f.Id == item.Key) 
-                    .Select(f => f.Price * item.Value)
-                    .FirstOrDefault());
+            {
+                if (int.TryParse(item.Key, out int foodId))
+                {
+                    return _db.Foods
+                        .Where(f => f.Id == foodId)
+                        .Select(f => f.Price * item.Value.Quantity)
+                        .FirstOrDefault();
+                }
+                return 0;
+            });
             return total;
         }
 
-        // Create OrderDetail and OrderItems based on current cart
-        public OrderDetail CreateOrderDetail(string seatNo, string staffId = "S001")
+        public OrderDetail CreateOrderDetail(string seatNo = "0", string staffId = null, string adminId = null)
         {
             var cart = GetCart(seatNo);
             if (!cart.Any()) return null;
@@ -72,28 +81,31 @@ namespace WSM.Helpers
             {
                 Id = orderId,
                 SeatNo = int.Parse(seatNo),
-                Quantity = cart.Sum(x => x.Value),
+                Quantity = cart.Sum(x => x.Value.Quantity),
                 TotalPrice = CalculateTotal(seatNo),
-                Status = "Completed",
+                Status = "Pending",
                 OrderDate = DateTime.Now,
                 StaffId = staffId,
+                AdminId = adminId,
                 OrderItems = cart.Select((x, index) => new OrderItem
                 {
                     Id = $"{orderId}-OI{index + 1}",
                     OrderDetailId = orderId,
-                    FoodId = x.Key, // string key
-                    Quantity = x.Value,
-                    SubTotal = _db.Foods
-                                .Where(f => f.Id.ToString() == x.Key)
-                                .Select(f => f.Price * x.Value)
-                                .FirstOrDefault(),
-                    ExtraDetail = "N/A"
+                    FoodId = x.Key,
+                    Quantity = x.Value.Quantity,
+                    SubTotal = int.TryParse(x.Key, out int foodId)
+                        ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
+                        : 0,
+                    ExtraDetail = x.Value.ExtraDetail
                 }).ToList()
             };
 
             _db.OrderDetails.Add(orderDetail);
             _db.SaveChanges();
+
             return orderDetail;
         }
+
+
     }
 }

@@ -18,8 +18,7 @@ public class DB : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
-
-    public DbSet<Seat> Seat { get; set; }
+    public DbSet<Seat> Seats { get; set; } // Pluralized for EF Core convention
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,7 +43,6 @@ public class DB : DbContext
             .WithMany()
             .HasForeignKey(od => od.SeatNo)
             .OnDelete(DeleteBehavior.Restrict);
-
     }
 }
 
@@ -93,9 +91,9 @@ public class Company
 
 public class Food
 {
-    [Key][DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [Key][DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [MaxLength(6)]
-    public string Id { get; set; }
+    public int Id { get; set; }
 
     public string Name { get; set; }
 
@@ -106,7 +104,7 @@ public class Food
 
     public string? Image { get; set; }
     [NotMapped]
-    public IFormFile? Photo { get; set; }
+    public string? Photo { get; set; }
 
     [ForeignKey("Category")]
     public string CategoryId { get; set; }
@@ -240,8 +238,11 @@ public class OrderDetail
     [Required]
     public DateTime OrderDate { get; set; }
 
-    public string StaffId { get; set; }
-    public Staff Staff { get; set; }
+    public string? StaffId { get; set; }
+    public Staff? Staff { get; set; }
+
+    public string? AdminId { get; set; }
+    public Admin? Admin { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

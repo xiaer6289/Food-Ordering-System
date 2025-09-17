@@ -18,7 +18,7 @@ public class CartController : Controller
 
     public IActionResult Cart(string seatNo)
     {
-        var cart = _helper.GetCart(seatNo) ?? new Dictionary<string, int>();
+        var cart = _helper.GetCart(seatNo) ?? new Dictionary<string, Helper.CartItem>();
         var cartItems = new List<dynamic>();
 
         foreach (var item in cart)
@@ -26,7 +26,7 @@ public class CartController : Controller
             var food = _db.Foods.FirstOrDefault(f => f.Id.ToString() == item.Key);
             if (food != null)
             {
-                cartItems.Add(new { Food = food, Quantity = item.Value });
+                cartItems.Add(new { Food = food, Quantity = item.Value }); // Quantity 现在是 CartItem
             }
         }
 
@@ -37,29 +37,36 @@ public class CartController : Controller
     }
 
 
-    // Update cart with foodId and quantity
     [HttpPost]
-    public IActionResult AddToCart(string seatNo, string foodId, int quantity)
+    public IActionResult AddToCart(string seatNo, string foodId, int quantity, string extraDetail)
     {
         var cart = _helper.GetCart(seatNo);
 
         if (quantity <= 0)
+        {
             cart.Remove(foodId);
+        }
         else
         {
             if (cart.ContainsKey(foodId))
             {
-                cart[foodId] += quantity;
+                cart[foodId].Quantity += quantity;
+                cart[foodId].ExtraDetail = extraDetail;
             }
             else
             {
-                cart[foodId] = quantity;
+                cart[foodId] = new Helper.CartItem
+                {
+                    Quantity = quantity,
+                    ExtraDetail = extraDetail
+                };
             }
         }
 
         _helper.SetCart(seatNo, cart);
         return RedirectToAction("Cart", new { seatNo });
     }
+
 
     public IActionResult Remove(string seatNo, string foodId)
     {
