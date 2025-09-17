@@ -1,0 +1,57 @@
+﻿@model WMS.Models.EditStaffViewModel
+@{
+    ViewData["Title"] = "Edit Staff";
+}
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+<div class="edit-staff-form">
+    <h2 class="edit-staff-title">Edit Staff</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="EditStaff" method="post" class="edit-staff-wrapper">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
+
+        <div>
+            <label asp-for="Id">Staff ID</label>
+            <input asp-for="Id" class="edit-staff-input" readonly />
+        </div>
+
+        <div>
+            <label asp-for="Name">Name</label>
+            <input asp-for="Name" placeholder="Enter staff name" class="edit-staff-input" readonly />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Email">Email</label>
+            <input asp-for="Email" type="email" placeholder="e.g., staff@example.com" maxlength="100" class="edit-staff-input" readonly />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="PhoneNo">Phone Number</label>
+            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" class="edit-staff-input" readonly />
+            <span asp-validation-for="PhoneNo" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Salary">Salary (RM)</label>
+            <input asp-for="Salary" type="number" step="100" placeholder="Enter salary" class="edit-staff-input" />
+            <span asp-validation-for="Salary" class="text-danger"></span>
+        </div>
+
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Save Changes</button>
+            <a asp-action="ReadStaff" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/js/staff.js"></script>

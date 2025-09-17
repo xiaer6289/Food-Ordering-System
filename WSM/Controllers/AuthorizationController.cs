@@ -46,8 +46,12 @@ public class AuthorizationController : Controller
         {
             // Set session for logged-in company
             HttpContext.Session.SetString("CompanyId", company.Id);
+            var admin = _db.Admins.FirstOrDefault(a => a.CompanyId == company.Id);
+            if (admin != null)
+            {
+                HttpContext.Session.SetString("AdminId", admin.Id);
+            }
 
-           
 
             // Save logo in session
             if (!string.IsNullOrEmpty(company.LogoPath))
@@ -181,6 +185,7 @@ public class AuthorizationController : Controller
         TempData["SuccessMessage"] = "Registration successful! You can now login.";
 
         HttpContext.Session.SetString("CompanyId", company.Id);
+        HttpContext.Session.SetString("AdminId", admin.Id);
 
         if (!string.IsNullOrEmpty(company.LogoPath))
         {

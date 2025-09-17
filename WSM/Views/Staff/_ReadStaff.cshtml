@@ -1,0 +1,68 @@
+﻿@using WSM.Models
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.Staff>
+
+@{
+    Layout = null;
+}
+
+@{
+    string currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
+}
+
+@if (!Model.Any())
+{
+    <p>No staff found.</p>
+}
+else
+{
+    <p>Showing @Model.Count of @Model.TotalItemCount staff | Page @Model.PageNumber of @Model.PageCount</p>
+
+    <table class="record-table">
+        <thead>
+            <tr>
+                <th>
+                    <a href="?sortOrder=@(currentSort == "Id" ? "Id_desc" : "Id")">
+                        Staff ID
+                    </a>
+                </th>
+                <th>
+                    <a href="?sortOrder=@(currentSort == "Name" ? "Name_desc" : "Name")">
+                        Name
+                    </a>
+                </th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Salary (RM)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var staff in Model)
+            {
+                <tr>
+                    <td>@staff.Id</td>
+                    <td>@staff.Name</td>
+                    <td>@staff.Email</td>
+                    <td>@staff.PhoneNo</td>
+                    <td>@staff.Salary</td>
+                    <td class="edit-remove-group">
+                        <a asp-action="EditStaff" asp-route-id="@staff.Id" class="edit-ingredient">Edit</a>
+                        <a asp-action="DeleteStaff" asp-route-id="@staff.Id"
+                           onclick="return confirm('Are you sure you want to delete @staff.Name?');"
+                           class="remove-ingredient delete-staff">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="pagination-wrapper">
+        @Html.PagedListPager(
+        Model,
+        page => Url.Action("ReadStaff", new { page, sortOrder = currentSort, id = ViewData["CurrentFilter"] }),
+        PagedListRenderOptions.ClassicPlusFirstAndLast
+        )
+</div>
+}

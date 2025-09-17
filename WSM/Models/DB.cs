@@ -181,7 +181,7 @@ public class Staff
     public string AdminId { get; set; }
     public Admin Admin { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(200)]
     [Required]
     public string Password { get; set; }
 

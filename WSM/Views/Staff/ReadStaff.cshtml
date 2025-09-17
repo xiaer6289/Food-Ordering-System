@@ -1,0 +1,61 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WSM.Models.Staff>
+
+@{
+    ViewData["Title"] = "Staff List";
+    string currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
+}
+
+<link rel="stylesheet" href="~/css/app.css" />
+
+<h2>Staff List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert-success-message">@TempData["SuccessMessage"]</div>
+}
+
+<div class="button-group">
+    <a asp-action="CreateStaff" class="create-ingredient">Add New Staff</a>
+</div>
+
+<!-- AJAX-loaded staff table -->
+<div id="staff-table-container">
+    <partial name="_ReadStaff" model="Model" />
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    let timer = null;
+
+    function loadStaff(searchText = '', page = 1) {
+        $.ajax({
+            url: '/Staff/ReadStaff',
+            type: 'GET',
+            data: { id: searchText, page: page },
+             dataType: 'html',
+            success: function(result) {
+                $('#staff-table-container').html(result);
+            },         
+        });
+    }
+
+    // Listen to global layout search input
+    $('#search').on('input', function() {
+        clearTimeout(timer);
+        const query = $(this).val();
+        timer = setTimeout(() => loadStaff(query), 500);
+    });
+
+    // Handle pagination links inside AJAX-loaded table
+    $(document).on('click', '#staff-table-container .pagination-wrapper a', function(e) {
+        e.preventDefault();
+        const url = new URL($(this).attr('href'), window.location.origin);
+        const page = url.searchParams.get('page') || 1;
+        const searchText = $('#search').val();
+        loadStaff(searchText, page);
+    });
+});
+</script>

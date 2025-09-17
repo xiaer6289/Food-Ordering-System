@@ -75,3 +75,52 @@ function generatePDF() {
     html2pdf().from(pdf).save(fileName);
 }
 
+//Staff 
+$(document).ready(function () {
+    let timer = null;
+
+    function loadStaff(searchText = '', page = 1) {
+        $.ajax({
+            url: '@Url.Action("ReadStaff", "Staff")',
+            type: 'GET',
+            data: { id: searchText, page: page },
+            success: function (result) {
+                $('#staff-table-container').html(result);
+            },
+        });
+    }
+
+    // Header search input
+    $('#search').on('input', function () {
+        clearTimeout(timer);
+        const searchText = $(this).val();
+        timer = setTimeout(() => loadStaff(searchText), 500);
+    });
+
+    // Pagination links
+    $(document).on('click', '#staff-table-container .pagination-wrapper a', function (e) {
+        e.preventDefault();
+        const url = new URL($(this).attr('href'), window.location.origin);
+        const page = url.searchParams.get('page') || 1;
+        const searchText = $('#search').val();
+        loadStaff(searchText, page);
+    });
+});
+
+$(function () {
+    // Search on input
+    $('#staff-search').on('input', function () {
+        let query = $(this).val();
+        $.get('@Url.Action("ReadStaff", "Staff")', { id: query }, function (data) {
+            $('#staff-table-container').html(data);
+        });
+    });
+
+    // Clear search
+    $('#clear-search').on('click', function () {
+        $('#staff-search').val('');
+        $.get('@Url.Action("ReadStaff", "Staff")', {}, function (data) {
+            $('#staff-table-container').html(data);
+        });
+    });
+});

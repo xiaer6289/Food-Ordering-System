@@ -841,7 +841,7 @@ header {
 .logo{
     cursor: pointer;
 }
-}
+
 
 .btn-back {
     background-color: #6c757d; /* gray */
@@ -982,3 +982,327 @@ select.select-status option {
     text-decoration: none;
 }
 /* Table css start */
+
+/*reset password page*/
+#reset-password-body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+#reset-password-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 100px;
+}
+
+#reset-password-title {
+    color: #333;
+}
+
+#reset-password-image {
+    margin-left: 230px;
+    height: 250px;
+    width: 250px;
+}
+
+#reset-password-error {
+    margin-top: 15px;
+}
+
+#reset-password-button {
+    background-color: #007bff;
+    border: none;
+}
+
+#reset-password-button:hover {
+    background-color: #0056b3;
+}
+
+/*forgot password page*/
+#forgot-password-body {
+    background-color: #f8f9fa; /* Light gray background */
+    font-family: Arial, sans-serif;
+}
+
+#forgot-password-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 100px;
+}
+
+#forgot-password-title {
+    color: #333;
+}
+
+#forgot-password-button {
+    background-color: #007bff;
+    border: none;
+}
+
+#forgot-password-button:hover {
+    background-color: #0056b3;
+}
+
+
+#forgot-password-image {
+    display: block;
+    margin: 10px auto;
+    max-width: 250px;
+    height: auto;
+    border-radius: 8px;
+}
+
+/*Create staff css*/
+
+.add-staff-form {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.add-staff-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.add-staff-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.add-staff-wrapper label {
+     font-weight: 600;
+     margin-bottom: 6px;
+     display: block;
+     color: #444;
+ }
+
+
+.add-staff-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease-in-out;
+}
+
+.add-staff-input:focus {
+     border-color: #0d6efd;
+     outline: none;
+     box-shadow: 0 0 4px rgba(13, 110, 253, 0.4);
+ }
+
+/* Validation error */
+.text-danger {
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Buttons */
+.add-staff-button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.add-staff-submit-btn,
+.add-staff-cancel-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.add-staff-submit-btn {
+    background-color: #0d6efd;
+    color: #fff;
+    margin-right: 10px;
+}
+
+    .add-staff-submit-btn:hover {
+        background-color: #0b5ed7;
+    }
+
+.add-staff-cancel-btn {
+    background-color: #6c757d;
+    color: #fff;
+    margin-left: 10px;
+}
+
+    .add-staff-cancel-btn:hover {
+        background-color: #5c636a;
+    }
+
+/* Alerts */
+.alert {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+}
+
+/*Edit  Staff css
+
+    Start
+*/
+
+.add-staff-form,
+.edit-staff-form {
+    max-width: 600px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.add-staff-title,
+.edit-staff-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.add-staff-form label,
+.edit-staff-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.add-staff-input,
+.edit-staff-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .add-staff-input:focus,
+    .edit-staff-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        outline: none;
+    }
+
+.text-danger {
+    font-size: 0.9rem;
+    color: #dc3545;
+}
+
+
+.add-staff-button-group,
+.edit-button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.add-staff-submit-btn,
+.edit-submit-btn,
+.add-staff-cancel-btn,
+.cancel-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Primary (Save / Add) button */
+.add-staff-submit-btn,
+.edit-submit-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .add-staff-submit-btn:hover,
+    .edit-submit-btn:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+/* Secondary (Cancel) button */
+.add-staff-cancel-btn,
+.cancel-btn {
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+}
+
+    .add-staff-cancel-btn:hover,
+    .cancel-btn:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+    }
+
+.alert {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+@media (max-width: 576px) {
+    .add-staff-form,
+    .edit-staff-form {
+        padding: 20px;
+    }
+
+    .add-staff-title,
+    .edit-staff-title {
+        font-size: 1.5rem;
+    }
+
+    .add-staff-button-group,
+    .edit-button-group {
+        flex-direction: column;
+    }
+
+    .add-staff-submit-btn,
+    .edit-submit-btn,
+    .add-staff-cancel-btn,
+    .cancel-btn {
+        width: 100%;
+    }
+}
