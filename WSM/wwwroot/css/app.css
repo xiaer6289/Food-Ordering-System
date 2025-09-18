@@ -483,7 +483,7 @@ header {
 
     .cancel-po:hover,
     .edit-cancel-btn,
-    .cancel-btn{
+    .refund-cancel-btn{
         background-color: #e88888;
     }
 
@@ -788,7 +788,7 @@ header {
     background-color: #57a65c;
 }
 
-.cancel-btn {
+.refund-cancel-btn {
     padding: 16px 42px;
     background-color: #ff9999;
     color: white;
