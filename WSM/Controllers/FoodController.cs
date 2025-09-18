@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using WSM.Helpers;
 using WSM.Models;
 using X.PagedList.Extensions;
@@ -108,14 +109,18 @@ namespace WSM.Controllers
                 if (e != "") ModelState.AddModelError("Photo", e);
             }
 
+
+
             if (ModelState.IsValid)
             {
+                String photoString = hp.SavePhoto(vm.Photo, "uploads");
+
                 db.Foods.Add(new()
                 {
                     Name = vm.Name,
                     Price = vm.Price,
                     Description = vm.Description,
-                    Photo = hp.SavePhoto(vm.Photo, "uploads"),
+                    Photo = photoString,
                     CategoryId = vm.CategoryId,
                 });
                 db.SaveChanges();

@@ -14,7 +14,7 @@
 
         <div class="left-header">
             <div class="logo">
-                <a href="../Home/Both">
+                <a href="../Table/Index">
                 <img src="@Url.Content(
                                          string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
                                              ? "~/images/default-logo.png"
@@ -37,15 +37,15 @@
         </div>
 
         <nav class="header-navigation">
-            <a href="../Home/Both">Home</a>
-            <a href="../Orde/Cart.cshtml">Menu</a>
+            <a href="../Table/Index">Home</a>
+            <a href="../Food/Menu">Menu</a>
             <a href="../Food/Foods">Food</a>
             <a href="../Category/Categories">Category</a>
-            <a href="../OrderHistory/OrderHistory.cshtml">Order History</a>
+            <a href="../OrderHistory/OrderHistory">Order History</a>
             <a href="../Admin/Admins">Admin</a>
             <a href="../Staff/ReadStaff">Staff</a>
-            <a href="../Food/Menu.cshtml">Menu</a>
-            <a href="../Ingredient/ReadIngredient.cshtml">Restock</a>
+            <a href="../Food/Menu">Menu</a>
+            <a href="../Ingredient/ReadIngredient">Restock</a>
         </nav>
 
         <div class="potrait" onclick="ToggleEventDropdown()">

@@ -46,7 +46,7 @@ public class FoodHelper
         };
 
         using var stream = f.OpenReadStream();
-        using var img = Image.Load(stream); ;
+        using var img = Image.Load(stream);
         img.Mutate(x => x.Resize(options));
         img.Save(path);
 
