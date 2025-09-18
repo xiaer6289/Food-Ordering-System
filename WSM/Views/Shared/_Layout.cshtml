@@ -8,10 +8,12 @@
     @RenderSection("head", false) @*optional section name head for individual page to inject content*@
     <script src="~/js/app.js"></script>
     <link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
+    <script src="~/js/app.js" asp-append-version="true"></script>
+
 
 
  </head>
-    <body>
+<body data-role="@Context.Session.GetString("Role")">
     <header>
 
         <div class="left-header">
@@ -38,17 +40,21 @@
 
         </div>
 
+        @{
+            var role = Context.Session.GetString("Role");
+        }
+
         <nav class="header-navigation">
             <a href="../Table/Index">Home</a>
             <a href="../Menu/foodlisting">Menu</a>
-            <a href="../Food/Foods">Food</a>
-            <a href="../Category/Categories">Category</a>
-            <a href="../OrderHistory/OrderHistory">Order History</a>
-            <a href="../Admin/Admins">Admin</a>
-            <a href="../Staff/ReadStaff">Staff</a>
-            <a href="../Food/Menu">Menu</a>
-            <a href="../Ingredient/ReadIngredient">Restock</a>
+            <a href="../Food/Foods" class="restricted" data-role="Staff">Food</a>
+            <a href="../Category/Categories" class="restricted" data-role="Staff">Category</a>
+            <a href="../OrderHistory/OrderHistory" class="restricted" data-role="Staff">Order History</a>
+            <a href="../Admin/Admins" class="restricted" data-role="Staff">Admin</a>
+            <a href="../Staff/ReadStaff" class="restricted" data-role="Staff">Staff</a>
+            <a href="../Ingredient/ReadIngredient" class="restricted" data-role="Staff">Restock</a>
         </nav>
+
 
         <div class="portrait" onclick="toggleDropdown()">
             @if (Context.Session.GetString("ProfilePhoto") != null)
@@ -59,7 +65,7 @@
             }
             else
             {
-                <img src="~/images/default-profile.png"
+                <img src="~/images/default-profile.jpg"
                      alt="Default Profile"
                      style="width:40px; height:40px; border-radius:50%;" />
             }
@@ -109,3 +115,19 @@
     });
 
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const role = document.body.getAttribute("data-role");
+
+    document.querySelectorAll(".restricted").forEach(btn => {
+        btn.addEventListener("click", e => {
+            if (role === "Staff") {
+                e.preventDefault(); // stop navigation
+                // redirect to a no-permission page or show alert
+                window.location.href = "/Home/NoPermission";
+            }
+        });
+    });
+});
+</script>
+

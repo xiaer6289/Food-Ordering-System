@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
 
@@ -17,10 +17,24 @@ namespace WSM.Controllers
 
         // Home page after company login
         public IActionResult Both()
+        // Ifpublic IActionResult Both()
         {
             string? companyId = HttpContext.Session.GetString("CompanyId");
-            if (companyId == null)
-                return RedirectToAction("Login", "Authorization");
+
+            // If session is empty, try to get the first company from DB
+            if (string.IsNullOrEmpty(companyId))
+            {
+                var firstCompany = db.Companies.FirstOrDefault();
+                if (firstCompany == null)
+                    return RedirectToAction("Login", "Authorization");
+
+                companyId = firstCompany.Id;
+
+                // Restore session
+                HttpContext.Session.SetString("CompanyId", companyId);
+                if (!string.IsNullOrEmpty(firstCompany.LogoPath))
+                    HttpContext.Session.SetString("CompanyLogo", firstCompany.LogoPath);
+            }
 
             var company = db.Companies.Find(companyId);
             if (company == null)
@@ -32,6 +46,7 @@ namespace WSM.Controllers
             ViewBag.CompanyName = company.CompanyName;
             ViewBag.CompanyDescription = company.Description;
 
+            // Restore staff/admin profile photo if session exists
             string? staffId = HttpContext.Session.GetString("StaffAdminId");
             if (!string.IsNullOrEmpty(staffId))
             {
@@ -42,12 +57,13 @@ namespace WSM.Controllers
                 }
             }
 
-
             return View();
         }
+ 
 
-        // POST: Login with Email or ID + Password
-        [HttpPost]
+
+            // POST: Login with Email or ID + Password
+            [HttpPost]
         public IActionResult Login(string loginInput, string Password)
         {
             string? companyId = HttpContext.Session.GetString("CompanyId");
@@ -117,6 +133,11 @@ namespace WSM.Controllers
         {
             if (HttpContext.Session.GetString("Role") != "Staff")
                 return RedirectToAction("Both");
+            return View();
+        }
+
+        public IActionResult NoPermission()
+        {
             return View();
         }
     }

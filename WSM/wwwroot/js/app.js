@@ -156,3 +156,17 @@ function toggleDropdown() {
         document.getElementById("dropdownMenu").classList.remove("show");
     }
 }
+
+//Main menu redirect to no permission page
+const role = document.body.getAttribute("data-role");
+
+document.querySelectorAll(".restricted").forEach(btn => {
+    btn.addEventListener("click", e => {
+        if (role === "Staff") {
+            e.preventDefault();
+            window.location.href = "/Home/NoPermission";
+        }
+    });
+});
+
+

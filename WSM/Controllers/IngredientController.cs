@@ -18,7 +18,15 @@ public class IngredientController : Controller
     }
 
     public IActionResult ReadIngredient(string? id, string? sort, string? dir, int page = 1)
-    {
+
+    {   //RESTRICT staff for login this page
+        string? role = HttpContext.Session.GetString("Role");
+        if (role != "Admin")
+        {
+            TempData["ErrorMessage"] = "You do not have permission to access this page.";
+            return RedirectToAction("Index", "Table");
+        }
+
         // For Layout.cshtml search bar
         ViewBag.SearchContext = "Ingredient";
         ViewBag.SearchPlaceholder = "Search by Ingredient ID/Name";

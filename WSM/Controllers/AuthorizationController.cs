@@ -5,6 +5,8 @@ using WSM.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 namespace WSM.Services;
 
+
+
 public class AuthorizationController : Controller
 {
     private readonly IPasswordHasher<string> _passwordHasher;
@@ -22,10 +24,17 @@ public class AuthorizationController : Controller
         _emailSender = emailSender;
     }
 
-    
+
     [HttpGet]
     public IActionResult Login()
     {
+        
+        if (_db.Companies.Any())
+        {
+            
+            return RedirectToAction("Both", "Home");
+        }
+
         return View();
     }
 
@@ -184,8 +193,7 @@ public class AuthorizationController : Controller
         _db.Admins.Add(admin);
         _db.SaveChanges();
 
-        TempData["SuccessMessage"] = "Registration successful! You can now login.";
-
+        
         HttpContext.Session.SetString("CompanyId", company.Id);
         HttpContext.Session.SetString("AdminId", admin.Id);
 
@@ -424,7 +432,30 @@ public class AuthorizationController : Controller
         if (role == "company")
             return RedirectToAction("Login", "Authorization");
         else
-            return RedirectToAction("Both", "Home");
+        {
+            // Restore company session for admin/staff
+            string? linkedCompanyId = null;
+
+            if (company != null)
+                linkedCompanyId = company.Id;
+            else if (admin != null)
+                linkedCompanyId = admin.CompanyId;
+            else if (staff != null)
+                linkedCompanyId = staff.CompanyId;
+
+            if (!string.IsNullOrEmpty(linkedCompanyId))
+            {
+                HttpContext.Session.SetString("CompanyId", linkedCompanyId);
+
+                var linkedCompany = _db.Companies.Find(linkedCompanyId);
+                if (linkedCompany != null && !string.IsNullOrEmpty(linkedCompany.LogoPath))
+                {
+                    HttpContext.Session.SetString("CompanyLogo", linkedCompany.LogoPath);
+                }
+            }
+        }
+        TempData["SuccessMessage"] = "Password reset successfully.";
+        return RedirectToAction("Both", "Home");
     }
 
     public IActionResult Reset()

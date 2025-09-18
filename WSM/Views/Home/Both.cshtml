@@ -2,45 +2,59 @@
     Layout = null;
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
 @{
-    ViewData["Title"] = "Login";
+    Layout = null;
+    ViewData["Title"] = "Staff Login";
     var companyLogo = ViewBag.CompanyLogo as string;
-    var companyName = ViewBag.CompanyName as string;
-    var companyDescription = ViewBag.CompanyDescription as string;
+    var companyName = ViewBag.CompanyName as string ?? "My Company";
+    var companyDesc = ViewBag.CompanyDescription as string ?? "Welcome to the staff system!";
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 
-<div class="container vh-100 d-flex flex-column justify-content-center align-items-center">
+<div class="both-page vh-100 d-flex flex-column justify-content-center align-items-center">
 
-    <div class="company-info text-center">
-        <h2>Welcome To @companyName !</h2>
-        <p class="fst-italic">@companyDescription</p>
+    <div class="both-page__logo text-center mb-5">
+        <img src="@Url.Content(string.IsNullOrEmpty(companyLogo) ? "~/images/default-logo.png" : companyLogo)"
+             alt="Logo"
+             class="both-page__logo-img mb-3">
+        <h2 class="both-page__company-name">@companyName</h2>
+        <p class="both-page__company-desc fst-italic">@companyDesc</p>
     </div>
 
-    <div class="card p-4 shadow" style="min-width: 350px;">
-        <h3 class="text-center mb-4">Login</h3>
+    <div class="both-page__card card p-4 shadow">
+        <h3 class="both-page__card-title text-center mb-4">Login</h3>
 
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger">
+            <div class="both-page__alert alert alert-danger">
                 @TempData["ErrorMessage"]
             </div>
         }
 
-        <form asp-controller="Home" asp-action="Login" method="post">
-            <div class="mb-3">
+        <form asp-controller="Home" asp-action="Login" method="post" class="both-page__form">
+            <div class="mb-3 both-page__form-group">
                 <label>ID / Email</label>
-                <input type="text" name="loginInput" class="form-control" required />
+                <input type="text" name="loginInput" class="form-control both-page__input" required />
             </div>
-            <div class="mb-3">
+            <div class="mb-3 both-page__form-group">
                 <label>Password</label>
-                <input type="password" name="Password" class="form-control" required />
+                <input type="password" name="Password" class="form-control both-page__input" required />
             </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-            <div class="text-center mt-3">
-                <a asp-controller="Authorization" asp-action="ForgotPassword" asp-route-role="admin">Forgot Password?</a>
+            <button type="submit" class="btn btn-primary w-100 both-page__btn">Login</button>
+            <div class="both-page__forgot text-center mt-3">
+                <a asp-controller="Authorization" asp-action="ForgotPassword" asp-route-role="staff">Forgot Password?</a>
             </div>
         </form>
     </div>
+
 </div>

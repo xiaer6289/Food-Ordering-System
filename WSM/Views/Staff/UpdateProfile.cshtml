@@ -30,7 +30,6 @@
             @Html.AntiForgeryToken()
             <input asp-for="Id" type="hidden" />
 
-            <!-- Profile Photo -->
             <div class="profile-picture">
                 <img src="@(!string.IsNullOrEmpty(Model.PhotoPath) ? Url.Content(Model.PhotoPath) : Url.Content("~/images/default-profile.jpg"))"
                      alt="Profile Picture" />
@@ -38,13 +37,11 @@
                 <input type="file" name="Photo" accept="image/*" class="file-input" />
             </div>
 
-            <!-- Staff ID -->
             <div class="form-group">
                 <label asp-for="Id">Staff ID</label>
                 <input asp-for="Id" readonly />
             </div>
 
-            <!-- Editable Fields -->
             <div class="form-group">
                 <label asp-for="Name">Name</label>
                 <input asp-for="Name" placeholder="Enter your name" />
@@ -63,7 +60,6 @@
                 <span asp-validation-for="PhoneNo" class="text-danger"></span>
             </div>
 
-            <!-- Change Password -->
             <h3 class="section-title">Change Password</h3>
             <div class="form-group">
                 <label asp-for="CurrentPassword">Current Password</label>
@@ -83,7 +79,6 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
-            <!-- Buttons -->
             <div class="button-group">
                 <button type="submit" class="save-btn">Save Changes</button>
                 <a asp-action="Index" asp-controller="Table" class="cancel-btn">Cancel</a>
