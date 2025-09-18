@@ -13,16 +13,27 @@
 
 <h2 class="mb-4">Food Menu</h2>
 
-<!-- Category Filter -->
-<div class="mb-3">
-    <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All" })"
-       class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
-    @foreach (var cat in categories)
-    {
-        <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id })"
-           class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
-    }
+<!-- Category Filter + Go to Cart button -->
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+        <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All" })"
+           class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
+        @foreach (var cat in categories)
+        {
+            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id })"
+               class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
+        }
+    </div>
+
+    <!-- Go to Cart button -->
+    <div>
+        <a href="@Url.Action("Cart", "Cart", new { seatNo = ViewBag.SeatNo })"
+           class="btn btn-success">
+            🛒 Go to Cart
+        </a>
+    </div>
 </div>
+
 
 <!-- Food Grid -->
 <div class="container">
