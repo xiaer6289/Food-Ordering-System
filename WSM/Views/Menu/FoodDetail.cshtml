@@ -1,36 +1,39 @@
 ﻿@model WSM.Models.Food
 
 @{
-    ViewData["Title"] = "Food Detail - " + Model.Name;
+    ViewData["Title"] = "Food Detail";
 }
 
-<div>
-    <img src="@(!string.IsNullOrEmpty(Model.Image) ? Model.Image : Url.Content("~/images/default.png"))"
-         alt="@Model.Name"
-         style="width:250px; height:250px; object-fit:contain;" />
-</div>
+<h1 class="table-header">Food Detail - @Model.Name</h1>
 
-<div>
-    <p><strong>Price:</strong> RM @Model.Price</p>
-    <p><strong>Description:</strong> @Model.Description</p>
-    <p><strong>Category:</strong> @Model.CategoryId</p>
-</div>
-
-<hr />
-
-<form asp-controller="Cart" asp-action="AddToCart" method="post">
-    <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
-    <input type="hidden" name="foodId" value="@Model.Id" />
-
-    <div class="mb-3">
-        <label for="quantity"><strong>Quantity:</strong></label>
-        <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="form-control" style="width:120px;" />
+<div class="food-detail-container">
+    <div class="food-image">
+        <img src="@(!string.IsNullOrEmpty(Model.Image) ? Model.Image : Url.Content("~/images/default.png"))"
+             alt="@Model.Name" />
     </div>
 
-    <div class="mb-3">
-        <label for="extraDetail"><strong>Extra Detail (optional):</strong></label>
-        <textarea id="extraDetail" name="extraDetail" class="form-control" rows="3"></textarea>
-    </div>
+    <div class="food-info">
+        <p><strong>Food ID:</strong> @Model.Id</p>
+        <p><strong>Price:</strong> RM @Model.Price</p>
+        <p><strong>Description:</strong> @Model.Description</p>
 
-    <button type="submit" class="btn btn-primary">Add to Cart</button>
-</form>
+        <hr />
+
+        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+            <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
+            <input type="hidden" name="foodId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="quantity"><strong>Quantity:</strong></label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="form-control-sm" />
+            </div>
+
+            <div class="mb-3">
+                <label for="extraDetail"><strong>Extra Detail (optional):</strong></label>
+                <textarea id="extraDetail" name="extraDetail" class="form-control-sm"></textarea>
+            </div>
+
+            <button type="submit" class="btn-addcart">Add to Cart</button>
+        </form>
+    </div>
+</div>
