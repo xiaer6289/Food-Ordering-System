@@ -12,16 +12,32 @@
 
 
 <form method="post" action="/Admin/DeleteMany" id="deleteForm">
-    <p>
-        <button type="button" class="check-all-btn">Check All</button>
-        <button type="button" class="uncheck-all-btn">Uncheck All</button>
-    </p>
+
+        <button type="button" class="check-all-btn btn btn-sm btn-outline-primary">Check All</button>
+        <button type="button" class="uncheck-all-btn btn btn-sm btn-outline-secondary">Uncheck All</button>
+
 
     <div id="target">
         <partial name="_Admins" model="Model" />
     </div>
 </form>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkAllBtn = document.querySelector('.check-all-btn');
+        const uncheckAllBtn = document.querySelector('.uncheck-all-btn');
+        const checkboxes = document.querySelectorAll('.admin-checkbox');
 
+        // Check All
+        checkAllBtn.addEventListener('click', function () {
+            checkboxes.forEach(cb => cb.checked = true);
+        });
+
+        // Uncheck All
+        uncheckAllBtn.addEventListener('click', function () {
+            checkboxes.forEach(cb => cb.checked = false);
+        });
+    });
+</script>
 
 

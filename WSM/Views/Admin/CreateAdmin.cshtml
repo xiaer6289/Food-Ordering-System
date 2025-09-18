@@ -2,10 +2,11 @@
 @{
     ViewData["Title"] = "Add Admin";
 }
+
 <div class="edit-ingredient-form">
     <h2 class="edit-ingredient-title">Add Admin</h2>
 
-    <!-- Success Message -->
+    <!-- Inline Success Message -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success text-center">
@@ -13,6 +14,7 @@
         </div>
     }
 
+    <!-- Inline Validation Error Messages -->
     @if (!ViewData.ModelState.IsValid)
     {
         <div class="alert alert-danger">
@@ -36,7 +38,7 @@
 
         <div>
             <label asp-for="Email">Email</label>
-            <input asp-for="Email" type="email" placeholder="e.g., admin@example.com" maxlength="100" class="edit-ingredient-quantity" required />
+            <input asp-for="Email" type="email" placeholder="e.g., admin@gmail.com" maxlength="100" class="edit-ingredient-quantity" required />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
@@ -58,6 +60,3 @@
         </div>
     </form>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/admin.js"></script>
