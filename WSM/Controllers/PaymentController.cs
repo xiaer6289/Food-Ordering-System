@@ -23,59 +23,53 @@ namespace WSM.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public IActionResult CreateCheckoutSession(string seatNo)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-            string role = HttpContext.Session.GetString("Role");
-            string staffAdminId = HttpContext.Session.GetString("StaffAdminId");
+            var pendingOrders = _db.OrderDetails
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Food)
+                .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status != "Paid")
+                .ToList();
 
-            OrderDetail orderDetail = null;
-            if (role == "Staff")
-            {
-                orderDetail = _helper.CreateOrderDetail(seatNo, staffId: staffAdminId);
-            }
-            else if (role == "Admin")
-            {
-                orderDetail = _helper.CreateOrderDetail(seatNo, adminId: staffAdminId);
-            }
+            if (!pendingOrders.Any())
+                return BadRequest("No pending orders to pay.");
 
-            if (orderDetail == null)
-                return BadRequest("Cart is empty.");
+            var totalAmount = pendingOrders.Sum(o => o.TotalPrice);
 
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    new SessionLineItemOptions
+                    Currency = "myr",
+                    UnitAmount = (long)(totalAmount * 100),
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "myr",
-                            UnitAmount = (long)(orderDetail.TotalPrice * 100),
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = "Restaurant Order",
-                                Description = $"Order ID: {orderDetail.Id}"
-                            }
-                        },
-                        Quantity = 1
+                        Name = "Restaurant Order",
+                        Description = $"Seat No: {seatNo} - {pendingOrders.Count} orders"
                     }
                 },
+                Quantity = 1
+            }
+        },
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Payment/Success?seatNo={seatNo}&session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/Cancel",
-                Metadata = new Dictionary<string, string> { { "order_id", orderDetail.Id } },
+                CancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/Cancel"
             };
 
             var service = new SessionService();
             var session = service.Create(options);
 
+            HttpContext.Session.SetString("OrdersToPay", string.Join(",", pendingOrders.Select(o => o.Id)));
+
             return Redirect(session.Url);
         }
-
 
         public async Task<IActionResult> Success(string seatNo, string session_id)
         {
@@ -86,47 +80,50 @@ namespace WSM.Controllers
             if (session.PaymentStatus != "paid")
                 return View("OrderCancel");
 
-            string orderId = session.Metadata["order_id"];
+            var orderIdsStr = HttpContext.Session.GetString("OrdersToPay") ?? "";
+            var orderIds = orderIdsStr.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-            // Save payment info
+            var orders = _db.OrderDetails
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Food)
+                .Where(o => orderIds.Contains(o.Id))
+                .ToList();
+
+            if (!orders.Any())
+                return BadRequest("No matching orders found.");
+
+            var totalAmount = orders.Sum(o => o.TotalPrice);
+
             var payment = new Payment
             {
-                Id = "P" + orderId.Substring(3),
-                OrderDetailId = orderId,
+                Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                OrderDetailId = orders.First().Id, 
                 PaymentMethod = "Card",
+                TotalPrice = totalAmount,
                 AmountPaid = (decimal)session.AmountTotal / 100,
                 Paymentdate = DateTime.Now,
                 StripeTransactionId = session.PaymentIntentId
             };
             _db.Payments.Add(payment);
+
+            foreach (var order in orders)
+            {
+                order.Status = "Paid";
+                _db.OrderDetails.Update(order);
+            }
+
             _db.SaveChanges();
 
-            var orderDetail = _db.OrderDetails
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Food)
-                .FirstOrDefault(o => o.Id == orderId);
-
-
-            var orderItems = _db.OrderItems
-                                .Include(i => i.Food)
-                                .Where(i => i.OrderDetailId == orderId)
-                                .ToList();
-
-      
-
-            // Pass everything to the view
             var model = new OrderConfirmationViewModel
             {
-                OrderDetail = orderDetail,
-                OrderItems = orderDetail.OrderItems.ToList(),
+                OrderDetail = orders.First(),
+                OrderItems = orders.SelectMany(o => o.OrderItems).ToList(),
                 Payment = payment
             };
 
-            // clear cart
-            _helper.SetCart(seatNo, new Dictionary<string, Helper.CartItem>());
             return View("OrderConfirmation", model);
-
         }
+
 
         // Payment cancel page
         public IActionResult Cancel()

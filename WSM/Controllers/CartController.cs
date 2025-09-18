@@ -18,24 +18,32 @@ public class CartController : Controller
 
     public IActionResult Cart(string seatNo)
     {
-        var cart = _helper.GetCart(seatNo) ?? new Dictionary<string, Helper.CartItem>();
+        var sessionCart = _helper.GetCart(seatNo) ?? new Dictionary<string, Helper.CartItem>();
         var cartItems = new List<dynamic>();
-
-        foreach (var item in cart)
+        foreach (var item in sessionCart)
         {
             var food = _db.Foods.FirstOrDefault(f => f.Id.ToString() == item.Key);
             if (food != null)
             {
-                cartItems.Add(new { Food = food, Quantity = item.Value }); // Quantity 现在是 CartItem
+                cartItems.Add(new { Food = food, Quantity = item.Value });
             }
         }
+
+
+        var previousOrders = _db.OrderDetails
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Food)
+            .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status != "Pending") 
+            .OrderByDescending(o => o.OrderDate)
+            .ToList();
 
         ViewBag.CartItems = cartItems;
         ViewBag.TotalAmount = _helper.CalculateTotal(seatNo);
         ViewBag.SeatNo = seatNo;
+        ViewBag.PreviousOrders = previousOrders;
+
         return View();
     }
-
 
     [HttpPost]
     public IActionResult AddToCart(string seatNo, string foodId, int quantity, string extraDetail)
@@ -75,4 +83,42 @@ public class CartController : Controller
         _helper.SetCart(seatNo, cart);
         return RedirectToAction("Cart", new { seatNo });
     }
+
+    [HttpPost]
+    public IActionResult SendOrder(string seatNo)
+    {
+        var role = HttpContext.Session.GetString("Role");
+        var staffAdminId = HttpContext.Session.GetString("StaffAdminId");
+
+        if (string.IsNullOrEmpty(role) || string.IsNullOrEmpty(staffAdminId))
+            return Unauthorized("User not recognized as staff/admin.");
+
+        OrderDetail orderDetail;
+
+        if (role == "Staff")
+            orderDetail = _helper.CreateOrderDetail(seatNo, staffId: staffAdminId);
+        else if (role == "Admin")
+            orderDetail = _helper.CreateOrderDetail(seatNo, adminId: staffAdminId);
+        else
+            return Unauthorized("Invalid role.");
+
+        if (orderDetail == null)
+            return BadRequest("Cart is empty.");
+
+        orderDetail.Status = "Preparing";
+        _db.OrderDetails.Update(orderDetail);
+        _db.SaveChanges();
+
+        _helper.SetCart(seatNo, new Dictionary<string, Helper.CartItem>());
+
+        return RedirectToAction("OrderSentConfirmation", new { orderId = orderDetail.Id });
+    }
+
+
+    public IActionResult OrderSentConfirmation(string orderId)
+    {
+        ViewBag.OrderId = orderId;
+        return View();
+    }
+
 }

@@ -86,26 +86,32 @@ namespace WSM.Helpers
                 Status = "Pending",
                 OrderDate = DateTime.Now,
                 StaffId = staffId,
-                AdminId = adminId,
-                OrderItems = cart.Select((x, index) => new OrderItem
-                {
-                    Id = $"{orderId}-OI{index + 1}",
-                    OrderDetailId = orderId,
-                    FoodId = x.Key,
-                    Quantity = x.Value.Quantity,
-                    SubTotal = int.TryParse(x.Key, out int foodId)
-                        ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
-                        : 0,
-                    ExtraDetail = x.Value.ExtraDetail
-                }).ToList()
+                AdminId = adminId
             };
 
             _db.OrderDetails.Add(orderDetail);
             _db.SaveChanges();
 
+            int index = 1;
+            foreach (var x in cart)
+            {
+                var orderItem = new OrderItem
+                {
+                    Id = $"{orderId}-OI{index++}",
+                    OrderDetailId = orderId,
+                    FoodId = int.Parse(x.Key),
+                    Quantity = x.Value.Quantity,
+                    SubTotal = int.TryParse(x.Key, out int foodId)
+                        ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
+                        : 0,
+                    ExtraDetail = string.IsNullOrEmpty(x.Value.ExtraDetail) ? "N/A" : x.Value.ExtraDetail
+                };
+                _db.OrderItems.Add(orderItem);
+            }
+
+            _db.SaveChanges();
+
             return orderDetail;
         }
-
-
     }
 }

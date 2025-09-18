@@ -1,13 +1,8 @@
-﻿@{
-    ViewData["Title"] = "My Cart";
-    var cartItems = ViewBag.CartItems as List<dynamic>;
-    var totalAmount = ViewBag.TotalAmount;
-}
+﻿<h3>🛒 My Cart (Seat @ViewBag.SeatNo)</h3>
 
-<h3>🛒 My Cart (Seat @ViewBag.SeatNo)</h3>
-
-@if (cartItems != null && cartItems.Count > 0)
+@if (ViewBag.CartItems != null && ViewBag.CartItems.Count > 0)
 {
+    <h4>Current Cart</h4>
     <table class="table">
         <thead>
             <tr>
@@ -20,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in cartItems)
+            @foreach (var item in ViewBag.CartItems)
             {
                 <tr>
                     <td>@item.Food.Name</td>
@@ -36,17 +31,59 @@
         </tbody>
     </table>
 
-    <h4>Total: RM @totalAmount</h4>
-    
-    @if (cartItems != null && cartItems.Count > 0)
-    {
-        <form asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
-            <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
-            <button type="submit" class="btn btn-success">Checkout</button>
-        </form>
-    }
+    <h4>Total: RM @ViewBag.TotalAmount</h4>
+
+    <form asp-controller="Cart" asp-action="SendOrder" method="post">
+        <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
+        <button type="submit" class="btn btn-primary">Send Order</button>
+    </form>
+
+    <br />
+
+    <form asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
+        <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
+        <button type="submit" class="btn btn-success">Checkout</button>
+    </form>
 }
 else
 {
     <p>Your cart is empty.</p>
+}
+
+@if (ViewBag.PreviousOrders != null && ViewBag.PreviousOrders.Count > 0)
+{
+    <h4>Previous Orders</h4>
+    @foreach (var order in ViewBag.PreviousOrders)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                Order ID: @order.Id | Status: @order.Status | Date: @order.OrderDate.ToString("yyyy-MM-dd HH:mm")
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Food</th>
+                            <th>Quantity</th>
+                            <th>Extra Detail</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.Food.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.ExtraDetail</td>
+                                <td>RM @item.Food.Price</td>
+                                <td>RM @item.SubTotal</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 }

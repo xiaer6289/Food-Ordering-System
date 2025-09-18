@@ -260,7 +260,8 @@ public class OrderItem
 
     [MaxLength(6)]
     [Required]
-    public string FoodId { get; set; }
+    public int FoodId { get; set; }
+    [ForeignKey("FoodId")]
     public Food Food { get; set; }
 
     [Required]
@@ -271,7 +272,7 @@ public class OrderItem
     public decimal SubTotal { get; set; }
 
     [MaxLength(200)]
-    public string ExtraDetail { get; set; }
+    public string ExtraDetail { get; set; } = "";
 }
 
 public class Payment

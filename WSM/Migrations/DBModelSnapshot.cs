@@ -272,12 +272,8 @@ namespace WMS.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("FoodId")
-                        .IsRequired()
+                    b.Property<int>("FoodId")
                         .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<int>("FoodId1")
                         .HasColumnType("int");
 
                     b.Property<string>("OrderDetailId")
@@ -294,7 +290,7 @@ namespace WMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FoodId1");
+                    b.HasIndex("FoodId");
 
                     b.HasIndex("OrderDetailId");
 
@@ -461,7 +457,7 @@ namespace WMS.Migrations
                 {
                     b.HasOne("WSM.Models.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId1")
+                        .HasForeignKey("FoodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
