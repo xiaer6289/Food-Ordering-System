@@ -322,9 +322,21 @@ namespace WMS.Migrations
                     b.Property<DateTime>("Paymentdate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("ServiceCharge")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("StripeTransactionId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Tax")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(10, 2)

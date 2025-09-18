@@ -308,6 +308,13 @@ public class Payment
 
     [ForeignKey(nameof(OrderDetailId))]
     public OrderDetail OrderDetail { get; set; }
+
+    [Precision(10, 2)]
+    public decimal Subtotal { get; set; }
+    [Precision(10, 2)]
+    public decimal Tax { get; set; }
+    [Precision(10, 2)]
+    public decimal ServiceCharge { get; set; }
 }
 
 public class Ingredient

@@ -232,7 +232,7 @@ namespace WSM.Controllers
             TempData["Info"] = "Food updated successfully!";
             return RedirectToAction("Foods");
         }
-        // GET: /Food/DeleteFood/{id}
+        // GET: /Food/DeleteFood
         public IActionResult DeleteFood(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
