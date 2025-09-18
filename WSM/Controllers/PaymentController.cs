@@ -36,32 +36,41 @@ namespace WSM.Controllers
             if (!pendingOrders.Any())
                 return BadRequest("No pending orders to pay.");
 
-            var totalAmount = pendingOrders.Sum(o => o.TotalPrice);
+            var subtotal = pendingOrders.Sum(o => o.TotalPrice);
+            var tax = subtotal * 0.06m;
+            var serviceCharge = subtotal * 0.1m;
+            var totalAmountWithCharges = subtotal + tax + serviceCharge;
+
+            HttpContext.Session.SetString("Subtotal", subtotal.ToString());
+            HttpContext.Session.SetString("Tax", tax.ToString());
+            HttpContext.Session.SetString("ServiceCharge", serviceCharge.ToString());
+            HttpContext.Session.SetString("TotalAmount", totalAmountWithCharges.ToString());
 
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
-        {
-            new SessionLineItemOptions
             {
-                PriceData = new SessionLineItemPriceDataOptions
+                new SessionLineItemOptions
                 {
-                    Currency = "myr",
-                    UnitAmount = (long)(totalAmount * 100),
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    PriceData = new SessionLineItemPriceDataOptions
                     {
-                        Name = "Restaurant Order",
-                        Description = $"Seat No: {seatNo} - {pendingOrders.Count} orders"
-                    }
-                },
-                Quantity = 1
-            }
-        },
+                        Currency = "myr",
+                        UnitAmount = (long)(totalAmountWithCharges * 100),
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = "Restaurant Order",
+                            Description = $"Seat No: {seatNo} - {pendingOrders.Count} orders\n"
+                        }
+                    },
+                    Quantity = 1
+                }
+            },
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Payment/Success?seatNo={seatNo}&session_id={{CHECKOUT_SESSION_ID}}",
                 CancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/Cancel"
             };
+
 
             var service = new SessionService();
             var session = service.Create(options);
@@ -94,22 +103,38 @@ namespace WSM.Controllers
 
             var totalAmount = orders.Sum(o => o.TotalPrice);
 
+            var subtotal = decimal.Parse(HttpContext.Session.GetString("Subtotal") ?? "0");
+            var tax = decimal.Parse(HttpContext.Session.GetString("Tax") ?? "0");
+            var serviceCharge = decimal.Parse(HttpContext.Session.GetString("ServiceCharge") ?? "0");
+            var totalAmountWithCharges = decimal.Parse(HttpContext.Session.GetString("TotalAmount") ?? "0");
+
             var payment = new Payment
             {
                 Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss"),
-                OrderDetailId = orders.First().Id, 
+                OrderDetailId = orders.First().Id,
                 PaymentMethod = "Card",
-                TotalPrice = totalAmount,
+                Subtotal = subtotal,           
+                Tax = tax,                     
+                ServiceCharge = serviceCharge, 
+                TotalPrice = totalAmountWithCharges,
                 AmountPaid = (decimal)session.AmountTotal / 100,
                 Paymentdate = DateTime.Now,
                 StripeTransactionId = session.PaymentIntentId
             };
             _db.Payments.Add(payment);
 
+
             foreach (var order in orders)
             {
                 order.Status = "Paid";
                 _db.OrderDetails.Update(order);
+            }
+
+            var seat = _db.Seats.FirstOrDefault(s => s.SeatNo == int.Parse(seatNo));
+            if (seat != null)
+            {
+                seat.Status = "Available";
+                _db.Seats.Update(seat);
             }
 
             _db.SaveChanges();

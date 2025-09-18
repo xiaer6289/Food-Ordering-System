@@ -33,7 +33,7 @@ public class CartController : Controller
         var previousOrders = _db.OrderDetails
             .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Food)
-            .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status != "Pending") 
+            .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status == "Preparing")
             .OrderByDescending(o => o.OrderDate)
             .ToList();
 
@@ -107,6 +107,14 @@ public class CartController : Controller
 
         orderDetail.Status = "Preparing";
         _db.OrderDetails.Update(orderDetail);
+
+        var seat = _db.Seats.FirstOrDefault(s => s.SeatNo == int.Parse(seatNo));
+        if (seat != null)
+        {
+            seat.Status = "Occupied";
+            _db.Seats.Update(seat);
+        }
+
         _db.SaveChanges();
 
         _helper.SetCart(seatNo, new Dictionary<string, Helper.CartItem>());
