@@ -208,13 +208,6 @@ namespace WSM.Controllers
                 admin.Email = model.Email;
                 admin.PhoneNo = model.PhoneNo;
 
-                // If password was updated
-                if (!string.IsNullOrWhiteSpace(model.NewPassword))
-                {
-                    var hasher = new PasswordHasher<Admin>();
-                    admin.Password = hasher.HashPassword(admin, model.NewPassword);
-                }
-
                 db.SaveChanges();
 
                 TempData["SuccessMessage"] = $"Admin '{admin.Name}' updated successfully.";
@@ -260,7 +253,6 @@ namespace WSM.Controllers
 
             try
             {
-                // Get admins belonging to this company
                 var admins = db.Admins
                                .Include(a => a.Staffs)
                                .Where(a => ids.Contains(a.Id) && a.CompanyId == companyId)
@@ -272,7 +264,6 @@ namespace WSM.Controllers
                     return RedirectToAction("Admins");
                 }
 
-                // Check for linked staff
                 var linkedAdmins = admins.Where(a => a.Staffs.Any()).ToList();
                 if (linkedAdmins.Any())
                 {
@@ -281,7 +272,6 @@ namespace WSM.Controllers
                     return RedirectToAction("Admins");
                 }
 
-                // Delete admins
                 db.Admins.RemoveRange(admins);
                 int deletedCount = db.SaveChanges();
 
