@@ -33,7 +33,7 @@ namespace WSM.Controllers
                 return RedirectToAction("Login", "Authorization");
             }
 
-            // Base query
+            // Base query - only admins for this company
             var admins = db.Admins
                            .Where(a => a.CompanyId == companyId)
                            .AsQueryable();
@@ -75,21 +75,22 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = 1 });
             }
 
-            var pagedAdmins = sorted.ToPagedList(page, 10);
+            var pagedAdmins = sorted.ToPagedList(page, 5);
 
             if (page > pagedAdmins.PageCount && pagedAdmins.PageCount > 0)
             {
                 return RedirectToAction(null, new { id, sort, dir, page = pagedAdmins.PageCount });
             }
 
-            // Support for AJAX partial rendering
+            // AJAX support for partial reload
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                return PartialView("_AdminsPartial", pagedAdmins);
+                return PartialView("_Admins", pagedAdmins);
             }
 
             return View(pagedAdmins);
         }
+
 
 
 
@@ -236,8 +237,6 @@ namespace WSM.Controllers
                           .FirstOrDefault(a => a.Id == id && a.CompanyId == companyId);
 
             if (admin == null) return NotFound();
-
-            // Prevent deletion if linked to staff
             if (admin.Staffs.Any())
             {
                 TempData["ErrorMessage"] = $"Cannot delete admin '{admin.Name}' because they are linked to staff records.";
@@ -276,5 +275,9 @@ namespace WSM.Controllers
 
             return $"A{nextNumber:D4}";
         }
+
+
+
+
     }
 }

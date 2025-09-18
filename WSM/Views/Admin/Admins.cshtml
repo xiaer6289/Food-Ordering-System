@@ -3,97 +3,25 @@
 @model IPagedList<WSM.Models.Admin>
 
 @{
-    ViewData["Title"] = "Admin";
-    string currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
+    ViewData["Title"] = "Admin Management";
+    string[] fields = ["", "Id", "Name", "Email", "Phone Number", ""];
 }
 
-<h2>Admin List</h2>
+<h2>Admin Management</h2>
 
-<!-- Success Message -->
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert-success-message">
-        @TempData["SuccessMessage"]
-    </div>
-}
 
-<div class="button-group">
-    <a asp-action="CreateAdmin" class="create-ingredient">Add New Admin</a>
-</div>
 
-@if (!Model.Any())
-{
-    <p>No admins found.</p>
-}
-else
-{
-    <p class="pagination-count">
-        Showing @Model.Count of @Model.TotalItemCount admins |
-        Page @Model.PageNumber of @Model.PageCount
+<form method="post" action="/Admin/DeleteMany" id="deleteForm">
+    <p>
+        <button type="button" class="check-all-btn">Check All</button>
+        <button type="button" class="uncheck-all-btn">Uncheck All</button>
     </p>
 
-    <table class="record-table">
-        <thead>
-            <tr>
-                <th>
-                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">
-                        Admin ID @(currentSort == "Id" ? "↑" : currentSort == "id_desc" ? "↓" : "")
-                    </a>
-                </th>
-                <th>
-                    <a asp-action="Admins" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-searchString="@ViewData["CurrentFilter"]">
-                        Name @(currentSort == "" ? "↑" : currentSort == "name_desc" ? "↓" : "")
-                    </a>
-                </th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var admin in Model)
-            {
-                <tr>
-                    <td>@admin.Id</td>
-                    <td>@admin.Name</td>
-                    <td>@admin.Email</td>
-                    <td>@admin.PhoneNo</td>
-                    <td class="edit-remove-group">
-                        <a asp-action="EditAdmin" asp-route-id="@admin.Id" class="edit-ingredient">Edit</a>
-                        <a asp-action="DeleteAdmin"
-                           asp-route-id="@admin.Id"
-                           data-admin-name="@admin.Name"
-                           class="remove-ingredient delete-admin">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <!-- Pagination Controls -->
-    <div class="pagination-wrapper">
-        @{
-            var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
-            options.LinkToFirstPageFormat = "First";
-            options.LinkToLastPageFormat = "Last";
-            options.LinkToPreviousPageFormat = "Previous";
-            options.LinkToNextPageFormat = "Next";
-        }
-
-        @Html.PagedListPager(
-            Model,
-            page => Url.Action("Admins", new { 
-                page,
-                sortOrder = ViewData["CurrentSort"], 
-                searchString = ViewData["CurrentFilter"] 
-            }),
-            options
-        )
+    <div id="target">
+        <partial name="_Admins" model="Model" />
     </div>
-}
+</form>
 
-<!-- Include JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/admin.js"></script>
+
+
+
