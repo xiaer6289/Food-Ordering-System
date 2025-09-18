@@ -59,6 +59,8 @@ public class AuthorizationController : Controller
                 HttpContext.Session.SetString("CompanyLogo", company.LogoPath);
             }
 
+
+
             // Redirect based on first login
             if (company.IsFirstLogin)
                 return RedirectToAction("FillCompanyProfile"); // first login → fill profile

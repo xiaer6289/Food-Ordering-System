@@ -1306,3 +1306,147 @@ select.select-status option {
         width: 100%;
     }
 }
+
+.portrait {
+    position: relative;
+    display: inline-block;
+    cursor: pointer; /* makes it clickable */
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: #fff;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+    .dropdown.show {
+        display: block;
+    }
+
+    .dropdown a {
+        display: block;
+        padding: 8px 12px;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .dropdown a:hover {
+            background: #f0f0f0;
+        }
+.update-profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background: #f8f9fa;
+}
+
+.update-profile-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 450px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+    .update-profile-form .form-title {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .update-profile-form .profile-picture {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .update-profile-form .profile-picture img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+    .update-profile-form .upload-label {
+        font-size: 14px;
+        color: #007bff;
+        cursor: pointer;
+        margin-bottom: 8px;
+    }
+
+    .update-profile-form .file-input {
+        font-size: 13px;
+    }
+
+    .update-profile-form .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .update-profile-form label {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .update-profile-form input {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        transition: border 0.3s;
+    }
+
+        .update-profile-form input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    .update-profile-form .section-title {
+        margin: 20px 0 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #444;
+    }
+
+    .update-profile-form .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .update-profile-form .save-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .update-profile-form .save-btn:hover {
+            background: #0056b3;
+        }
+
+    .update-profile-form .cancel-btn {
+        background: #6c757d;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .update-profile-form .canc
+
+

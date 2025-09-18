@@ -145,3 +145,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+/* main Menu dropdown */
+function toggleDropdown() {
+        document.getElementById("dropdownMenu").classList.toggle("show");
+}
+    // Close dropdown when clicking outside
+    window.onclick = function(event) {
+    if (!event.target.closest('.portrait')) {
+        document.getElementById("dropdownMenu").classList.remove("show");
+    }
+}

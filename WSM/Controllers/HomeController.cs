@@ -32,6 +32,17 @@ namespace WSM.Controllers
             ViewBag.CompanyName = company.CompanyName;
             ViewBag.CompanyDescription = company.Description;
 
+            string? staffId = HttpContext.Session.GetString("StaffAdminId");
+            if (!string.IsNullOrEmpty(staffId))
+            {
+                var staff = db.Staff.FirstOrDefault(s => s.Id == staffId && s.CompanyId == companyId);
+                if (staff != null && !string.IsNullOrEmpty(staff.PhotoPath))
+                {
+                    HttpContext.Session.SetString("ProfilePhoto", staff.PhotoPath);
+                }
+            }
+
+
             return View();
         }
 
@@ -59,6 +70,9 @@ namespace WSM.Controllers
                 {
                     HttpContext.Session.SetString("StaffAdminId", admin.Id);
                     HttpContext.Session.SetString("Role", "Admin");
+                    if (!string.IsNullOrEmpty(admin.PhotoPath))
+                        HttpContext.Session.SetString("ProfilePhoto", admin.PhotoPath);
+
                     return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
             }
@@ -78,6 +92,9 @@ namespace WSM.Controllers
                 {
                     HttpContext.Session.SetString("StaffAdminId", staff.Id);
                     HttpContext.Session.SetString("Role", "Staff");
+                    if (!string.IsNullOrEmpty(staff.PhotoPath))
+                        HttpContext.Session.SetString("ProfilePhoto", staff.PhotoPath);
+
                     return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
             }

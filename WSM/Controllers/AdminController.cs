@@ -276,5 +276,90 @@ namespace WSM.Controllers
 
             return $"A{nextNumber:D4}";
         }
+
+        [HttpGet]
+        public IActionResult UpdateProfile()
+        {
+            var userId = HttpContext.Session.GetString("StaffAdminId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Authorization");
+
+            var admin = db.Admins.FirstOrDefault(a => a.Id == userId);
+            if (admin == null) return NotFound();
+
+            var vm = new UpdateProfileViewModel
+            {
+                Id = admin.Id,
+                Name = admin.Name,
+                Email = admin.Email,
+                PhoneNo = admin.PhoneNo,
+                PhotoPath = admin.PhotoPath
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileViewModel model, IFormFile? Photo)
+        {
+            var userId = HttpContext.Session.GetString("StaffAdminId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Authorization");
+
+            var admin = db.Admins.FirstOrDefault(a => a.Id == userId);
+            if (admin == null) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                admin.Name = model.Name;
+                admin.Email = model.Email;
+                admin.PhoneNo = model.PhoneNo;
+
+                // Handle photo upload
+                if (Photo != null && Photo.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profile");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var fileName = $"{Guid.NewGuid()}_{Photo.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Photo.CopyToAsync(stream);
+                    }
+
+                    admin.PhotoPath = $"/images/profile/{fileName}";
+                    HttpContext.Session.SetString("PhotoPath", admin.PhotoPath); // update session
+                }
+
+                // Optional password update
+                if (!string.IsNullOrWhiteSpace(model.NewPassword))
+                {
+                    if (string.IsNullOrWhiteSpace(model.CurrentPassword))
+                    {
+                        ModelState.AddModelError("CurrentPassword", "Please enter your current password to change it.");
+                        return View(model);
+                    }
+
+                    var hasher = new PasswordHasher<Admin>();
+                    var result = hasher.VerifyHashedPassword(admin, admin.Password, model.CurrentPassword);
+
+                    if (result == PasswordVerificationResult.Failed)
+                    {
+                        ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
+                        return View(model);
+                    }
+
+                    admin.Password = hasher.HashPassword(admin, model.NewPassword);
+                }
+
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("UpdateProfile");
+            }
+
+            return View(model);
+        }
     }
 }

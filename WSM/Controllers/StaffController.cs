@@ -31,8 +31,8 @@ namespace WSM.Controllers
             var searched = db.Staff.AsQueryable();
 
             if (!string.IsNullOrEmpty(id))
-            {   
-                    searched = searched.Where(s => s.Name.Contains(id) || s.Id.Contains(id));    
+            {
+                searched = searched.Where(s => s.Name.Contains(id) || s.Id.Contains(id));
             }
 
             //sorting
@@ -76,44 +76,12 @@ namespace WSM.Controllers
             ViewBag.Ingredients = db.Ingredients.ToList();
             return View(m);
             //int pageSize = 5;
-            //int pageNumber = page ?? 1;
 
-            //var staff = db.Staff.AsQueryable();
-
-            //// Save filter + sort state
-            //ViewData["CurrentFilter"] = id;
-            //ViewData["CurrentSort"] = sortOrder;
-
-            //// Search
-            //if (!string.IsNullOrEmpty(id))
-            //{
-            //    staff = staff.Where(s => s.Id.Contains(id) ||
-            //                             s.Name.Contains(id) ||
-            //                             s.Email.Contains(id));
-            //}
-
-            //// Sorting
-            //staff = sortOrder switch
-            //{
-            //    "Id_desc" => staff.OrderByDescending(s => s.Id),
-            //    "Name" => staff.OrderBy(s => s.Name),
-            //    "Name_desc" => staff.OrderByDescending(s => s.Name),
-            //    _ => staff.OrderBy(s => s.Id)
-            //};
-
-            //var pagedList = staff.ToPagedList(pageNumber, pageSize);
-
-            //if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            //{
-            //    return PartialView("_ReadStaff", pagedList);
-            //}
-
-            //return View(pagedList);
         }
 
 
 
-        // GET: Create Staff
+        //GET: Create Staff
         public IActionResult CreateStaff() => View();
 
         [HttpPost]
@@ -147,7 +115,7 @@ namespace WSM.Controllers
                 ModelState.AddModelError("Email", "Invalid email address.");
 
             if (db.Staff.Any(s => s.Email == model.Email && s.CompanyId == companyId))
-                ModelState.AddModelError("Email","The email is already exist");
+                ModelState.AddModelError("Email", "The email is already exist");
 
             if (model.Salary <= 0)
                 ModelState.AddModelError("Salary", "Salary must be greater than 0.");
@@ -248,5 +216,93 @@ namespace WSM.Controllers
 
             return $"S{nextNumber:D4}";
         }
+
+        // GET: Staff UpdateProfile
+        public IActionResult UpdateProfile()
+        {
+            var staffId = HttpContext.Session.GetString("StaffAdminId"); // 
+            if (string.IsNullOrEmpty(staffId))
+                return RedirectToAction("Login", "Authorization");
+
+            var staff = db.Staff.FirstOrDefault(s => s.Id == staffId);
+            if (staff == null) return NotFound();
+
+            var vm = new StaffUpdateProfileViewModel
+            {
+                Id = staff.Id,
+                Name = staff.Name,
+                Email = staff.Email,
+                PhoneNo = staff.PhoneNo,
+                PhotoPath = staff.PhotoPath
+            };
+
+            return View(vm); // 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(StaffUpdateProfileViewModel model, IFormFile? Photo)
+        {
+            var staffId = HttpContext.Session.GetString("StaffAdminId");
+            if (string.IsNullOrEmpty(staffId))
+                return RedirectToAction("Login", "Authorization");
+
+            var staff = db.Staff.FirstOrDefault(s => s.Id == staffId);
+            if (staff == null) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                staff.Name = model.Name;
+                staff.Email = model.Email;
+                staff.PhoneNo = model.PhoneNo;
+
+                // Handle photo upload
+                if (Photo != null && Photo.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profile");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var fileName = $"{Guid.NewGuid()}_{Photo.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Photo.CopyToAsync(stream);
+                    }
+
+                    staff.PhotoPath = $"/images/profile/{fileName}";
+                    HttpContext.Session.SetString("ProfilePhoto", staff.PhotoPath);
+                }
+
+                // Password change
+                if (!string.IsNullOrWhiteSpace(model.NewPassword))
+                {
+                    if (string.IsNullOrWhiteSpace(model.CurrentPassword))
+                    {
+                        ModelState.AddModelError("CurrentPassword", "Please enter your current password to change it.");
+                        return View(model);
+                    }
+
+                    var hasher = new PasswordHasher<Staff>();
+                    var result = hasher.VerifyHashedPassword(staff, staff.Password, model.CurrentPassword);
+
+                    if (result == PasswordVerificationResult.Failed)
+                    {
+                        ModelState.AddModelError("CurrentPassword", "Current password is incorrect.");
+                        return View(model);
+                    }
+
+                    staff.Password = hasher.HashPassword(staff, model.NewPassword);
+                }
+
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("UpdateProfile");
+            }
+
+            return View(model);
+        }
+
     }
 }

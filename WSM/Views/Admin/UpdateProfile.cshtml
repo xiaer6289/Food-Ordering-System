@@ -1,0 +1,93 @@
+﻿@model WSM.Models.UpdateProfileViewModel
+@{
+    ViewData["Title"] = "Update Profile";
+}
+
+<div class="update-profile-page">
+    <div class="update-profile-form">
+        <h2 class="form-title">Update Profile</h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+
+            <!-- Profile Photo -->
+            <div class="profile-picture">
+                <img src="@(!string.IsNullOrEmpty(Model.PhotoPath) ? Url.Content(Model.PhotoPath) : Url.Content("~/images/default-profile.jpg"))"
+                     alt="Profile Picture" />
+                <label for="Photo" class="upload-label">Upload New Photo</label>
+                <input type="file" name="Photo" accept="image/*" class="file-input" />
+            </div>
+
+            <!-- Admin ID -->
+            <div class="form-group">
+                <label asp-for="Id">Admin ID</label>
+                <input asp-for="Id" readonly />
+            </div>
+
+            <!-- Editable Fields -->
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input asp-for="Name" placeholder="Enter your name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" placeholder="e.g., admin@example.com" maxlength="100" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhoneNo">Phone Number</label>
+                <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" required />
+                <span asp-validation-for="PhoneNo" class="text-danger"></span>
+            </div>
+
+            <!-- Change Password -->
+            <h3 class="section-title">Change Password</h3>
+            <div class="form-group">
+                <label asp-for="CurrentPassword">Current Password</label>
+                <input asp-for="CurrentPassword" type="password" placeholder="Enter current password" />
+                <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="NewPassword">New Password</label>
+                <input asp-for="NewPassword" type="password" placeholder="Enter new password" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm New Password</label>
+                <input asp-for="ConfirmPassword" type="password" placeholder="Re-enter new password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <a asp-action="Index" asp-controller="Table" class="cancel-btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

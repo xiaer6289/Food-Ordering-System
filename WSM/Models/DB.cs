@@ -156,6 +156,8 @@ public class Admin
     [RegularExpression(@"^01[0-9]{8,13}$", ErrorMessage = "Phone number must start with '01' and be 10 to 15 digits long.")]
     public string PhoneNo { get; set; } = "N/A";
 
+    public string? PhotoPath { get; set; }
+
     public string? ResetToken { get; set; }
     public DateTime? TokenExpiry { get; set; }
 
@@ -192,6 +194,8 @@ public class Staff
     [MaxLength(15)]
     [Required]
     public string PhoneNo { get; set; }
+
+    public string? PhotoPath { get; set; }
 
     [Required, MaxLength(8)]
     public string CompanyId { get; set; }

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Include="C:\Users\ASUS\Downloads\ReadStaff.txt" Link="ReadStaff.txt" />
+    <Content Include="C:\Users\ASUS\Downloads\staff.css" Link="staff.css" />
     <Content Include="DB.mdf">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -26,10 +27,6 @@
     <PackageReference Include="Stripe.net" Version="48.3.0" />
     <PackageReference Include="X.PagedList" Version="10.5.7" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
