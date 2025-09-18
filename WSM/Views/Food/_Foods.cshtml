@@ -44,7 +44,8 @@
                     <input type="checkbox" name="ids" value="@s.Id" class="ingredient-checkbox" />
                 </td>
                 <td>@s.Id</td>
-                <td><img @Url.Content("~/uploads/" + s.Photo) style="width:150px; height:150px;"></td>
+                @* <td><img @Url.Content("~/uploads/" + s.Photo) style="width:150px; height:150px;"></td> *@
+                <td><img src="~/uploads/@s.Photo" /></td>
                 <td>@s.Name</td>
                 <td>@s.Price</td>
                 <td>@s.Description</td>
