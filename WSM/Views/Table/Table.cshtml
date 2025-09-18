@@ -9,10 +9,13 @@
 <link rel="stylesheet" href="~/css/app.css" />
 
 <div class="container mt-4">
-    <h3>Table Management</h3>
+    <div class="table-header">
+        <h1>Table Management</h1>
+        <p>Total Seats: <strong>@Model.Count</strong></p>
+    </div>
+
     <div class="three-column-layout">
         <div class="table-area">
-            <p>Total Seats: <strong>@Model.Count</strong></p>
             <div class="table-grid">
                 @foreach (var seat in Model)
                 {
@@ -31,8 +34,8 @@
         </div>
 
         <div class="action-area">
-            <a asp-controller="Table" asp-action="Create" class="btn btn-success mb-2">Add Table</a>
-            <a asp-controller="Table" asp-action="Delete" class="btn btn-danger">Delete Table</a>
+            <a asp-controller="Table" asp-action="Create" class="add-table">Add Table</a>
+            <button type="button" onclick="location.href='@Url.Action("Delete", "Table")'" class="delete-table">Delete Table</button>
         </div>
     </div>
 </div>

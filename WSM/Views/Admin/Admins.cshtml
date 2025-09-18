@@ -12,16 +12,48 @@
 
 
 <form method="post" action="/Admin/DeleteMany" id="deleteForm">
-    <p>
-        <button type="button" class="check-all-btn">Check All</button>
-        <button type="button" class="uncheck-all-btn">Uncheck All</button>
-    </p>
+
+        <button type="button" class="check-all-btn btn btn-sm btn-outline-primary">Check All</button>
+        <button type="button" class="uncheck-all-btn btn btn-sm btn-outline-secondary">Uncheck All</button>
+
 
     <div id="target">
         <partial name="_Admins" model="Model" />
     </div>
 </form>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkAllBtn = document.querySelector('.check-all-btn');
+        const uncheckAllBtn = document.querySelector('.uncheck-all-btn');
+        const checkboxes = document.querySelectorAll('.admin-checkbox');
+        const deleteForm = document.getElementById("deleteForm");
+
+        if (checkAllBtn) {
+            checkAllBtn.addEventListener('click', function () {
+                checkboxes.forEach(cb => cb.checked = true);
+            });
+        }
+        if (uncheckAllBtn) {
+            uncheckAllBtn.addEventListener('click', function () {
+                checkboxes.forEach(cb => cb.checked = false);
+            });
+        }
+        if (deleteForm) {
+            deleteForm.addEventListener("submit", function (e) {
+                const checkedBoxes = document.querySelectorAll(".admin-checkbox:checked");
+                if (checkedBoxes.length === 0) {
+                    alert("Please select at least one admin before deleting.");
+                    e.preventDefault();
+                    return;
+                }
+                if (!confirm("Are you sure you want to delete the selected admins?")) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
 
 
 

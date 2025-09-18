@@ -938,11 +938,32 @@ select.select-status option {
 .table-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
+    gap: 20px;
+    justify-items: center;
     margin-top: 20px;
 }
 
 /* Table css start */
+.container h3,
+.container p {
+    text-align: center;
+}
+
+.table-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+    .table-header h1 {
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .table-header p {
+        margin: 5px 0 0 0;
+        font-size: 16px;
+    }
+
 .table-square {
     position: relative;
     width: 120px;
@@ -981,7 +1002,141 @@ select.select-status option {
 .table-link {
     text-decoration: none;
 }
-/* Table css start */
+
+.add-table {
+    background-color: #66bb6a;
+    color: white;
+    padding: 20px 32px;
+    font-size: 16px;
+    font-family: 'Lora', sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 215px;
+    text-align: center;
+    text-decoration: none;
+}
+
+    .add-table:hover {
+        background-color: #57a65c;
+    }
+
+
+.delete-table {
+    background-color: #ff9999;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    padding: 20px 30px;
+    font-size: 16px;
+    font-family: 'Lora', sans-serif;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    width: 215px;
+}
+
+    .delete-table:hover {
+        background-color: #e88888;
+    }
+
+
+/* Table css end */
+
+/* Food Detail start */
+
+.food-detail-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.food-image {
+    flex: 1;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    height: 500px;
+}
+
+    .food-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+.food-info {
+    flex: 1;
+    width: 50%;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+
+    .food-info h2 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: #000;
+    }
+
+    .food-info p {
+        margin: 8px 0;
+        color: #000;
+    }
+
+    .food-info label {
+        margin-top: 12px;
+        display: block;
+        color: #000;
+    }
+
+    .food-info input,
+    .food-info textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+.btn-addcart {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .btn-addcart:hover {
+        background: #0056b3;
+    }
+
+/* Order Detail end*/   
 
 /*reset password page*/
 #reset-password-body {

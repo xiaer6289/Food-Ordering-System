@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace WSM.Models;
 
@@ -7,7 +8,7 @@ public class ViewAdmin
     [StringLength(6)]
     public string Id { get; set; }
 
-    [StringLength(100)]
+    [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Invalid email address.")]
     public string Email { get; set; }
 

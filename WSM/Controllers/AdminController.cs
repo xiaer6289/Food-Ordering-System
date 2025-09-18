@@ -114,7 +114,7 @@ namespace WSM.Controllers
             model.Id = GenerateSequentialId();
             model.CompanyId = companyId;
 
-            // Clear validation errors for auto-generated fields
+            // Clear validation for auto-generated fields
             if (ModelState.ContainsKey("Id"))
             {
                 ModelState["Id"].Errors.Clear();
@@ -127,53 +127,49 @@ namespace WSM.Controllers
                 ModelState["CompanyId"].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
             }
 
-            // Phone number validation
-            if (!string.IsNullOrEmpty(model.PhoneNo) && !Regex.IsMatch(model.PhoneNo, @"^01[0-9]{8,13}$"))
+            if (db.Admins.Any(a => a.Email == model.Email && a.CompanyId == companyId))
             {
-                ModelState.AddModelError("PhoneNo", "Phone number must start with '01' and be 10 to 15 digits long.");
+                ModelState.AddModelError("Email", "This email is already registered.");
             }
 
-            // Password validation
+            //Validate password
             if (!string.IsNullOrEmpty(model.Password) &&
                 !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
             {
-                ModelState.AddModelError("Password", "Password must be 8 to 20 characters long, with at least one uppercase, one lowercase, one digit, and one special character (!@#$%^&*).");
+                ModelState.AddModelError("Password", "Password must be 8-20 characters with uppercase, lowercase, number, and special character.");
             }
 
-            // Email validation
-            if (!string.IsNullOrEmpty(model.Email) && !Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("Email", "Please enter a valid email address.");
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    // Hash password before saving
-                    var hasher = new PasswordHasher<Admin>();
-                    model.Password = hasher.HashPassword(model, model.Password);
+                //Hash password
+                var hasher = new PasswordHasher<Admin>();
+                model.Password = hasher.HashPassword(model, model.Password);
 
-                    db.Admins.Add(model);
-                    db.SaveChanges();
+                db.Admins.Add(model);
+                db.SaveChanges();
 
-                    TempData["SuccessMessage"] = $"Admin '{model.Name}' added successfully.";
-                    return RedirectToAction("Admins");
-                }
-                catch (DbUpdateException ex)
-                {
-                    ModelState.AddModelError("", $"Failed to create admin: {ex.InnerException?.Message ?? ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"An unexpected error occurred: {ex.Message}");
-                }
+                return RedirectToAction("Admins");
+            }
+            catch (DbUpdateException ex)
+            {
+                ModelState.AddModelError("", $"Failed to create admin: {ex.InnerException?.Message ?? ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An unexpected error occurred: {ex.Message}");
             }
 
             return View(model);
         }
 
-        // GET: /Admin/EditAdmin/{id}
+        
+
+        // GET: /Admin/EditAdmin
         public IActionResult EditAdmin(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -212,13 +208,6 @@ namespace WSM.Controllers
                 admin.Email = model.Email;
                 admin.PhoneNo = model.PhoneNo;
 
-                // If password was updated
-                if (!string.IsNullOrWhiteSpace(model.NewPassword))
-                {
-                    var hasher = new PasswordHasher<Admin>();
-                    admin.Password = hasher.HashPassword(admin, model.NewPassword);
-                }
-
                 db.SaveChanges();
 
                 TempData["SuccessMessage"] = $"Admin '{admin.Name}' updated successfully.";
@@ -228,7 +217,7 @@ namespace WSM.Controllers
             return View(model);
         }
 
-        // GET: /Admin/DeleteAdmin/{id}
+        // GET: /Admin/DeleteAdmin
         public IActionResult DeleteAdmin(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -247,6 +236,52 @@ namespace WSM.Controllers
             db.SaveChanges();
 
             TempData["SuccessMessage"] = $"Admin '{admin.Name}' deleted successfully.";
+            return RedirectToAction("Admins");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteMany(string[] ids)
+        {
+            var companyId = HttpContext.Session.GetString("CompanyId");
+
+            if (ids == null || ids.Length == 0)
+            {
+                TempData["ErrorMessage"] = "No admins selected for deletion.";
+                return RedirectToAction("Admins");
+            }
+
+            try
+            {
+                var admins = db.Admins
+                               .Include(a => a.Staffs)
+                               .Where(a => ids.Contains(a.Id) && a.CompanyId == companyId)
+                               .ToList();
+
+                if (!admins.Any())
+                {
+                    TempData["ErrorMessage"] = "No matching admins found for deletion.";
+                    return RedirectToAction("Admins");
+                }
+
+                var linkedAdmins = admins.Where(a => a.Staffs.Any()).ToList();
+                if (linkedAdmins.Any())
+                {
+                    var names = string.Join(", ", linkedAdmins.Select(a => a.Name));
+                    TempData["ErrorMessage"] = $"Cannot delete these admins because they are linked to staff records: {names}";
+                    return RedirectToAction("Admins");
+                }
+
+                db.Admins.RemoveRange(admins);
+                int deletedCount = db.SaveChanges();
+
+                TempData["SuccessMessage"] = $"{deletedCount} admin(s) deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while deleting admins: {ex.Message}";
+            }
+
             return RedirectToAction("Admins");
         }
 

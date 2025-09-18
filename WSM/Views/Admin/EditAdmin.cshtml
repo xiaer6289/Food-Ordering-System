@@ -52,27 +52,9 @@
         </div>
 
         <div class="edit-button-group">
-            <button type="button" class="edit-submit-btn" onclick="togglePasswordFields()">Change Password</button>
-        </div>
-
-        <div>
-            <label asp-for="NewPassword">New Password</label>
-            <input asp-for="NewPassword" type="password" placeholder="Enter new password" class="edit-ingredient-quantity" />
-            <span asp-validation-for="NewPassword" class="text-danger"></span>
-        </div>
-
-        <div>
-            <label asp-for="ConfirmPassword">Confirm New Password</label>
-            <input asp-for="ConfirmPassword" type="password" placeholder="Re-enter new password" class="edit-ingredient-quantity" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <div class="edit-button-group">
             <button type="submit" class="edit-submit-btn">Save Changes</button>
             <a asp-action="Admins" class="cancel-btn">Cancel</a>
         </div>
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/admin.js"></script>
