@@ -329,7 +329,7 @@ namespace WSM.Controllers
                     }
 
                     admin.PhotoPath = $"/images/profile/{fileName}";
-                    HttpContext.Session.SetString("PhotoPath", admin.PhotoPath); // update session
+                    HttpContext.Session.SetString("ProfilePhoto", admin.PhotoPath); // update session
                 }
 
                 // Optional password update
