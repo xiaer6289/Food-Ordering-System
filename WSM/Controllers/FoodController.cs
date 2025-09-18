@@ -131,106 +131,106 @@ namespace WSM.Controllers
             return View(vm);
         }
 
-            //    // Generate new Food ID
-            //    var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
-            //    model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
+        //    // Generate new Food ID
+        //    var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
+        //    model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
 
-            //    // *** Handle File Upload ***
-            //    if (model.Photo != null && model.Photo.Length > 0)
-            //    {
-            //        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
+        //    // *** Handle File Upload ***
+        //    if (model.Photo != null && model.Photo.Length > 0)
+        //    {
+        //        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
 
-            //        // Create directory if it doesn't exist
-            //        if (!Directory.Exists(uploadsFolder))
-            //            Directory.CreateDirectory(uploadsFolder);
+        //        // Create directory if it doesn't exist
+        //        if (!Directory.Exists(uploadsFolder))
+        //            Directory.CreateDirectory(uploadsFolder);
 
-            //        // Generate unique file name
-            //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+        //        // Generate unique file name
+        //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
 
-            //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+        //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            //        // Save file to server
-            //        using (var stream = new FileStream(filePath, FileMode.Create))
-            //        {
-            //            model.Photo.CopyTo(stream);
-            //        }
+        //        // Save file to server
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            model.Photo.CopyTo(stream);
+        //        }
 
-            //        // Save relative path to DB
-            //        model.Image = "/uploads/foods/" + uniqueFileName;
-            //    }
-            //    else
-            //    {
-            //        // If no image is uploaded, you can either set a default image or leave it null
-            //        model.Image = null;
-            //    }
+        //        // Save relative path to DB
+        //        model.Image = "/uploads/foods/" + uniqueFileName;
+        //    }
+        //    else
+        //    {
+        //        // If no image is uploaded, you can either set a default image or leave it null
+        //        model.Image = null;
+        //    }
 
-            //    db.Foods.Add(model);
-            //    db.SaveChanges();
+        //    db.Foods.Add(model);
+        //    db.SaveChanges();
 
-            //    TempData["SuccessMessage"] = "Food created successfully!";
-            //    return RedirectToAction(nameof(Foods));
+        //    TempData["SuccessMessage"] = "Food created successfully!";
+        //    return RedirectToAction(nameof(Foods));
 
-        // GET: Edit Food
-        [HttpGet]
-        public IActionResult EditFood(string id)
+        // GET: /Food/EditFood/{id}
+        public IActionResult EditFood(int id)
         {
-            if (string.IsNullOrEmpty(id))
-                return BadRequest();
+            var food = db.Foods.FirstOrDefault(f => f.Id == id);
+            if (food == null) return NotFound();
 
-            if (!int.TryParse(id, out int foodId))
-                return BadRequest();
-
-            var food = db.Foods.FirstOrDefault(f => f.Id == foodId);
-            if (food == null)
-                return NotFound();
-            // Map database entity to ViewModel
-            var model = new EditFoodVM
+            var vm = new EditFoodVM
             {
-                Id = food.Id.ToString(),
+                Id = food.Id,
                 Name = food.Name,
                 Price = food.Price,
                 Description = food.Description,
-                Image = food.Image,
+                Image = food.Photo,
                 CategoryId = food.CategoryId
             };
-            // Populate dropdown
-            ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name", food.CategoryId);
 
-            return View(model);
+            ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", food.CategoryId);
+            return View(vm);
         }
-        // POST: Edit Food
+
+        // POST: /Food/EditFood
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditFood(EditFoodVM model)
+        public IActionResult EditFood(EditFoodVM vm)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name", model.CategoryId);
-                return View(model);
+                ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", vm.CategoryId);
+                return View(vm);
             }
 
-            if (!int.TryParse(model.Id, out int foodId))
-                return BadRequest();
+            var existingFood = db.Foods.FirstOrDefault(f => f.Id == vm.Id);
+            if (existingFood == null) return NotFound();
 
-            var existingFood = db.Foods.FirstOrDefault(f => f.Id == foodId);
-            if (existingFood == null)
-                return NotFound();
+            if (vm.Photo != null)
+            {
+                var error = hp.ValidatePhoto(vm.Photo);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    ModelState.AddModelError("Photo", error);
+                    ViewBag.Categories = new SelectList(db.Categories, "Id", "Name", vm.CategoryId);
+                    return View(vm);
+                }
+            }
 
-            // If CategoryId is null or empty, keep the old category
-            var finalCategoryId = string.IsNullOrEmpty(model.CategoryId) ? existingFood.CategoryId : model.CategoryId;
+            existingFood.Name = vm.Name;
+            existingFood.Price = vm.Price;
+            existingFood.Description = vm.Description;
+            existingFood.CategoryId = string.IsNullOrEmpty(vm.CategoryId) ? existingFood.CategoryId : vm.CategoryId;
 
-            // Update only editable fields
-            existingFood.Name = model.Name;
-            existingFood.Price = model.Price;
-            existingFood.Description = model.Description;
-            existingFood.Image = model.Image;
-            existingFood.CategoryId = finalCategoryId;
+            if (vm.Photo != null)
+            {
+                var photoString = hp.SavePhoto(vm.Photo, "uploads");
+                existingFood.Photo = photoString;
+            }
 
             db.Foods.Update(existingFood);
             db.SaveChanges();
 
-            TempData["SuccessMessage"] = "Food updated successfully!";
-            return RedirectToAction(nameof(Foods));
+            TempData["Info"] = "Food updated successfully!";
+            return RedirectToAction("Foods");
         }
         // GET: /Food/DeleteFood/{id}
         public IActionResult DeleteFood(string id)
@@ -246,19 +246,22 @@ namespace WSM.Controllers
 
         public IActionResult FoodListing(string categoryId = "All")
         {
+            // Fetch all categories for filter buttons
             var categories = db.Categories.ToList();
             ViewBag.Categories = categories;
             ViewBag.SelectedCategory = categoryId;
 
-            IQueryable<WSM.Models.Food> foods = db.Foods;
+            // Start with all foods
+            IQueryable<Food> foods = db.Foods;
 
-            if (categoryId != "All")
+            // Filter by category if it's not "All"
+            if (!string.IsNullOrEmpty(categoryId) && categoryId != "All")
+            {
                 foods = foods.Where(f => f.CategoryId == categoryId);
+            }
 
             return View(foods.ToList());
         }
-
-
 
     }
 }

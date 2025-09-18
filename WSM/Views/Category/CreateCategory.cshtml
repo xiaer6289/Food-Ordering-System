@@ -4,18 +4,18 @@
     <h2 class="edit-ingredient-title">Add Category</h2>
 
     <form asp-action="CreateCategory" method="post" class="edit-ingredient-wrapper">
+        <!-- Category ID -->
         <div>
             <label asp-for="Id"></label>
-            <input asp-for="Id" type="text" class="form-control" />
+            <input asp-for="Id" type="text" class="form-control" placeholder="BV,AP,MD" />
             <span asp-validation-for="Id" class="text-danger"></span>
-            <small class="form-text text-muted">Example: C01</small>
         </div>
 
+        <!-- Category Name -->
         <div>
             <label asp-for="Name"></label>
-            <input asp-for="Name" type="text" class="form-control" />
+            <input asp-for="Name" type="text" class="form-control" placeholder="Beverages,Appetizers,Main Dish" />
             <span asp-validation-for="Name" class="text-danger"></span>
-            <small class="form-text text-muted">Example: Drinks, Dessert, Fast Food</small>
         </div>
 
         <div class="edit-button-group">

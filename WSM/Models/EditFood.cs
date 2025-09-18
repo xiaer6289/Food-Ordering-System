@@ -1,12 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WSM.Models;
 
 
 public class EditFoodVM
 {
-    [StringLength(6)]
-    public string Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
     [Required(ErrorMessage = "Food name is required.")]
     [StringLength(100, ErrorMessage = "Food name cannot exceed 100 characters.")]
@@ -19,11 +21,10 @@ public class EditFoodVM
     [StringLength(500)]
     public string? Description { get; set; }
 
-    [StringLength(255)]
-    [Url(ErrorMessage = "Please enter a valid URL for the image.")]
     public string? Image { get; set; }
 
-    // CategoryId is optional for editing
+    public IFormFile? Photo { get; set; }
+
     [StringLength(6, ErrorMessage = "Category ID cannot exceed 6 characters.")]
     public string? CategoryId { get; set; }
 }

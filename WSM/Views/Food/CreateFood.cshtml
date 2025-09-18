@@ -64,24 +64,3 @@
         </div>
     </form>
 </div>
-
-@section Scripts {
-    <script>
-        const imageInput = document.getElementById('ImageUrl');
-        const preview = document.getElementById('previewImage');
-
-        imageInput.addEventListener('input', function () {
-            const url = imageInput.value.trim();
-            if (url) {
-                preview.src = url;
-                preview.style.display = 'block';
-            } else {
-                preview.style.display = 'none';
-            }
-        });
-
-        preview.onerror = function () {
-            preview.style.display = 'none';
-        };
-    </script>
-}

@@ -4,17 +4,17 @@
     ViewData["Title"] = "Edit Food";
 }
 
-@if (TempData["SuccessMessage"] != null)
+@if (TempData["Info"] != null)
 {
     <div class="alert alert-success">
-        @TempData["SuccessMessage"]
+        @TempData["Info"]
     </div>
 }
 
 <div class="edit-ingredient-form">
     <h2 class="edit-ingredient-title">Edit Food</h2>
 
-    <form asp-controller="Food" asp-action="EditFood" method="post" class="edit-ingredient-wrapper">
+    <form asp-controller="Food" asp-action="EditFood" method="post" enctype="multipart/form-data" class="edit-ingredient-wrapper">
         @Html.AntiForgeryToken()
 
         <input type="hidden" asp-for="Id" />
@@ -42,22 +42,30 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <!-- Image URL with Preview -->
-        <div>
-            <label asp-for="Image">Image URL</label>
-            <input asp-for="Image" id="ImageUrl" class="edit-ingredient-quantity" placeholder="Enter image URL (optional)" />
-            <span asp-validation-for="Image" class="text-danger"></span>
+        <!-- Current Photo -->
+        @if (!string.IsNullOrEmpty(Model.Image))
+        {
+            <div class="mt-2">
+                <label>Current Photo</label>
+                <div>
+                    <img src="/uploads/@Model.Image" alt="Current Photo" style="max-width:150px; border:1px solid #ccc;" />
+                </div>
+            </div>
+        }
+
+        <!-- Upload New Photo -->
+        <div class="mt-3">
+            <label asp-for="Photo">Upload New Photo</label>
+            <input asp-for="Photo" type="file" class="edit-ingredient-quantity" accept="image/*" />
+            <span asp-validation-for="Photo" class="text-danger"></span>
 
             <div class="mt-2">
-                <img id="previewImage"
-                     src="@Model?.Image"
-                     alt="Preview"
-                     style="max-width:150px; @(string.IsNullOrEmpty(Model?.Image) ? "display:none;" : "")" />
+                <img id="previewImage" src="" alt="Preview" style="max-width:150px; display:none; border:1px solid #ccc;" />
             </div>
         </div>
 
         <!-- Category -->
-        <div>
+        <div class="mt-3">
             <label asp-for="CategoryId">Category</label>
             <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="edit-ingredient-quantity">
                 <option value="">-- Keep Current Category --</option>
@@ -66,34 +74,10 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="edit-button-group">
-            <button type="submit" class="edit-submit-btn">Save Changes</button>
-            <a asp-action="Foods" class="cancel-btn">Cancel</a>
+        <div class="edit-button-group mt-4">
+            <button type="submit" class="edit-submit-btn btn btn-primary">Save Changes</button>
+            <a asp-action="Foods" class="cancel-btn btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
 
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const imageInput = document.getElementById('ImageUrl');
-            const preview = document.getElementById('previewImage');
-
-            if (imageInput && preview) {
-                imageInput.addEventListener('input', function () {
-                    const url = imageInput.value.trim();
-                    if (url) {
-                        preview.src = url;
-                        preview.style.display = 'block';
-                    } else {
-                        preview.style.display = 'none';
-                    }
-                });
-
-                preview.onerror = function () {
-                    preview.style.display = 'none';
-                };
-            }
-        });
-    </script>
-}
