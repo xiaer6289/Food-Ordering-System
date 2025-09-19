@@ -50,6 +50,9 @@
                 <label>Password</label>
                 <input type="password" name="Password" class="form-control both-page__input" required />
             </div>
+            <div class="mb-3 text-center">
+                <div class="g-recaptcha" data-sitekey="6LcNUs4rAAAAAP8rvLKYrJBwY81dGPI-V7bGPNjM"></div>
+            </div>
             <button type="submit" class="btn btn-primary w-100 both-page__btn">Login</button>
             <div class="both-page__forgot text-center mt-3">
                 <a asp-controller="Authorization" asp-action="ForgotPassword" asp-route-role="staff">Forgot Password?</a>
@@ -58,3 +61,4 @@
     </div>
 
 </div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
