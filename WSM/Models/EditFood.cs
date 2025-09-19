@@ -21,6 +21,9 @@ public class EditFoodVM
     [StringLength(500)]
     public string? Description { get; set; }
 
+    public IFormFile? Photo { get; set; }
+
+    public string? CurrentPhoto { get; set; }
     public string? CurrentPhoto { get; set; }
     public IFormFile? Photo { get; set; }
 

@@ -4,7 +4,7 @@ namespace WSM.Models;
 
 public class FoodVM
 {
-    public string? Id { get; set; }
+    public int Id { get; set; }
 
     [StringLength(100, ErrorMessage = "Food name cannot exceed 100 characters.")]
     public string Name { get; set; }
@@ -14,10 +14,6 @@ public class FoodVM
 
     [StringLength(500)]
     public string? Description { get; set; }
-
-    [StringLength(255)]
-    [Url(ErrorMessage = "Please enter a valid URL for the image.")]
-    public string? Image { get; set; }
 
     [StringLength(6, ErrorMessage = "Category ID cannot exceed 6 characters.")]
     public string CategoryId { get; set; }

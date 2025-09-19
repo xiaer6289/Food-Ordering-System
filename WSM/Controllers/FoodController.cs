@@ -54,7 +54,7 @@ namespace WSM.Controllers
             Func<Food, object> fn = sort switch
             {
                 "Id" => s => s.Id,
-                "Image" => s => s.Image,
+                "Image" => s => s.Photo,
                 "Name" => s => s.Name,
                 "Price" => s => s.Price,
                 "Description" => s => s.Description,
@@ -147,7 +147,7 @@ namespace WSM.Controllers
                 Name = food.Name,
                 Price = food.Price,
                 Description = food.Description,
-                CurrentPhoto = food.Photo,
+                Image = food.Photo,
                 CategoryId = food.CategoryId
             };
 
