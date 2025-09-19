@@ -127,31 +127,66 @@ namespace WSM.Controllers
             return RedirectToAction("Categories");
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(string id)
         {
             var category = _db.Categories.FirstOrDefault(c => c.Id == id);
-            if (category != null)
+
+            if (category == null)
             {
-                _db.Categories.Remove(category);
-                _db.SaveChanges();
+                return Json(new { success = false, message = "Category not found." });
             }
 
-            return RedirectToAction("Categories");
+            bool isCategoryInUse = _db.Foods.Any(f => f.CategoryId == id);
+
+            if (isCategoryInUse)
+            {
+                return Json(new { success = false, message = "Cannot delete this category because it is currently assigned to one or more food items." });
+            }
+
+            _db.Categories.Remove(category);
+            _db.SaveChanges();
+
+            return Json(new { success = true, message = "Category deleted successfully." });
         }
 
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteMany([FromForm] string[] ids)
         {
-            if (ids != null && ids.Length > 0)
+            if (ids == null || ids.Length == 0)
             {
-                var categories = _db.Categories.Where(c => ids.Contains(c.Id)).ToList();
-                if (categories.Any())
-                {
-                    _db.Categories.RemoveRange(categories);
-                    _db.SaveChanges();
-                }
+                return Json(new { success = false, message = "No categories selected for deletion." });
             }
-            return RedirectToAction("Categories");
+
+            var categories = _db.Categories.Where(c => ids.Contains(c.Id)).ToList();
+
+            if (!categories.Any())
+            {
+                return Json(new { success = false, message = "Selected categories not found." });
+            }
+
+            var usedCategoryIds = _db.Foods
+                .Where(f => ids.Contains(f.CategoryId))
+                .Select(f => f.CategoryId)
+                .Distinct()
+                .ToList();
+
+            if (usedCategoryIds.Any())
+            {
+                var errorCategories = string.Join(", ", usedCategoryIds);
+                return Json(new
+                {
+                    success = false,
+                    message = $"Cannot delete the following categories because they are in use: {errorCategories}"
+                });
+            }
+
+            _db.Categories.RemoveRange(categories);
+            _db.SaveChanges();
+
+            return Json(new { success = true, message = "Selected categories deleted successfully." });
         }
 
 

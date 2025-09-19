@@ -8,6 +8,21 @@
 
 <h2 class="mb-4">Category Management</h2>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger text-center">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
 <form method="get">
     @Html.Hidden("sort")
     @Html.Hidden("dir")
@@ -91,8 +106,7 @@
 
         <div class="restock-button">
             <a asp-controller="Category" asp-action="CreateCategory" class="create-ingredient">Add New Category</a>
-            <button type="submit" class="remove-check-ingredient btn btn-danger"
-                    onclick="return confirm('Are you sure you want to delete the selected categories?');">
+            <button type="submit" class="remove-check-ingredient btn btn-danger">
                 Delete Selected
             </button>
         </div>
@@ -118,16 +132,19 @@
 @section Scripts {
 <script>
     $(document).ready(function () {
-        // Check All
+
         $('.check-all-btn').click(function () {
             $('.category-checkbox').prop('checked', true);
         });
+
         $('.uncheck-all-btn').click(function () {
             $('.category-checkbox').prop('checked', false);
         });
+
         $('.category-checkbox').change(function () {
             $(this).closest('tr').toggleClass('table-active', $(this).is(':checked'));
         });
+
         $('.delete-category').click(function () {
             var id = $(this).data('id');
 
@@ -142,14 +159,59 @@
                     id: id,
                     __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                 },
-                success: function () {
-                    location.reload(); 
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
                 },
                 error: function () {
-                    alert('Error deleting category.');
+                    alert('An unexpected error occurred while deleting the category.');
+                }
+            });
+        });
+
+        $('.remove-check-ingredient').click(function (e) {
+            e.preventDefault();
+
+            var selectedIds = [];
+            $('.category-checkbox:checked').each(function () {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one category to delete.');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete the selected categories?')) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("DeleteMany", "Category")',
+                type: 'POST',
+                traditional: true,
+                data: {
+                    ids: selectedIds,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('An unexpected error occurred while deleting the selected categories.');
                 }
             });
         });
     });
 </script>
 }
+
