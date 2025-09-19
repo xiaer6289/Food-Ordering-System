@@ -188,19 +188,60 @@ namespace WSM.Controllers
 
         // GET: Delete Staff
         [Authorize(Roles = "Admin")]
-        public IActionResult DeleteStaff(string id)
+        [HttpPost]
+        public IActionResult Delete(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
+            if (string.IsNullOrEmpty(companyId))
+                return RedirectToAction("Login", "Authorization");
+
             var staff = db.Staff.FirstOrDefault(s => s.Id == id && s.CompanyId == companyId);
 
-            if (staff == null) return NotFound();
+            if (staff != null)
+            {
+                db.Staff.Remove(staff);
+                db.SaveChanges();
 
-            db.Staff.Remove(staff);
-            db.SaveChanges();
+                TempData["Info"] = $"Staff '{staff.Name}' deleted successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Staff not found.";
+            }
 
-            TempData["SuccessMessage"] = $"Staff '{staff.Name}' deleted successfully.";
-            return RedirectToAction("ReadStaff");
+            return RedirectToAction(nameof(ReadStaff));
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public IActionResult DeleteMany(string[] ids)
+        {
+            var companyId = HttpContext.Session.GetString("CompanyId");
+            if (string.IsNullOrEmpty(companyId))
+                return RedirectToAction("Login", "Authorization");
+
+            if (ids == null || ids.Length == 0)
+            {
+                TempData["Error"] = "No staff selected for deletion.";
+                return RedirectToAction(nameof(ReadStaff));
+            }
+
+            try
+            {
+                var staffList = db.Staff.Where(s => ids.Contains(s.Id) && s.CompanyId == companyId).ToList();
+                db.Staff.RemoveRange(staffList);
+                int n = db.SaveChanges();
+
+                TempData["Info"] = $"{n} staff record(s) deleted successfully.";
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "An error occurred while deleting staff.";
+            }
+
+            return RedirectToAction(nameof(ReadStaff));
+        }
+
 
         // Helper to generate sequential IDs like S0001
         private string GenerateSequentialId()

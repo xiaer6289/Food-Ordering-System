@@ -4,65 +4,85 @@
 @model IPagedList<WSM.Models.Staff>
 
 @{
-    Layout = null;
+    string[] fields = ["", "Id", "Name", "Email", "Phone Number", "Salary (RM)", ""];
 }
 
-@{
-    string currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
-}
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount staff |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
 
-@if (!Model.Any())
-{
-    <p>No staff found.</p>
-}
-else
-{
-    <p>Showing @Model.Count of @Model.TotalItemCount staff | Page @Model.PageNumber of @Model.PageCount</p>
-
+<div style="display: flex; align-items: flex-start; gap: 20px;">
     <table class="record-table">
-        <thead>
-            <tr>
-                <th>
-                    <a href="?sortOrder=@(currentSort == "Id" ? "Id_desc" : "Id")">
-                        Staff ID
-                    </a>
-                </th>
-                <th>
-                    <a href="?sortOrder=@(currentSort == "Name" ? "Name_desc" : "Name")">
-                        Name
-                    </a>
-                </th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Salary (RM)</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var staff in Model)
+        <tr>
+            @foreach (var f in fields)
             {
-                <tr>
-                    <td>@staff.Id</td>
-                    <td>@staff.Name</td>
-                    <td>@staff.Email</td>
-                    <td>@staff.PhoneNo</td>
-                    <td>@staff.Salary</td>
-                    <td class="edit-remove-group">
-                        <a asp-action="EditStaff" asp-route-id="@staff.Id" class="edit-ingredient">Edit</a>
-                        <a asp-action="DeleteStaff" asp-route-id="@staff.Id"
-                           onclick="return confirm('Are you sure you want to delete @staff.Name?');"
-                           class="remove-ingredient delete-staff">Delete</a>
+                string d = "asc";
+                string c = "";
+
+                if (f == ViewBag.Sort)
+                {
+                    d = ViewBag.Dir == "des" ? "asc" : "des";
+                    c = ViewBag.Dir;
+                }
+
+                <th>
+                    @if (!string.IsNullOrEmpty(f))
+                    {
+                        <a href="?sort=@f&dir=@d" class="@c">@f</a>
+                    }
+                </th>
+            }
+        </tr>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var s in Model)
+            {
+                <tr data-checkable data-id="@s.Id">
+                    <td>
+                        <input type="checkbox" name="ids" value="@s.Id" class="staff-checkbox" />
+                    </td>
+                    <td>@s.Id</td>
+                    <td>@s.Name</td>
+                    <td>@s.Email</td>
+                    <td>@s.PhoneNo</td>
+                    <td>@s.Salary</td>
+                    <td>
+                        <div class="edit-remove-group">
+                            <a asp-controller="Staff" asp-action="EditStaff" asp-route-id="@s.Id" class="edit-ingredient">Edit</a>
+                            <button type="button" class="remove-ingredient" data-id="@s.Id">Delete</button>
+                        </div>
                     </td>
                 </tr>
             }
-        </tbody>
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted">No staff found</td>
+            </tr>
+        }
     </table>
 
-    <div class="pagination-wrapper">
-        @Html.PagedListPager(
-        Model,
-        page => Url.Action("ReadStaff", new { page, sortOrder = currentSort, id = ViewData["CurrentFilter"] }),
-        PagedListRenderOptions.ClassicPlusFirstAndLast
+    <div class="restock-button">
+        <a asp-controller="Staff" asp-action="CreateStaff" class="create-ingredient">Add New Staff</a>
+        <button type="submit" class="remove-check-ingredient">Delete Selected</button>
+    </div>
+</div>
+
+<div class="pagination-wrapper">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+    }
+
+    @Html.PagedListPager(
+    Model,
+    page => $"?sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
         )
 </div>
-}
