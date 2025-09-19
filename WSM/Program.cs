@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using WSM.Helpers;
+
 //using WSM.Data;
 using WSM.Models;
 using WSM.Services;
@@ -46,6 +48,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<DB>();
 builder.Services.AddScoped<WSM.Helpers.Helper>();
 builder.Services.AddScoped<WSM.Helpers.FoodHelper>();
+builder.Services.Configure<ReCaptchaSettings>(builder.Configuration.GetSection("ReCaptcha"));
+
 
 builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
 
