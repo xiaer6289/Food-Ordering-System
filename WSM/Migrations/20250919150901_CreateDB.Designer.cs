@@ -12,11 +12,7 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-<<<<<<<< HEAD:WSM/Migrations/20250919142541_CreateDB.Designer.cs
-    [Migration("20250919142541_CreateDB")]
-========
-    [Migration("20250919142051_CreateDB")]
->>>>>>>> fd04a58304b9fa04e0470502b70e9274d2b1fa26:WSM/Migrations/20250919142051_CreateDB.Designer.cs
+    [Migration("20250919150901_CreateDB")]
     partial class CreateDB
     {
         /// <inheritdoc />

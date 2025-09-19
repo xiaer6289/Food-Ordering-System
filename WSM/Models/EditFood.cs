@@ -21,10 +21,8 @@ public class EditFoodVM
     [StringLength(500)]
     public string? Description { get; set; }
 
-    public IFormFile? Photo { get; set; }
+    public string? CurrentPhoto { get; set; }
 
-    public string? CurrentPhoto { get; set; }
-    public string? CurrentPhoto { get; set; }
     public IFormFile? Photo { get; set; }
 
     [StringLength(6, ErrorMessage = "Category ID cannot exceed 6 characters.")]
