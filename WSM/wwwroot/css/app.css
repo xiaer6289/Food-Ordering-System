@@ -1741,3 +1741,12 @@ select.select-status option {
     justify-content: center;
     align-items: center;
 }
+
+.superadmin-row {
+    background-color: #fff3cd;
+    font-weight: bold;
+}
+
+    .superadmin-row td:first-child {
+        cursor: not-allowed;
+    }

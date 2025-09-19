@@ -23,11 +23,9 @@ namespace WSM.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Admins(string? id, string? sort, string? dir, int page = 1)
         {
-            // Setup for search bar in Layout
             ViewBag.SearchContext = "Admin";
             ViewBag.SearchPlaceholder = "Search by Admin ID or Name";
 
-            // Trim input
             ViewBag.Name = id = id?.Trim() ?? "";
 
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -36,27 +34,22 @@ namespace WSM.Controllers
                 return RedirectToAction("Login", "Authorization");
             }
 
-            // Base query - only admins for this company
             var admins = db.Admins
                            .Where(a => a.CompanyId == companyId)
                            .AsQueryable();
 
-            // Searching
             if (!string.IsNullOrEmpty(id))
             {
-                // If input matches an exact Admin ID
                 if (admins.Any(a => a.Id == id))
                 {
                     admins = admins.Where(a => a.Id == id);
                 }
                 else
                 {
-                    // Otherwise, search by partial Name
                     admins = admins.Where(a => a.Name.Contains(id));
                 }
             }
 
-            // Sorting
             ViewBag.Sort = sort;
             ViewBag.Dir = dir;
 
@@ -65,14 +58,13 @@ namespace WSM.Controllers
                 "Id" => a => a.Id,
                 "Name" => a => a.Name,
                 "Email" => a => a.Email,
-                _ => a => a.Id // default sort by Id
+                _ => a => a.Id
             };
 
             var sorted = dir == "des"
                 ? admins.OrderByDescending(fn)
                 : admins.OrderBy(fn);
 
-            // Paging
             if (page < 1)
             {
                 return RedirectToAction(null, new { id, sort, dir, page = 1 });
@@ -85,7 +77,6 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = pagedAdmins.PageCount });
             }
 
-            // AJAX support for partial reload
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return PartialView("_Admins", pagedAdmins);
@@ -94,28 +85,22 @@ namespace WSM.Controllers
             return View(pagedAdmins);
         }
 
-
-
-
-        // GET: /Admin/CreateAdmin
         [Authorize(Roles = "Admin")]
         public IActionResult CreateAdmin()
         {
             return View();
         }
 
-        // POST: /Admin/CreateAdmin
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public IActionResult CreateAdmin(Admin model)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
-           
+
             model.Id = GenerateSequentialId();
             model.CompanyId = companyId;
 
-            // Clear validation for auto-generated fields
             if (ModelState.ContainsKey("Id"))
             {
                 ModelState["Id"].Errors.Clear();
@@ -133,7 +118,6 @@ namespace WSM.Controllers
                 ModelState.AddModelError("Email", "This email is already registered.");
             }
 
-            //Validate password
             if (!string.IsNullOrEmpty(model.Password) &&
                 !Regex.IsMatch(model.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$"))
             {
@@ -147,7 +131,6 @@ namespace WSM.Controllers
 
             try
             {
-                //Hash password
                 var hasher = new PasswordHasher<Admin>();
                 model.Password = hasher.HashPassword(model, model.Password);
 
@@ -168,9 +151,6 @@ namespace WSM.Controllers
             return View(model);
         }
 
-
-
-        // GET: /Admin/EditAdmin
         [Authorize(Roles = "Admin")]
         public IActionResult EditAdmin(string id)
         {
@@ -190,7 +170,6 @@ namespace WSM.Controllers
             return View(model);
         }
 
-        // POST: /Admin/EditAdmin
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -220,7 +199,6 @@ namespace WSM.Controllers
             return View(model);
         }
 
-        // GET: /Admin/DeleteAdmin
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdmin(string id)
         {
@@ -230,6 +208,19 @@ namespace WSM.Controllers
                           .FirstOrDefault(a => a.Id == id && a.CompanyId == companyId);
 
             if (admin == null) return NotFound();
+
+            var superAdminId = db.Admins
+                                 .Where(a => a.CompanyId == companyId)
+                                 .OrderBy(a => a.Id)
+                                 .Select(a => a.Id)
+                                 .FirstOrDefault();
+
+            if (admin.Id == superAdminId)
+            {
+                TempData["ErrorMessage"] = $"Cannot delete the SuperAdmin '{admin.Name}'.";
+                return RedirectToAction("Admins");
+            }
+
             if (admin.Staffs.Any())
             {
                 TempData["ErrorMessage"] = $"Cannot delete admin '{admin.Name}' because they are linked to staff records.";
@@ -269,11 +260,24 @@ namespace WSM.Controllers
                     return RedirectToAction("Admins");
                 }
 
+                var superAdminId = db.Admins
+                                     .Where(a => a.CompanyId == companyId)
+                                     .OrderBy(a => a.Id)
+                                     .Select(a => a.Id)
+                                     .FirstOrDefault();
+
                 var linkedAdmins = admins.Where(a => a.Staffs.Any()).ToList();
-                if (linkedAdmins.Any())
+                var superAdminSelected = admins.Any(a => a.Id == superAdminId);
+
+                if (superAdminSelected || linkedAdmins.Any())
                 {
-                    var names = string.Join(", ", linkedAdmins.Select(a => a.Name));
-                    TempData["ErrorMessage"] = $"Cannot delete these admins because they are linked to staff records: {names}";
+                    var errorMessages = new List<string>();
+                    if (superAdminSelected)
+                        errorMessages.Add("Cannot delete the SuperAdmin.");
+                    if (linkedAdmins.Any())
+                        errorMessages.Add($"Cannot delete these admins because they are linked to staff records: {string.Join(", ", linkedAdmins.Select(a => a.Name))}");
+
+                    TempData["ErrorMessage"] = string.Join(" ", errorMessages);
                     return RedirectToAction("Admins");
                 }
 
@@ -290,7 +294,6 @@ namespace WSM.Controllers
             return RedirectToAction("Admins");
         }
 
-        // Helper to generate sequential admin IDs like A0001, A0002
         private string GenerateSequentialId()
         {
             var adminIds = db.Admins
@@ -355,7 +358,6 @@ namespace WSM.Controllers
                 admin.Email = model.Email;
                 admin.PhoneNo = model.PhoneNo;
 
-                // Handle photo upload
                 if (Photo != null && Photo.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/profile");
@@ -371,10 +373,9 @@ namespace WSM.Controllers
                     }
 
                     admin.PhotoPath = $"/images/profile/{fileName}";
-                    HttpContext.Session.SetString("ProfilePhoto", admin.PhotoPath); // update session
+                    HttpContext.Session.SetString("ProfilePhoto", admin.PhotoPath);
                 }
 
-                // Optional password update
                 if (!string.IsNullOrWhiteSpace(model.NewPassword))
                 {
                     if (string.IsNullOrWhiteSpace(model.CurrentPassword))
