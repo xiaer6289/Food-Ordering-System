@@ -8,6 +8,11 @@
 
 <h2 class="mb-4">Food Management</h2>
 
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount Categories |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
 <form method="post" action="/Food/DeleteMany" id="deleteForm">
     @Html.AntiForgeryToken()
 

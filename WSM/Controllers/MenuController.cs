@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WSM.Helpers;
 using WSM.Models;
+using System.Linq;
 
 namespace WMS.Controllers
 {
@@ -14,40 +14,50 @@ namespace WMS.Controllers
         {
             _db = db;
         }
-        public IActionResult FoodListing(string categoryId = "All", string SeatNo = null)
+
+        // GET: /Menu/FoodListing
+        public IActionResult FoodListing(string search = null, string categoryId = "All", string SeatNo = null)
         {
-            var categories = _db.Categories.ToList();
-            ViewBag.Categories = categories;
-            ViewBag.SelectedCategory = categoryId;
+            // Setup for search bar
+            ViewBag.SearchContext = "Food";
+            ViewBag.SearchPlaceholder = "Search by Food Name or ID";
+            ViewBag.SearchTerm = search?.Trim() ?? "";
             ViewBag.SeatNo = SeatNo;
 
-            IQueryable<WSM.Models.Food> foods = _db.Foods;
+            IQueryable<Food> foods = _db.Foods;
 
-            if (categoryId != "All")
+            // Filter by category
+            if (!string.IsNullOrEmpty(categoryId) && categoryId != "All")
+            {
                 foods = foods.Where(f => f.CategoryId == categoryId);
+            }
+
+            // Search by ID or Name
+            if (!string.IsNullOrEmpty(search))
+            {
+                if (int.TryParse(search, out int foodId) && foods.Any(f => f.Id == foodId))
+                {
+                    foods = foods.Where(f => f.Id == foodId);
+                }
+                else
+                {
+                    foods = foods.Where(f => f.Name.Contains(search));
+                }
+            }
+
+            ViewBag.Categories = _db.Categories.ToList();
+            ViewBag.SelectedCategory = categoryId;
 
             return View(foods.ToList());
         }
 
-
-        public IActionResult FoodDetail(string id, string seatNo)
+        public IActionResult FoodDetail(int id, string seatNo)
         {
-            if (string.IsNullOrEmpty(id))
-                return NotFound();
-
-            if (!int.TryParse(id, out int foodId))
-                return NotFound();
-
-            var food = _db.Foods
-                          .Where(f => f.Id == foodId)
-                          .FirstOrDefault();
-
-            if (food == null)
-                return NotFound();
+            var food = _db.Foods.FirstOrDefault(f => f.Id == id);
+            if (food == null) return NotFound();
 
             ViewBag.SeatNo = seatNo;
             return View(food);
         }
-
     }
 }
