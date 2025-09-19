@@ -1920,3 +1920,20 @@ select.select-status {
     margin-top: 3px;
     font-size: 15px;
 }
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .drop-zone.dragover {
+        background-color: #e6f7ff;
+    }
+
+.file-input {
+    display:  none;
+}

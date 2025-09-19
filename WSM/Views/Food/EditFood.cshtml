@@ -47,24 +47,29 @@
         </div>
 
         <!-- Current Photo -->
-        @if (!string.IsNullOrEmpty(Model.Image))
+        @if (!string.IsNullOrEmpty(Model.CurrentPhoto))
         {
-            <div class="mt-2">
-                <label>Current Photo:</label>
-                <div>
-                    <img src="/uploads/@Model.Image" alt="Current Photo" class="current-photo-preview" />
-                </div>
+            <div class="mb-2">
+                <label>Current Photo:</label><br />
+                <img id="currentPhoto" src="/uploads/@Model.CurrentPhoto" alt="Current Photo"
+                     class="current-photo-preview" style="max-width:150px; border: 1px solid #ccc; padding: 2px;" />
             </div>
         }
 
-        <!-- Upload New Photo -->
+        <!-- Drag-and-Drop New Photo -->
         <div class="mt-3">
             <label asp-for="Photo">Upload New Photo:</label>
-            <input asp-for="Photo" type="file" class="edit-ingredient-quantity" accept="image/*" />
+            <div id="dropZone" class="drop-zone">
+                <p>Drag & drop an image here or click to select</p>
+                <input asp-for="Photo" type="file" accept="image/*" class="file-input" />
+            </div>
             <span asp-validation-for="Photo" class="text-danger"></span>
 
+            <!-- Preview of new photo -->
             <div class="mt-2">
-                <img id="previewImage" src="" alt="Preview" class="current-photo-preview" style="display:none;" />
+                <label>New Photo Preview:</label><br />
+                <img id="previewImage" src="" alt="Preview" class="current-photo-preview"
+                     style="display:none; max-width:150px; border: 1px solid #ccc; padding: 2px;" />
             </div>
         </div>
 
@@ -78,9 +83,50 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="edit-button-group">
+        <div class="edit-button-group mt-3">
             <button type="submit" class="ingredient-edit-submit-btn">Update</button>
             <button type="button" class="ingredient-edit-cancel-btn" onclick="window.location.href='/Food/Foods'">Cancel</button>
         </div>
     </div>
 </form>
+
+
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = dropZone.querySelector('.file-input');
+    const previewImage = document.getElementById('previewImage');
+
+    // Click to open file dialog
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Handle file selection
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            previewImage.src = URL.createObjectURL(fileInput.files[0]);
+            previewImage.style.display = 'block';
+        }
+    });
+
+    // Drag over effect
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    // Drop file
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            previewImage.src = URL.createObjectURL(e.dataTransfer.files[0]);
+            previewImage.style.display = 'block';
+        }
+    });
+</script>
+

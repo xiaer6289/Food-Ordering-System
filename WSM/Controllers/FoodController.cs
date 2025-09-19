@@ -147,7 +147,7 @@ namespace WSM.Controllers
                 Name = food.Name,
                 Price = food.Price,
                 Description = food.Description,
-                Image = food.Photo,
+                CurrentPhoto = food.Photo,
                 CategoryId = food.CategoryId
             };
 

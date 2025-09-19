@@ -34,18 +34,21 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <!-- Image File Upload -->
+        <!-- Drag-and-Drop Image Upload -->
         <div>
             <label asp-for="Photo">Upload Image</label>
-            <input asp-for="Photo" type="file" class="edit-ingredient-quantity" accept="image/*" />
+
+            <div id="dropZone" class="drop-zone">
+                <p>Drag & drop an image here or click to select</p>
+                <input asp-for="Photo" type="file" accept="image/*" class="file-input" />
+            </div>
+
             <span asp-validation-for="Photo" class="text-danger"></span>
 
             <div class="mt-2">
                 <img id="previewImage" src="" alt="Preview" style="max-width:150px; display:none;" />
             </div>
         </div>
-
-
 
         <!-- Category -->
         <div>
@@ -64,3 +67,42 @@
         </div>
     </form>
 </div>
+
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = dropZone.querySelector('.file-input');
+    const previewImage = document.getElementById('previewImage');
+
+    // Click to open file dialog
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Handle file selection
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            previewImage.src = URL.createObjectURL(fileInput.files[0]);
+            previewImage.style.display = 'block';
+        }
+    });
+
+    // Drag over effect
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    // Drop file
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            previewImage.src = URL.createObjectURL(e.dataTransfer.files[0]);
+            previewImage.style.display = 'block';
+        }
+    });
+</script>
