@@ -102,7 +102,6 @@ public class Food
 
     public string? Description { get; set; }
 
-    public string? Image { get; set; }
     public string? Photo { get; set; }
 
     [ForeignKey("Category")]

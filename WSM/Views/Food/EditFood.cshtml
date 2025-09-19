@@ -47,14 +47,9 @@
         </div>
 
         <!-- Current Photo -->
-        @if (!string.IsNullOrEmpty(Model.Image))
+        @if (!string.IsNullOrEmpty(Model.CurrentPhoto))
         {
-            <div class="mt-2">
-                <label>Current Photo:</label>
-                <div>
-                    <img src="/uploads/@Model.Image" alt="Current Photo" class="current-photo-preview" />
-                </div>
-            </div>
+            <img src="/uploads/@Model.CurrentPhoto" alt="Current Photo" />
         }
 
         <!-- Upload New Photo -->
