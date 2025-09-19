@@ -72,7 +72,7 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = 1 });
             }
 
-            var m = sorted.ToPagedList(page, 4);
+            var m = sorted.ToPagedList(page, 10);
 
             if (page > m.PageCount && m.PageCount > 0)
             {
