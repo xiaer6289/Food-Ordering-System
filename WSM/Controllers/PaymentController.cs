@@ -25,20 +25,20 @@ namespace WSM.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public IActionResult CreateCheckoutSession(string seatNo)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-            var pendingOrders = _db.OrderDetails
+            var order = _db.OrderDetails
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Food)
-                .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status != "Paid")
-                .ToList();
+                .FirstOrDefault(o => o.SeatNo == int.Parse(seatNo) && o.Status == "Pending");
 
-            if (!pendingOrders.Any())
-                return BadRequest("No pending orders to pay.");
+            if (order == null)
+                return BadRequest("No pending order to pay.");
 
-            var subtotal = pendingOrders.Sum(o => o.TotalPrice);
+            var subtotal = order.TotalPrice;
             var tax = subtotal * 0.06m;
             var serviceCharge = subtotal * 0.1m;
             var totalAmountWithCharges = subtotal + tax + serviceCharge;
@@ -47,37 +47,35 @@ namespace WSM.Controllers
             HttpContext.Session.SetString("Tax", tax.ToString());
             HttpContext.Session.SetString("ServiceCharge", serviceCharge.ToString());
             HttpContext.Session.SetString("TotalAmount", totalAmountWithCharges.ToString());
+            HttpContext.Session.SetString("OrderIdToPay", order.Id);
 
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
-            {
-                new SessionLineItemOptions
                 {
-                    PriceData = new SessionLineItemPriceDataOptions
+                    new SessionLineItemOptions
                     {
-                        Currency = "myr",
-                        UnitAmount = (long)(totalAmountWithCharges * 100),
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Name = "Restaurant Order",
-                            Description = $"Seat No: {seatNo} - {pendingOrders.Count} orders\n"
-                        }
-                    },
-                    Quantity = 1
-                }
-            },
+                            Currency = "myr",
+                            UnitAmount = (long)(totalAmountWithCharges * 100),
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = "Restaurant Order",
+                                Description = $"Seat No: {seatNo}, Order ID: {order.Id}"
+                            }
+                        },
+                        Quantity = 1
+                    }
+                },
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Payment/Success?seatNo={seatNo}&session_id={{CHECKOUT_SESSION_ID}}",
                 CancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/Cancel"
             };
 
-
             var service = new SessionService();
             var session = service.Create(options);
-
-            HttpContext.Session.SetString("OrdersToPay", string.Join(",", pendingOrders.Select(o => o.Id)));
 
             return Redirect(session.Url);
         }
@@ -91,19 +89,17 @@ namespace WSM.Controllers
             if (session.PaymentStatus != "paid")
                 return View("OrderCancel");
 
-            var orderIdsStr = HttpContext.Session.GetString("OrdersToPay") ?? "";
-            var orderIds = orderIdsStr.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            var orderId = HttpContext.Session.GetString("OrderIdToPay");
+            if (string.IsNullOrEmpty(orderId))
+                return BadRequest("No order found in session.");
 
-            var orders = _db.OrderDetails
+            var order = _db.OrderDetails
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Food)
-                .Where(o => orderIds.Contains(o.Id))
-                .ToList();
+                .FirstOrDefault(o => o.Id == orderId);
 
-            if (!orders.Any())
-                return BadRequest("No matching orders found.");
-
-            var totalAmount = orders.Sum(o => o.TotalPrice);
+            if (order == null)
+                return BadRequest("Order not found.");
 
             var subtotal = decimal.Parse(HttpContext.Session.GetString("Subtotal") ?? "0");
             var tax = decimal.Parse(HttpContext.Session.GetString("Tax") ?? "0");
@@ -113,11 +109,11 @@ namespace WSM.Controllers
             var payment = new Payment
             {
                 Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss"),
-                OrderDetailId = orders.First().Id,
+                OrderDetailId = order.Id,
                 PaymentMethod = "Card",
-                Subtotal = subtotal,           
-                Tax = tax,                     
-                ServiceCharge = serviceCharge, 
+                Subtotal = subtotal,
+                Tax = tax,
+                ServiceCharge = serviceCharge,
                 TotalPrice = totalAmountWithCharges,
                 AmountPaid = (decimal)session.AmountTotal / 100,
                 Paymentdate = DateTime.Now,
@@ -125,12 +121,8 @@ namespace WSM.Controllers
             };
             _db.Payments.Add(payment);
 
-
-            foreach (var order in orders)
-            {
-                order.Status = "Paid";
-                _db.OrderDetails.Update(order);
-            }
+            order.Status = "Paid";
+            _db.OrderDetails.Update(order);
 
             var seat = _db.Seats.FirstOrDefault(s => s.SeatNo == int.Parse(seatNo));
             if (seat != null)
@@ -143,8 +135,8 @@ namespace WSM.Controllers
 
             var model = new OrderConfirmationViewModel
             {
-                OrderDetail = orders.First(),
-                OrderItems = orders.SelectMany(o => o.OrderItems).ToList(),
+                OrderDetail = order,
+                OrderItems = order.OrderItems.ToList(),
                 Payment = payment
             };
 

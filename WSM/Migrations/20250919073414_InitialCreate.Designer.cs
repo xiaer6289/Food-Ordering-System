@@ -12,8 +12,13 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
+<<<<<<<< HEAD:WSM/Migrations/20250919075748_CreateDB.Designer.cs
     [Migration("20250919075748_CreateDB")]
     partial class CreateDB
+========
+    [Migration("20250919073414_InitialCreate")]
+    partial class InitialCreate
+>>>>>>>> da2e17183e82a686c1e32bba2a3f58627a7bebdc:WSM/Migrations/20250919073414_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

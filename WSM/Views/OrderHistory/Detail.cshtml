@@ -88,7 +88,7 @@
                 <strong>Total:</strong>
             </td>
             <td>
-                <strong>RM @((Model.orderDetail.TotalPrice * 1.06M * 1.1M).ToString("F2"))</strong>
+                <strong>RM @((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
             </td>
         </tr>
     </table>

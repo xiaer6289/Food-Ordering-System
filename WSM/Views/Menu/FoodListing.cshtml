@@ -42,7 +42,7 @@
         {
             <div class="col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow-sm food-card">
-                    <img src="@(!string.IsNullOrEmpty(food.Image) ? food.Image : Url.Content("~/images/default.png"))"
+                    <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
                          class="card-img-top"
                          alt="@food.Name"
                          style="height:150px; object-fit:contain;" />
