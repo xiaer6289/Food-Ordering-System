@@ -16,10 +16,10 @@
     <div style="text-align:center;" class="read-details-header">
         <div class="page-logo">
             <img src="@Url.Content(
-                      string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
-                      ? "~/images/default-logo.png"
-                      : Context.Session.GetString("CompanyLogo")
-            )" alt="Company Logo" class="page-logo" />
+                                       string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                                       ? "~/images/default-logo.png"
+                                       : Context.Session.GetString("CompanyLogo")
+                             )" alt="Company Logo" class="page-logo" />
         </div>
         <h1><strong>@Model.company.CompanyName</strong></h1>
         <h4>@Model.company.Street, @Model.company.Postcode</h4>
@@ -58,13 +58,13 @@
                 <td>@item.SubTotal.ToString("F2")</td>
             </tr>
         }
-        
+
         <tr>
             <td style="text-align:right;" colspan="4">
                 <strong>Subtotal:</strong>
             </td>
             <td>
-                RM @Model.orderDetail.TotalPrice.ToString("F2")
+                @Model.orderDetail.TotalPrice.ToString("F2")
             </td>
         </tr>
         <tr>
@@ -72,7 +72,7 @@
                 <strong>Service charge (10%):</strong>
             </td>
             <td>
-                RM @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
+                @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
             </td>
         </tr>
         <tr>
@@ -80,7 +80,7 @@
                 <strong>Tax (6%):</strong>
             </td>
             <td>
-                RM @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
+                @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
             </td>
         </tr>
         <tr>
@@ -88,7 +88,7 @@
                 <strong>Total:</strong>
             </td>
             <td>
-                <strong>RM @((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
+                <strong>@((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
             </td>
         </tr>
     </table>

@@ -23,7 +23,7 @@ header {
     padding: 12px 40px;
 }
 
-.left-header{
+.left-header {
     display: flex;
     align-items: center;
     gap: 35px;
@@ -36,7 +36,7 @@ header {
     gap: 10px;
 }*/
 
-.search{
+.search {
     display: flex;
     align-items: center;
     background: #fff;
@@ -46,48 +46,48 @@ header {
     width: 400px;
 }
 
-.search input{
-    border: none;
-    outline: none;
-    flex: 1;
-    font-size: 14px;
-}
+    .search input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 14px;
+    }
 
-.search i{
-    color: gray;
-    margin-right: 8px;
-}
+    .search i {
+        color: gray;
+        margin-right: 8px;
+    }
 
-.header-navigation{
+.header-navigation {
     display: flex;
     gap: 24px;
     font-size: 15px;
     color: #333;
 }
 
-.header-navigation a{
-    text-decoration: none;
-    color: inherit;
-}
+    .header-navigation a {
+        text-decoration: none;
+        color: inherit;
+    }
 
-.header-navigation a:hover{
-    color: #000;
-}
+        .header-navigation a:hover {
+            color: #000;
+        }
 
-.potrait{
+.potrait {
     position: relative;
     display: inline-block;
     cursor: pointer;
 }
 
-.potrait img{
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-}
+    .potrait img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+    }
 
-.dropdown{
+.dropdown {
     display: none;
     position: absolute;
     top: 70%;
@@ -100,28 +100,28 @@ header {
     z-index: 100;
 }
 
-.dropdown .details{
-    padding: 112px;
-    border-bottom: 1px solid #eee;
-}
+    .dropdown .details {
+        padding: 112px;
+        border-bottom: 1px solid #eee;
+    }
 
-.dropdown .details p{
-    margin: 4px 0;
-    font-size: 14px;
-    color: #333;
-}
+        .dropdown .details p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #333;
+        }
 
-.dropdown a{
-    display: block;
-    padding: 10px 14px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-}
+    .dropdown a {
+        display: block;
+        padding: 10px 14px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
 
-.dropdown a:hover{
-    background: #f5f5f5;
-}
+        .dropdown a:hover {
+            background: #f5f5f5;
+        }
 /*.orderLogout,
 .searchBar button {
     padding: 6px 12px;
@@ -263,6 +263,7 @@ header {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
     .check-all-btn:hover,
@@ -275,7 +276,7 @@ header {
     width: 130px;
 }
 
-.uncheck-all-btn{
+.uncheck-all-btn {
     padding: 10px 10px;
     width: 130px
 }
@@ -470,7 +471,7 @@ header {
     }
 
 .cancel-po,
-.ingredient-edit-cancel-btn{
+.ingredient-edit-cancel-btn {
     padding: 18px 54px;
     background-color: #ff9999;
     color: white;
@@ -483,7 +484,7 @@ header {
 
     .cancel-po:hover,
     .ingredient-edit-cancel-btn,
-    .refund-cancel-btn{
+    .refund-cancel-btn {
         background-color: #e88888;
     }
 
@@ -547,24 +548,24 @@ header {
     .pagination-wrapper ul,
     .pagination-wrapper .pagination,
     ul.pagination {
-        list-style: none ;
-        padding: 0 ;
-        display: flex ;
-        justify-content: center ;
-        flex-wrap: wrap ;
-        margin-top: 30px ;
-        gap: 0 ;
-        width: 100% ;
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+        gap: 0;
+        width: 100%;
     }
 
 #target {
-    width: 100% ;
-    display: block ;
+    width: 100%;
+    display: block;
 }
 
 .restock-container {
-    width: 100% ;
-    display: block ;
+    width: 100%;
+    display: block;
 }
 
 
@@ -643,9 +644,9 @@ header {
 }
 
 
-.ingredient-edit-submit-btn:hover {
-    background-color: #0056b3;
-}
+    .ingredient-edit-submit-btn:hover {
+        background-color: #0056b3;
+    }
 
 #savepdf {
     display: block;
@@ -684,11 +685,12 @@ header {
     .return-orderhistory:hover {
         background-color: #3119bd;
     }
-.order-info{
+
+.order-info {
     text-align: right;
     font-size: 15px;
     font-weight: bold;
-    padding:0 15px 0 0;
+    padding: 0 15px 0 0;
 }
 
 .additional-info {
@@ -699,9 +701,9 @@ header {
 }
 
 .detail-table {
-    width: 100%; 
-    border-collapse: collapse; 
-    table-layout: fixed; 
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
     margin: 20px 0;
     font-family: Arial, sans-serif;
     font-size: 14px;
@@ -711,17 +713,17 @@ header {
     .detail-table td {
         padding: 12px 16px;
         text-align: left;
-        white-space: nowrap; 
+        white-space: nowrap;
     }
 
     .detail-table th {
-        border-bottom: 2px solid black; 
+        border-bottom: 2px solid black;
         font-size: 16px;
         font-weight: bold;
     }
 
     .detail-table td {
-        border: none; 
+        border: none;
         font-size: 16px;
     }
 
@@ -734,8 +736,7 @@ header {
 }
 
 .history-detail-btn,
-.refund-page-btn{
-
+.refund-page-btn {
     color: white;
     padding: 14px 12px;
     font-size: 12px;
@@ -753,6 +754,7 @@ header {
 .history-detail-btn {
     background-color: #1862d9;
 }
+
     .history-detail-btn:hover {
         background-color: #0c47a6;
     }
@@ -765,7 +767,7 @@ header {
     background-color: #57a65c;
 }
 
-.footer-container{
+.footer-container {
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -801,7 +803,7 @@ header {
 }
 
 
-.check-btn-actions{
+.check-btn-actions {
     display: flex;
     gap: 20px;
 }
@@ -820,13 +822,13 @@ header {
 
 
 .page-logo {
-    margin: 0 auto; 
+    margin: 0 auto;
     width: 120px;
     height: 120px;
-    border-radius: 50%; 
-    object-fit: cover; 
-    border: 2px solid #ddd; 
-    background-color: #fff; 
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    background-color: #fff;
 }
 
 .company-logo {
@@ -838,7 +840,7 @@ header {
     background-color: #fff; /* fallback if image has transparency */
 }
 
-.logo{
+.logo {
     cursor: pointer;
 }
 
@@ -890,29 +892,29 @@ select.select-status {
     background-position: right 8px center;
     background-size: 14px;
     cursor: pointer;
-    text-align:center;
+    text-align: center;
 }
 
     /* On focus (highlight with blue border) */
-select.select-status:focus {
-    outline: none;
-    border-color: #2684ff;
-    box-shadow: 0 0 0 2px rgba(38, 132, 255, 0.2);
-}
+    select.select-status:focus {
+        outline: none;
+        border-color: #2684ff;
+        box-shadow: 0 0 0 2px rgba(38, 132, 255, 0.2);
+    }
 
     /* Options inside dropdown */
-select.select-status option {
-    padding: 8px 10px;
-    font-size: 14px;
-    border-radius: 8px; /* some browsers ignore this */
-}
+    select.select-status option {
+        padding: 8px 10px;
+        font-size: 14px;
+        border-radius: 8px; /* some browsers ignore this */
+    }
 
         /* Hover effect for options */
         select.select-status option:hover {
             background-color: #f2f2f2;
         }
 
-.select-list{
+.select-list {
     padding-left: 15px;
     padding-bottom: 15px;
 }
@@ -923,11 +925,11 @@ select.select-status option {
 }
 
 .table-area {
-    flex: 1 1 70%; 
+    flex: 1 1 70%;
 }
 
 .action-area {
-    flex: 0 0 20%; 
+    flex: 0 0 20%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1141,9 +1143,9 @@ select.select-status option {
 /* cart start*/
 
 .empty-cart {
-    text-align: center; 
-    font-size: 25px; 
-    margin: 40px 0; 
+    text-align: center;
+    font-size: 25px;
+    margin: 40px 0;
 }
 
 .cart-actions-large {
@@ -1166,6 +1168,130 @@ select.select-status option {
 }
 
 /* cart end */
+
+/* Order Sent Confirmation start */
+.order-sent-box {
+    border: 2px solid #ccc;
+    padding: 30px;
+    width: 700px;
+    margin: 100px auto;
+    text-align: center;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 18px;
+}
+
+    .order-sent-box h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+    }
+
+    .order-sent-box p {
+        margin: 10px 0;
+    }
+
+.order-extra {
+    margin: 20px 0;
+    padding: 15px;
+    border-top: 1px dashed #aaa;
+    border-bottom: 1px dashed #aaa;
+    font-size: 16px;
+    color: #444;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    text-decoration: none;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: #333;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+    .back-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+/* Order Sent Confirmation end */
+
+/* Success start */
+.success-header {
+    text-align: center;
+}
+
+.success-order-info {
+    text-align: right;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0 15px 0 0;
+}
+
+.success-additional-info {
+    text-align: left;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0 0 0 15px;
+}
+
+.success-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+    .success-detail-table th,
+    .success-detail-table td {
+        padding: 12px 16px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .success-detail-table th {
+        border-bottom: 2px solid black;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .success-detail-table td {
+        border: none;
+        font-size: 16px;
+    }
+
+.success-payment-info {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-top: 1.5px solid black;
+}
+
+.success-return {
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 20px;
+    background-color: #492ee6;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    display: inline-block;
+}
+
+    .success-return:hover {
+        background-color: #3119bd;
+    }
+
+/* Success start */
 
 /*reset password page*/
 #reset-password-body {
@@ -1200,9 +1326,9 @@ select.select-status option {
     border: none;
 }
 
-#reset-password-button:hover {
-    background-color: #0056b3;
-}
+    #reset-password-button:hover {
+        background-color: #0056b3;
+    }
 
 /*forgot password page*/
 #forgot-password-body {
@@ -1227,9 +1353,9 @@ select.select-status option {
     border: none;
 }
 
-#forgot-password-button:hover {
-    background-color: #0056b3;
-}
+    #forgot-password-button:hover {
+        background-color: #0056b3;
+    }
 
 
 #forgot-password-image {
@@ -1264,12 +1390,13 @@ select.select-status option {
     flex-direction: column;
     gap: 18px;
 }
-.add-staff-wrapper label {
-     font-weight: 600;
-     margin-bottom: 6px;
-     display: block;
-     color: #444;
- }
+
+    .add-staff-wrapper label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: block;
+        color: #444;
+    }
 
 
 .add-staff-input {
@@ -1281,11 +1408,11 @@ select.select-status option {
     transition: all 0.2s ease-in-out;
 }
 
-.add-staff-input:focus {
-     border-color: #0d6efd;
-     outline: none;
-     box-shadow: 0 0 4px rgba(13, 110, 253, 0.4);
- }
+    .add-staff-input:focus {
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 4px rgba(13, 110, 253, 0.4);
+    }
 
 /* Validation error */
 .text-danger {
@@ -1525,6 +1652,7 @@ select.select-status option {
         .dropdown a:hover {
             background: #f0f0f0;
         }
+
 .update-profile-page {
     display: flex;
     justify-content: center;
@@ -1652,31 +1780,31 @@ select.select-status option {
     max-width: 400px;
 }
 
-.no-permission-card h1 {
-    color: #e74c3c;
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
+    .no-permission-card h1 {
+        color: #e74c3c;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
 
-.no-permission-card p {
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 25px;
-}
+    .no-permission-card p {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 25px;
+    }
 
-.no-permission-card .btn-home {
-    text-decoration: none;
-    background-color: #3498db;
-    color: #fff;
-    padding: 12px 25px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    display: inline-block;
-}
+    .no-permission-card .btn-home {
+        text-decoration: none;
+        background-color: #3498db;
+        color: #fff;
+        padding: 12px 25px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+    }
 
-.no-permission-card .btn-home:hover {
-    background-color: #2980b9;
-}
+        .no-permission-card .btn-home:hover {
+            background-color: #2980b9;
+        }
 
 /*login page*/
 /* Both page */
@@ -1721,21 +1849,21 @@ select.select-status option {
 }
 
 .both-page__logo-img {
-    width: 100px; 
+    width: 100px;
     height: 100px;
-    border-radius: 50%; 
-    object-fit: cover; 
-    border: 3px solid black; 
-    padding: 3px; 
-    background-color: white; 
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid black;
+    padding: 3px;
+    background-color: white;
 }
 
 .both-page {
-    background-image: url('/images/login_background2.jpg'); 
-    background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat; 
-    min-height: 100vh; 
+    background-image: url('/images/login_background2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1750,3 +1878,18 @@ select.select-status option {
     .superadmin-row td:first-child {
         cursor: not-allowed;
     }
+
+.dropdown{
+    text-align: center;
+}
+
+.dropdown-link {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.dropdown-profile{
+    font-weight: bold;
+    margin-top: 3px;
+    font-size: 15px;
+}

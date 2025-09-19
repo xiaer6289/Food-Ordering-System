@@ -87,7 +87,7 @@ namespace WSM.Controllers
             var session = await service.GetAsync(session_id);
 
             if (session.PaymentStatus != "paid")
-                return View("OrderCancel");
+                return View("Cancel");
 
             var orderId = HttpContext.Session.GetString("OrderIdToPay");
             if (string.IsNullOrEmpty(orderId))
@@ -96,6 +96,7 @@ namespace WSM.Controllers
             var order = _db.OrderDetails
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Food)
+                .Include(o => o.Payment)
                 .FirstOrDefault(o => o.Id == orderId);
 
             if (order == null)
@@ -106,23 +107,27 @@ namespace WSM.Controllers
             var serviceCharge = decimal.Parse(HttpContext.Session.GetString("ServiceCharge") ?? "0");
             var totalAmountWithCharges = decimal.Parse(HttpContext.Session.GetString("TotalAmount") ?? "0");
 
-            var payment = new Payment
+            // Create payment record if not exists
+            if (order.Payment == null)
             {
-                Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss"),
-                OrderDetailId = order.Id,
-                PaymentMethod = "Card",
-                Subtotal = subtotal,
-                Tax = tax,
-                ServiceCharge = serviceCharge,
-                TotalPrice = totalAmountWithCharges,
-                AmountPaid = (decimal)session.AmountTotal / 100,
-                Paymentdate = DateTime.Now,
-                StripeTransactionId = session.PaymentIntentId
-            };
-            _db.Payments.Add(payment);
+                var payment = new Payment
+                {
+                    Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    OrderDetailId = order.Id,
+                    PaymentMethod = "Card",
+                    Subtotal = subtotal,
+                    Tax = tax,
+                    ServiceCharge = serviceCharge,
+                    TotalPrice = totalAmountWithCharges,
+                    AmountPaid = (decimal)session.AmountTotal / 100,
+                    Paymentdate = DateTime.Now,
+                    StripeTransactionId = session.PaymentIntentId
+                };
+                _db.Payments.Add(payment);
+                order.Payment = payment;
+            }
 
             order.Status = "Paid";
-            _db.OrderDetails.Update(order);
 
             var seat = _db.Seats.FirstOrDefault(s => s.SeatNo == int.Parse(seatNo));
             if (seat != null)
@@ -131,23 +136,23 @@ namespace WSM.Controllers
                 _db.Seats.Update(seat);
             }
 
+            _db.OrderDetails.Update(order);
             _db.SaveChanges();
 
-            var model = new OrderConfirmationViewModel
+            var company = _db.Companies.FirstOrDefault();
+
+            var vm = new DetailVM
             {
-                OrderDetail = order,
-                OrderItems = order.OrderItems.ToList(),
-                Payment = payment
+                orderDetail = order,
+                company = company
             };
 
-            return View("OrderConfirmation", model);
+            return View("Success", vm);
         }
 
-
-        // Payment cancel page
         public IActionResult Cancel()
         {
-            return View("OrderCancel");
+            return View("Cancel");
         }
     }
 }
