@@ -9,8 +9,8 @@
 <div class="food-detail-container">
     <div class="food-image">
         <img src="@(!string.IsNullOrEmpty(Model.Photo)
-                 ? Url.Content("~/uploads/" + Model.Photo)
-                 : Url.Content("~/images/default.png"))"
+                              ? Url.Content("~/uploads/" + Model.Photo)
+                              : Url.Content("~/images/default.png"))"
              alt="@Model.Name"
              style="max-width:300px; object-fit:contain;" />
     </div>

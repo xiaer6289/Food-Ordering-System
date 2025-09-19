@@ -1,5 +1,4 @@
-﻿using WSM.Models;
-
+﻿
 namespace WSM.Models;
 
 public class DetailVM      //wrap multiple table

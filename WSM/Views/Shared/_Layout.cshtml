@@ -45,8 +45,7 @@
         }
 
         <nav class="header-navigation">
-            <a href="../Table/Index">Home</a>
-            <a href="../Menu/foodlisting" class="restricted" data-role="Staff">Menu</a>
+            <a asp-controller="Table" asp-action="Index">Home</a>
             <a href="../Food/Foods">Food</a>
             <a href="../Category/Categories" >Category</a>
             <a href="../OrderHistory/OrderHistory" class="restricted" data-role="Staff">Order History</a>
@@ -74,13 +73,15 @@
                
                 @if (Context.Session.GetString("Role") == "Admin")
                 {
-                    <a href="../Admin/UpdateProfile">Update Profile</a>
+                    <p>Role: Admin</p>
+                    <a href="../Admin/UpdateProfile" class="dropdown-profile">Update Profile</a>
                 }
                 else if (Context.Session.GetString("Role") == "Staff")
                 {
-                    <a href="../Staff/UpdateProfile">Update Profile</a>
+                    <p>Role: Admin</p>
+                    <a href="../Staff/UpdateProfile" class="dropdown-profile">Update Profile</a>
                 }
-                <a href="../Home/Both">Logout</a>
+                <a href="../Home/Both" class="dropdown-link">Logout</a>
             </div>
         </div>
 

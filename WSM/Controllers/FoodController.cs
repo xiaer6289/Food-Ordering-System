@@ -29,20 +29,20 @@ namespace WSM.Controllers
             ViewBag.SearchContext = "Food";
             ViewBag.SearchPlaceholder = "Search by Food ID/Name";
 
-            // Searching
             ViewBag.Name = id = id?.Trim() ?? "";
             var searched = db.Foods.AsQueryable();
-
             if (!string.IsNullOrEmpty(id))
             {
                 // Try parse id as integer for Id search
                 if (int.TryParse(id, out int searchId))
                 {
-                    searched = searched.Where(s => s.Id == searchId || s.Name.Contains(id));
+                    // Search by exact ID match OR name contains (case-insensitive)
+                    searched = searched.Where(s => s.Id == searchId || s.Name.ToLower().Contains(id.ToLower()));
                 }
                 else
                 {
-                    searched = searched.Where(s => s.Name.Contains(id));
+                    // Search by name only (case-insensitive)
+                    searched = searched.Where(s => s.Name.ToLower().Contains(id.ToLower()));
                 }
             }
 

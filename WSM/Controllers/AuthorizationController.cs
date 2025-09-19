@@ -221,7 +221,7 @@ public class AuthorizationController : Controller
 
     [HttpPost]
     public IActionResult FillCompanyProfile(IFormFile Logo,
-    [Bind("Street,City,State,Postcode,Phone,Description")] Company updatedCompany)
+     [Bind("Street,City,State,Postcode,Phone,Description")] Company updatedCompany)
     {
         string? companyId = HttpContext.Session.GetString("CompanyId");
         if (string.IsNullOrEmpty(companyId)) return RedirectToAction("Login");
@@ -229,42 +229,89 @@ public class AuthorizationController : Controller
         var company = _db.Companies.Find(companyId);
         if (company == null) return RedirectToAction("Login");
 
-        // Update fields
+        // === Validation ===
+        if (string.IsNullOrWhiteSpace(updatedCompany.Street))
+        {
+            TempData["ErrorMessage"] = "Street is required.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        if (string.IsNullOrWhiteSpace(updatedCompany.City))
+        {
+            TempData["ErrorMessage"] = "City is required.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        if (string.IsNullOrWhiteSpace(updatedCompany.State))
+        {
+            TempData["ErrorMessage"] = "State is required.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        if (string.IsNullOrWhiteSpace(updatedCompany.Postcode))
+        {
+            TempData["ErrorMessage"] = "Postcode is required.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        if (!Regex.IsMatch(updatedCompany.Postcode, @"^\d+$"))
+        {
+            TempData["ErrorMessage"] = "Postcode must be numeric.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        if (string.IsNullOrWhiteSpace(updatedCompany.Phone))
+        {
+            TempData["ErrorMessage"] = "Phone number is required.";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        string phonePattern = @"^\+?\d{8,15}$"; 
+        if (!Regex.IsMatch(updatedCompany.Phone, phonePattern))
+        {
+            TempData["ErrorMessage"] = "Phone number format is invalid (eg.+60123456789).";
+            return RedirectToAction("FillCompanyProfile");
+        }
+
+        // === Update fields ===
         company.Street = updatedCompany.Street;
         company.City = updatedCompany.City;
         company.State = updatedCompany.State;
         company.Postcode = updatedCompany.Postcode;
         company.Phone = updatedCompany.Phone;
-        company.Description = updatedCompany.Description;
 
-        // Sync with admin phone
+        // If description empty, set as "N/A" or leave empty
+        company.Description = string.IsNullOrWhiteSpace(updatedCompany.Description) ? "" : updatedCompany.Description;
+
+        // === Sync with admin phone ===
         var admin = _db.Admins.FirstOrDefault(a => a.Email == company.Email);
         if (admin != null)
         {
             admin.PhoneNo = company.Phone;
         }
 
-        // Upload logo
-        if (Logo != null && Logo.Length > 0)
+       
+        if (Logo == null || Logo.Length == 0)
         {
-            string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string fileName = Guid.NewGuid() + Path.GetExtension(Logo.FileName);
-            string filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                Logo.CopyTo(stream);
-            }
-
-            company.LogoPath = "/uploads/" + fileName;
+            TempData["ErrorMessage"] = "Please upload a company logo.";
+            return RedirectToAction("FillCompanyProfile");
         }
 
+   
+        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        string fileName = Guid.NewGuid() + Path.GetExtension(Logo.FileName);
+        string filePath = Path.Combine(uploadsFolder, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            Logo.CopyTo(stream);
+        }
+
+        company.LogoPath = "/uploads/" + fileName;
         HttpContext.Session.SetString("CompanyId", company.Id);
-
-
 
         // Save logo in session
         if (!string.IsNullOrEmpty(company.LogoPath))
@@ -275,8 +322,10 @@ public class AuthorizationController : Controller
         company.IsFirstLogin = false;
         _db.SaveChanges();
 
+        TempData["SuccessMessage"] = "Company registered successfully.";
         return RedirectToAction("Both", "Home");
     }
+
 
 
     //Forgot password
