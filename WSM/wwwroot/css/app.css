@@ -470,7 +470,7 @@ header {
     }
 
 .cancel-po,
-.edit-cancel-btn{
+.ingredient-edit-cancel-btn{
     padding: 18px 54px;
     background-color: #ff9999;
     color: white;
@@ -482,7 +482,7 @@ header {
 }
 
     .cancel-po:hover,
-    .edit-cancel-btn,
+    .ingredient-edit-cancel-btn,
     .refund-cancel-btn{
         background-color: #e88888;
     }
@@ -630,7 +630,7 @@ header {
     color: #333;
 }
 
-.edit-submit-btn {
+.ingredient-edit-submit-btn {
     font-size: 16px;
     padding: 18px 54px;
     border: none;
@@ -643,7 +643,7 @@ header {
 }
 
 
-.edit-submit-btn:hover {
+.ingredient-edit-submit-btn:hover {
     background-color: #0056b3;
 }
 
@@ -1364,6 +1364,7 @@ select.select-status option {
     color: #333;
     text-align: center;
     margin-bottom: 20px;
+    font-weight: bold;
 }
 
 .add-staff-form label,
@@ -1476,6 +1477,7 @@ select.select-status option {
     .add-staff-title,
     .edit-staff-title {
         font-size: 1.5rem;
+        font-weight: bold;
     }
 
     .add-staff-button-group,
@@ -1739,3 +1741,12 @@ select.select-status option {
     justify-content: center;
     align-items: center;
 }
+
+.superadmin-row {
+    background-color: #fff3cd;
+    font-weight: bold;
+}
+
+    .superadmin-row td:first-child {
+        cursor: not-allowed;
+    }

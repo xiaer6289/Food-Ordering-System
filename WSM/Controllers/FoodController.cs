@@ -72,7 +72,7 @@ namespace WSM.Controllers
                 return RedirectToAction(null, new { id, sort, dir, page = 1 });
             }
 
-            var m = sorted.ToPagedList(page, 10);
+            var m = sorted.ToPagedList(page, 4);
 
             if (page > m.PageCount && m.PageCount > 0)
             {
@@ -134,45 +134,6 @@ namespace WSM.Controllers
 
             return View(vm);
         }
-
-        //    // Generate new Food ID
-        //    var lastFood = db.Foods.OrderByDescending(f => f.Id).FirstOrDefault();
-        //    model.Id = lastFood == null ? "F0001" : "F" + (int.Parse(lastFood.Id.Substring(1)) + 1).ToString("D4");
-
-        //    // *** Handle File Upload ***
-        //    if (model.Photo != null && model.Photo.Length > 0)
-        //    {
-        //        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "foods");
-
-        //        // Create directory if it doesn't exist
-        //        if (!Directory.Exists(uploadsFolder))
-        //            Directory.CreateDirectory(uploadsFolder);
-
-        //        // Generate unique file name
-        //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
-
-        //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        //        // Save file to server
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            model.Photo.CopyTo(stream);
-        //        }
-
-        //        // Save relative path to DB
-        //        model.Image = "/uploads/foods/" + uniqueFileName;
-        //    }
-        //    else
-        //    {
-        //        // If no image is uploaded, you can either set a default image or leave it null
-        //        model.Image = null;
-        //    }
-
-        //    db.Foods.Add(model);
-        //    db.SaveChanges();
-
-        //    TempData["SuccessMessage"] = "Food created successfully!";
-        //    return RedirectToAction(nameof(Foods));
 
         // GET: /Food/EditFood/{id}
         public IActionResult EditFood(int id)
@@ -248,23 +209,42 @@ namespace WSM.Controllers
             return RedirectToAction(nameof(Foods));
         }
 
-        public IActionResult FoodListing(string categoryId = "All")
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
         {
-            // Fetch all categories for filter buttons
-            var categories = db.Categories.ToList();
-            ViewBag.Categories = categories;
-            ViewBag.SelectedCategory = categoryId;
-
-            // Start with all foods
-            IQueryable<Food> foods = db.Foods;
-
-            // Filter by category if it's not "All"
-            if (!string.IsNullOrEmpty(categoryId) && categoryId != "All")
+            var food = db.Foods.FirstOrDefault(f => f.Id == id);
+            if (food == null)
             {
-                foods = foods.Where(f => f.CategoryId == categoryId);
+                return Json(new { success = false, message = "Food not found." });
             }
 
-            return View(foods.ToList());
+            db.Foods.Remove(food);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Food deleted successfully." });
+        }
+
+        // POST: /Food/DeleteMany
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteMany([FromForm] int[] ids)
+        {
+            if (ids == null || ids.Length == 0)
+            {
+                return Json(new { success = false, message = "No foods selected." });
+            }
+
+            var foods = db.Foods.Where(f => ids.Contains(f.Id)).ToList();
+            if (!foods.Any())
+            {
+                return Json(new { success = false, message = "No matching foods found." });
+            }
+
+            db.Foods.RemoveRange(foods);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Selected foods deleted successfully." });
         }
 
     }

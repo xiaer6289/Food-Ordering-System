@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using WSM.Models;
 
 namespace WSM.Helpers
@@ -70,48 +71,81 @@ namespace WSM.Helpers
             return total;
         }
 
-        public OrderDetail CreateOrderDetail(string seatNo = "0", string staffId = null, string adminId = null)
+        public OrderDetail CreateOrUpdateOrderDetail(string seatNo = "0", string staffId = null, string adminId = null)
         {
             var cart = GetCart(seatNo);
             if (!cart.Any()) return null;
 
-            string orderId = "ORD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            var existingOrder = _db.OrderDetails
+                .Include(o => o.OrderItems)
+                .FirstOrDefault(o => o.SeatNo == int.Parse(seatNo) && o.Status == "Pending");
 
-            var orderDetail = new OrderDetail
+            if (existingOrder != null)
             {
-                Id = orderId,
-                SeatNo = int.Parse(seatNo),
-                Quantity = cart.Sum(x => x.Value.Quantity),
-                TotalPrice = CalculateTotal(seatNo),
-                Status = "Pending",
-                OrderDate = DateTime.Now,
-                StaffId = staffId,
-                AdminId = adminId
-            };
-
-            _db.OrderDetails.Add(orderDetail);
-            _db.SaveChanges();
-
-            int index = 1;
-            foreach (var x in cart)
-            {
-                var orderItem = new OrderItem
+                int index = existingOrder.OrderItems.Count + 1;
+                foreach (var x in cart)
                 {
-                    Id = $"{orderId}-OI{index++}",
-                    OrderDetailId = orderId,
-                    FoodId = int.Parse(x.Key),
-                    Quantity = x.Value.Quantity,
-                    SubTotal = int.TryParse(x.Key, out int foodId)
-                        ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
-                        : 0,
-                    ExtraDetail = string.IsNullOrEmpty(x.Value.ExtraDetail) ? "N/A" : x.Value.ExtraDetail
-                };
-                _db.OrderItems.Add(orderItem);
+                    var orderItem = new OrderItem
+                    {
+                        Id = $"{existingOrder.Id}-OI{index++}",
+                        OrderDetailId = existingOrder.Id,
+                        FoodId = int.Parse(x.Key),
+                        Quantity = x.Value.Quantity,
+                        SubTotal = int.TryParse(x.Key, out int foodId)
+                            ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
+                            : 0,
+                        ExtraDetail = string.IsNullOrEmpty(x.Value.ExtraDetail) ? "N/A" : x.Value.ExtraDetail
+                    };
+                    _db.OrderItems.Add(orderItem);
+                }
+
+                existingOrder.Quantity += cart.Sum(x => x.Value.Quantity);
+                existingOrder.TotalPrice += CalculateTotal(seatNo);
+
+                _db.OrderDetails.Update(existingOrder);
+                _db.SaveChanges();
+
+                return existingOrder;
             }
+            else
+            {
+                string orderId = "ORD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
 
-            _db.SaveChanges();
+                var orderDetail = new OrderDetail
+                {
+                    Id = orderId,
+                    SeatNo = int.Parse(seatNo),
+                    Quantity = cart.Sum(x => x.Value.Quantity),
+                    TotalPrice = CalculateTotal(seatNo),
+                    Status = "Pending",
+                    OrderDate = DateTime.Now,
+                    StaffId = staffId,
+                    AdminId = adminId
+                };
 
-            return orderDetail;
+                _db.OrderDetails.Add(orderDetail);
+                _db.SaveChanges();
+
+                int index = 1;
+                foreach (var x in cart)
+                {
+                    var orderItem = new OrderItem
+                    {
+                        Id = $"{orderId}-OI{index++}",
+                        OrderDetailId = orderId,
+                        FoodId = int.Parse(x.Key),
+                        Quantity = x.Value.Quantity,
+                        SubTotal = int.TryParse(x.Key, out int foodId)
+                            ? _db.Foods.Where(f => f.Id == foodId).Select(f => f.Price * x.Value.Quantity).FirstOrDefault()
+                            : 0,
+                        ExtraDetail = string.IsNullOrEmpty(x.Value.ExtraDetail) ? "N/A" : x.Value.ExtraDetail
+                    };
+                    _db.OrderItems.Add(orderItem);
+                }
+
+                _db.SaveChanges();
+                return orderDetail;
+            }
         }
     }
 }

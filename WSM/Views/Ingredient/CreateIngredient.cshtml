@@ -10,7 +10,7 @@
 }
  
 
-<h1 style="text-align:center;"><strong>Purchase Order</strong></h1>
+<h1 style="text-align:center; font-weight:bold;"><strong>Purchase Order</strong></h1>
 
 <div class="purchase-header" style="text-align: right;">
     <span>Date: @today</span>
@@ -132,6 +132,13 @@
             } else {
                 discount = parseFloat(discount.toFixed(2));
                 discountInput.value = discount;
+            }
+
+            if (discount > subtotal){
+                alert("Discount cannot be more than subtotal!");
+                discountInput.value = "";        
+                discountInput.placeholder = "0.00"; 
+                discount = 0;
             }
 
             const finalTotal = subtotal - discount;

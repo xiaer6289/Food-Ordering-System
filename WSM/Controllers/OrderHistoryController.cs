@@ -16,8 +16,8 @@ public class OrderHistoryController : Controller
     {
         this.db = db;
     }
-   
-
+    [Authorize]
+    [Authorize(Roles = "Staff")]
     [Authorize(Roles = "Admin")]
     public IActionResult OrderHistory(string? id, string? sort, string? dir, string? status, int page = 1)
     {

@@ -26,6 +26,10 @@ public class SearchController : Controller
                 return ((q == "" || q == null) ? RedirectToAction("ReadStaff", "Staff") :
                     RedirectToAction("ReadStaff", "Staff", new { id = q }));
 
+            case "Menu":
+                return ((q == "" || q == null) ? RedirectToAction("FoodListing", "Menu") :
+                    RedirectToAction("FoodListing", "Menu", new { id = q }));
+
             case "Category":
                 return ((q == "" || q == null) ? RedirectToAction("Categories", "Category") :
                     RedirectToAction("Categories", "Category", new { id = q }));

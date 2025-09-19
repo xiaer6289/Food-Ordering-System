@@ -1,26 +1,9 @@
-﻿@using X.PagedList
-@using X.PagedList.Mvc.Core
-@model IPagedList<WSM.Models.Food>
-
-@{
-    ViewData["Title"] = "Food Management";
-    string[] fields = ["", "Id", "Image", "Name", "Price", "Description", "Category",""];
+﻿@{
+    string[] fields = ["", "Id", "Image", "Name", "Price", "Description", "Category", ""];
 }
 
-<h2 class="mb-4">Food Management</h2>
-
-<form>
-    @Html.Hidden("sort")
-    @Html.Hidden("dir")
-</form>
-
-<p class="pagination-count">
-    @Model.Count() of @Model.TotalItemCount Foods |
-    Page @Model.PageNumber of @Model.PageCount
-</p>
-
-<div id="target">
-    <table class="record-table">
+<table class="record-table">
+    <thead>
         <tr>
             @foreach (var f in fields)
             {
@@ -34,20 +17,26 @@
                 }
 
                 <th>
-                    <a href="?name=@ViewBag.Name&price=@ViewBag.Price&sort=@f&dir=@d" class="@c">@f</a>
+                    @if (!string.IsNullOrEmpty(f))
+                    {
+                        <a href="?name=@ViewBag.Name&price=@ViewBag.Price&sort=@f&dir=@d" class="@c">@f</a>
+                    }
                 </th>
             }
         </tr>
+    </thead>
 
+    <tbody>
         @foreach (var s in Model)
         {
             <tr>
-                <td data-checkable data-id="@s.Id">
-                    <input type="checkbox" name="ids" value="@s.Id" class="ingredient-checkbox" />
+                <td>
+                    <input type="checkbox" name="ids" value="@s.Id" class="category-checkbox" />
                 </td>
                 <td>@s.Id</td>
-                @* <td><img @Url.Content("~/uploads/" + s.Photo) style="width:150px; height:150px;"></td> *@
-                <td><img src="~/uploads/@s.Photo" /></td>
+                <td>
+                    <img src="~/uploads/@s.Photo" style="width:80px; height:80px;" alt="Food Image" />
+                </td>
                 <td>@s.Name</td>
                 <td>@s.Price</td>
                 <td>@s.Description</td>
@@ -55,114 +44,17 @@
                 <td>
                     <div class="edit-remove-group">
                         <a asp-controller="Food" asp-action="EditFood" asp-route-id="@s.Id" class="edit-ingredient">Update</a>
-                        <a asp-controller="Food" asp-action="DeleteFood" asp-route-id="@s.Id" class="remove-ingredient" onclick="return confirm('Are you sure you want to delete this food');">Delete</a>
+                        <a href="javascript:void(0);" class="remove-ingredient delete-category btn btn-link" data-id="@s.Id">
+                            Delete
+                        </a>
                     </div>
                 </td>
             </tr>
         }
-    </table>
+    </tbody>
+</table>
 
-    <div class="restock-button">
-        <a asp-controller="Food" asp-action="CreateFood" class="create-ingredient">Add New</a>
-        <button type="submit" class="remove-check-ingredient">Delete Selected</button>
-    </div>
+<div class="restock-button">
+    <a asp-controller="Food" asp-action="CreateFood" class="create-ingredient">Add New</a>
+    <button type="button" class="remove-check-ingredient">Delete Selected</button>
 </div>
-
-
-<div class="pagination-wrapper">
-    @{
-        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
-        options.LinkToFirstPageFormat = "First";
-        options.LinkToLastPageFormat = "Last";
-        options.LinkToPreviousPageFormat = "Previous";
-        options.LinkToNextPageFormat = "Next";
-
-        var ajaxOptions = new AjaxOptions
-        {
-            HttpMethod = "get",
-            UpdateTargetId = "target",
-            LoadingElementId = "#loader",
-        };
-    }
-
-    @Html.PagedListPager(
-    Model,
-    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
-    options
-        )
-</div>
-
-@* <div class="container mt-4">
-    <!-- Page Header -->
-    <div class="section-title d-flex justify-content-between align-items-center">
-        <h2>Food Management</h2>
-        <div>
-            
-            <a asp-action="CreateFood" class="btn-add-category">+ Add Food</a>
-        </div>
-    </div>
-
-
-            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
-            {
-                <a asp-action="Foods" class="uncheck-all-btn">Clear</a>
-            }
-        </div>
-
-    <!-- Food Table -->
-    <div class="table-responsive">
-        <table class="record-table">
-            <thead>
-                <tr>
-                    <th style="width:60px;">ID</th>
-                    <th style="width:80px;">Image</th>
-                    <th>Name</th>
-                    <th style="width:100px;">Price</th>
-                    <th>Description</th>
-                    <th style="width:150px;">Category</th>
-                    <th style="width:180px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">No food records found.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var food in Model)
-                    {
-                        <tr>
-                            <td>@food.Id</td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(food.Image))
-                                {
-                                    <img src="@food.Image" alt="@food.Name" style="max-height:50px;" />
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No Image</span>
-                                }
-                            </td>
-                            <td>@food.Name</td>
-                            <td>@food.Price.ToString("C")</td>
-                            <td>@food.Description</td>
-                            <td>@food.Category?.Name</td>
-                            <td>
-                                <div class="edit-remove-group">
-                                    <a asp-action="EditFood" asp-route-id="@food.Id" class="edit-ingredient">Edit</a>
-                                    <form asp-action="DeleteFood" asp-route-id="@food.Id" method="post"
-                                          style="display:inline;"
-                                          onsubmit="return confirm('Are you sure you want to delete this food item?');">
-                                        <button type="submit" class="remove-ingredient">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div> *@

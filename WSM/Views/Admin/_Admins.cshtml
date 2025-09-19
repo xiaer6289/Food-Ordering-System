@@ -6,6 +6,21 @@
     ViewData["Title"] = "Admin Management";
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
 <!-- Hidden form for sorting -->
 <form method="get">
     @Html.Hidden("sort")
@@ -60,12 +75,16 @@ else
                 <tbody>
                     @foreach (var admin in Model)
                     {
-                        <tr data-checkable data-id="@admin.Id">
+                        var superAdminId = Model.Min(a => a.Id); // SuperAdmin is first created
+                        bool isSuperAdmin = admin.Id == superAdminId;
+                        string rowClass = isSuperAdmin ? "superadmin-row" : "";
+
+                        <tr data-checkable data-id="@admin.Id" class="@rowClass">
                             <td>
-                                <input type="checkbox" name="ids" value="@admin.Id" class="admin-checkbox" />
+                                <input type="checkbox" name="ids" value="@admin.Id" class="admin-checkbox" @(isSuperAdmin ? "disabled" : "") />
                             </td>
                             <td>@admin.Id</td>
-                            <td>@admin.Name</td>
+                            <td>@admin.Name @(isSuperAdmin ? "(SuperAdmin)" : "")</td>
                             <td>@admin.Email</td>
                             <td>@admin.PhoneNo</td>
                             <td>
