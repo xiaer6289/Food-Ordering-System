@@ -2,15 +2,12 @@
 @{
     ViewData["Title"] = "Add Staff";
     Layout = "_LayoutIngredient";
-
 }
 
-<link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+<div class="edit-ingredient-form">
+    <h2 class="edit-ingredient-title">Add Staff</h2>
 
-<div class="add-staff-form">
-    <h2 class="add-staff-title">Add Staff</h2>
-
-    <!-- Success Message -->
+    <!-- Inline Success Message -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success text-center">
@@ -18,46 +15,55 @@
         </div>
     }
 
+    <!-- Inline Validation Error Messages -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.SelectMany(v => v.Value.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
 
-    <form asp-action="CreateStaff" method="post" class="add-staff-wrapper">
+    <form asp-action="CreateStaff" method="post" class="edit-ingredient-wrapper">
         @Html.AntiForgeryToken()
 
         <div>
             <label asp-for="Name">Name</label>
-            <input asp-for="Name" placeholder="Enter staff name" class="add-staff-input" />
+            <input asp-for="Name" placeholder="Enter staff name" class="edit-ingredient-quantity" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div>
             <label asp-for="Email">Email</label>
-            <input asp-for="Email" type="email" placeholder="e.g., staff@example.com" maxlength="100" class="add-staff-input" required />
+            <input asp-for="Email" type="email" placeholder="e.g., staff@example.com" maxlength="100" class="edit-ingredient-quantity" required />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div>
             <label asp-for="PhoneNo">Phone Number</label>
-            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" class="add-staff-input" required />
+            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" class="edit-ingredient-quantity" required />
             <span asp-validation-for="PhoneNo" class="text-danger"></span>
         </div>
 
         <div>
             <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" placeholder="Enter password" class="add-staff-input" />
+            <input asp-for="Password" type="password" placeholder="Enter password" class="edit-ingredient-quantity" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
         <div>
             <label asp-for="Salary">Salary (RM)</label>
-            <input asp-for="Salary" type="number" step="0.01" placeholder="Enter salary" class="add-staff-input" />
+            <input asp-for="Salary" type="number" step="0.01" placeholder="Enter salary" class="edit-ingredient-quantity" />
             <span asp-validation-for="Salary" class="text-danger"></span>
         </div>
 
-        <div class="add-staff-button-group">
-            <button type="submit" class="add-staff-submit-btn">Add Staff</button>
-            <a asp-action="ReadStaff" class="add-staff-cancel-btn">Cancel</a>
+        <div class="edit-button-group">
+            <button type="submit" class="edit-submit-btn">Add Staff</button>
+            <a asp-action="ReadStaff" class="cancel-btn">Cancel</a>
         </div>
     </form>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/app.js"></script>
