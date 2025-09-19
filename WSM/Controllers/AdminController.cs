@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Text.RegularExpressions;
 using WSM.Models;
 using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
+    [Authorize]
     public class AdminController : Controller
     {
         private readonly DB db;
@@ -18,6 +20,7 @@ namespace WSM.Controllers
         }
 
         // GET: /Admin/Admins
+        [Authorize(Roles = "Admin")]
         public IActionResult Admins(string? id, string? sort, string? dir, int page = 1)
         {
             // Setup for search bar in Layout
@@ -95,6 +98,7 @@ namespace WSM.Controllers
 
 
         // GET: /Admin/CreateAdmin
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateAdmin()
         {
             return View();
@@ -103,14 +107,11 @@ namespace WSM.Controllers
         // POST: /Admin/CreateAdmin
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateAdmin(Admin model)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
-            if (string.IsNullOrEmpty(companyId))
-            {
-                return RedirectToAction("Login", "Authorization");
-            }
-
+           
             model.Id = GenerateSequentialId();
             model.CompanyId = companyId;
 
@@ -167,9 +168,10 @@ namespace WSM.Controllers
             return View(model);
         }
 
-        
+
 
         // GET: /Admin/EditAdmin
+        [Authorize(Roles = "Admin")]
         public IActionResult EditAdmin(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -191,6 +193,7 @@ namespace WSM.Controllers
         // POST: /Admin/EditAdmin
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult EditAdmin(EditAdminViewModel model)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -218,6 +221,7 @@ namespace WSM.Controllers
         }
 
         // GET: /Admin/DeleteAdmin
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdmin(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -239,6 +243,7 @@ namespace WSM.Controllers
             return RedirectToAction("Admins");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteMany(string[] ids)
@@ -312,6 +317,7 @@ namespace WSM.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateProfile()
         {
             var userId = HttpContext.Session.GetString("StaffAdminId");
@@ -334,6 +340,7 @@ namespace WSM.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProfile(UpdateProfileViewModel model, IFormFile? Photo)
         {
             var userId = HttpContext.Session.GetString("StaffAdminId");

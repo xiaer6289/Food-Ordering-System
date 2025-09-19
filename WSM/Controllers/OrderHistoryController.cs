@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WSM.Models;
 using X.PagedList.Extensions;
@@ -6,6 +7,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WMS.Controllers;
 
+[Authorize]
 public class OrderHistoryController : Controller
 {
     private readonly DB db;
@@ -14,7 +16,9 @@ public class OrderHistoryController : Controller
     {
         this.db = db;
     }
-
+    [Authorize]
+    [Authorize(Roles = "Staff")]
+    [Authorize(Roles = "Admin")]
     public IActionResult OrderHistory(string? id, string? sort, string? dir, string? status, int page = 1)
     {
         // For Layout.cshtml search bar
@@ -78,6 +82,7 @@ public class OrderHistoryController : Controller
         return View(m);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Detail(string? id)
     {
         var order = db.OrderDetails
@@ -102,6 +107,7 @@ public class OrderHistoryController : Controller
         return View(vm);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Refund(string? id)
     {
         if (string.IsNullOrEmpty(id)) return RedirectToAction("OrderHistory");
@@ -127,6 +133,7 @@ public class OrderHistoryController : Controller
         return View(vm);
     }
 
+    [Authorize(Roles = "Admin")]
     // POST: Refund selected items
     [HttpPost]
     public IActionResult Refund(string orderId, string[] itemIds)

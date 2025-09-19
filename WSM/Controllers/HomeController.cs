@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
 
@@ -17,7 +21,6 @@ namespace WSM.Controllers
 
         // Home page after company login
         public IActionResult Both()
-        // Ifpublic IActionResult Both()
         {
             string? companyId = HttpContext.Session.GetString("CompanyId");
 
@@ -64,7 +67,7 @@ namespace WSM.Controllers
 
             // POST: Login with Email or ID + Password
             [HttpPost]
-        public IActionResult Login(string loginInput, string Password)
+        public async Task<IActionResult> Login(string loginInput, string Password)
         {
             string? companyId = HttpContext.Session.GetString("CompanyId");
             if (string.IsNullOrEmpty(companyId))
@@ -86,8 +89,22 @@ namespace WSM.Controllers
                 {
                     HttpContext.Session.SetString("StaffAdminId", admin.Id);
                     HttpContext.Session.SetString("Role", "Admin");
+
                     if (!string.IsNullOrEmpty(admin.PhotoPath))
                         HttpContext.Session.SetString("ProfilePhoto", admin.PhotoPath);
+
+                    var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, admin.Id),
+                    new Claim(ClaimTypes.Role, "Admin"),
+                    new Claim(ClaimTypes.Email, admin.Email)
+                };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
 
                     return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
@@ -111,6 +128,19 @@ namespace WSM.Controllers
                     if (!string.IsNullOrEmpty(staff.PhotoPath))
                         HttpContext.Session.SetString("ProfilePhoto", staff.PhotoPath);
 
+                    var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, staff.Id),
+                    new Claim(ClaimTypes.Role, "Staff"),
+                    new Claim(ClaimTypes.Email, staff.Email)
+                };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+
                     return RedirectToAction("Index", "Table"); // Redirect to Table page
                 }
             }
@@ -121,6 +151,7 @@ namespace WSM.Controllers
 
 
         // Admin page
+        [Authorize(Roles = "Admin")]
         public IActionResult Admin()
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
@@ -129,6 +160,7 @@ namespace WSM.Controllers
         }
 
         // Staff page
+        [Authorize(Roles = "Staff")]
         public IActionResult Staff()
         {
             if (HttpContext.Session.GetString("Role") != "Staff")

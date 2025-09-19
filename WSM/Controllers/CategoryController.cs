@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using WSM.Models;
 using X.PagedList;
 using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly DB _db;
@@ -16,6 +18,7 @@ namespace WSM.Controllers
             _db = db;
         }
 
+        [Authorize]
         public IActionResult Categories(
      string searchString,
      string sort = null,

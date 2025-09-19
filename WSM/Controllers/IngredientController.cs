@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WMS;
@@ -8,6 +9,7 @@ using X.PagedList.Extensions;
 namespace WSM.Controllers;
 #nullable disable warnings
 
+[Authorize]
 public class IngredientController : Controller
 {
     private readonly DB db;
@@ -17,6 +19,7 @@ public class IngredientController : Controller
         this.db = db;
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult ReadIngredient(string? id, string? sort, string? dir, int page = 1)
 
     {   //RESTRICT staff for login this page
@@ -89,6 +92,7 @@ public class IngredientController : Controller
         return View(m);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult CreateIngredient()
     {
         var model = new List<IngredientVM>
@@ -98,8 +102,10 @@ public class IngredientController : Controller
         return View(model);
     }
 
+   
     //POST
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult CreateIngredient(List<IngredientVM> vm)
     {
         if (ModelState.IsValid)
@@ -145,6 +151,7 @@ public class IngredientController : Controller
         return View(vm);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public IActionResult Delete(int? id)
     {
@@ -159,6 +166,8 @@ public class IngredientController : Controller
         }
         return RedirectToAction("ReadIngredient");
     }
+
+    [Authorize(Roles = "Admin")]
 
     [HttpPost]
     public IActionResult DeleteMany(int[] ids)
@@ -185,7 +194,7 @@ public class IngredientController : Controller
         return RedirectToAction(nameof(ReadIngredient));
     }
 
-
+    [Authorize(Roles = "Admin")]
     public IActionResult UpdateIngredient(int? id)
     {
         var ingredient = db.Ingredients.Find(id);
@@ -207,6 +216,7 @@ public class IngredientController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult UpdateIngredient(IngredientVM vm, string CombinedInput)
     {
         if (!ModelState.IsValid)

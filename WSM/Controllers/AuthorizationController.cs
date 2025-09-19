@@ -151,7 +151,7 @@ public class AuthorizationController : Controller
             Email = Email,
             PasswordHash = hashedPassword,
             LogoPath = null,
-            Phone = " " ,
+            Phone = "" ,
             Street = " ",
             City = "",
             State = "",

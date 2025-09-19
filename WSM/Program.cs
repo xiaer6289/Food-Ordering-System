@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +10,23 @@ using WSM.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var authProperties = new AuthenticationProperties
+{
+    IsPersistent = true,
+    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2),
+    AllowRefresh = true // allow sliding
+};
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.SlidingExpiration = true; // refresh expiry on activity
+        options.LoginPath = "/Home/Both";   // redirect if not logged in
+        options.AccessDeniedPath = "/Home/NoPermission"; // redirect if unauthorized
+    });
+
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -58,7 +76,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

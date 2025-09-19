@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
 using WSM.Helpers;
 using WSM.Models;
 using WSM.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace WSM.Controllers
 {
+    [Authorize]
     public class PaymentController : Controller
     {
         private readonly StripeSettings _stripeSettings;
