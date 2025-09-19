@@ -4,6 +4,8 @@
     ViewBag.Title = "Food Listing";
     var categories = ViewBag.Categories as List<WSM.Models.Category>;
     var selectedCategory = ViewBag.SelectedCategory as string ?? "All";
+    decimal? minPrice = ViewBag.MinPrice;
+    decimal? maxPrice = ViewBag.MaxPrice;
 }
 
 @section head {
@@ -13,14 +15,14 @@
 
 <h2 class="mb-4">Food Menu</h2>
 
-<!-- Category Filter + Go to Cart button -->
-<div class="mb-3 d-flex justify-content-between align-items-center">
-    <div>
-        <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All" })"
+<!-- Filters + Cart Button -->
+<div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All", SeatNo = ViewBag.SeatNo })"
            class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
         @foreach (var cat in categories)
         {
-            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id })"
+            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id, SeatNo = ViewBag.SeatNo })"
                class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
         }
     </div>
@@ -34,27 +36,59 @@
     </div>
 </div>
 
+<!-- Price Range Filter -->
+<form method="get" class="mb-4 p-3 border rounded bg-light">
+    <input type="hidden" name="categoryId" value="@selectedCategory" />
+    <input type="hidden" name="SeatNo" value="@ViewBag.SeatNo" />
+    <input type="hidden" name="search" value="@ViewBag.SearchTerm" />
+
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="minPrice" class="form-label">Min Price</label>
+            <input type="number" step="1" name="minPrice" id="minPrice" class="form-control" value="@(minPrice ?? 0)" />
+        </div>
+        <div class="col-md-4">
+            <label for="maxPrice" class="form-label">Max Price</label>
+            <input type="number" step="1" name="maxPrice" id="maxPrice" class="form-control" value="@(maxPrice ?? 0)" />
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = selectedCategory, SeatNo = ViewBag.SeatNo })" class="btn btn-secondary">Reset</a>
+        </div>
+    </div>
+</form>
 
 <!-- Food Grid -->
 <div class="container">
     <div class="row">
-        @foreach (var food in Model)
+        @if (!Model.Any())
         {
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 shadow-sm food-card">
-                    <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
-                         class="card-img-top"
-                         alt="@food.Name"
-                         style="height:150px; object-fit:contain;" />
-                    <div class="card-body">
-                        <h5 class="card-title">@food.Name</h5>
-                        <p class="fw-bold">RM @food.Price</p>
-
-                        <a asp-controller="Menu" asp-action="FoodDetail" asp-route-id="@food.Id" asp-route-SeatNo="@ViewBag.SeatNo"
-                            class="btn btn-sm btn-primary">View Detail</a>
-                    </div>
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    No food items match the selected filters.
                 </div>
             </div>
+        }
+        else
+        {
+            @foreach (var food in Model)
+            {
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm food-card">
+                        <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
+                             class="card-img-top"
+                             alt="@food.Name"
+                             style="height:150px; object-fit:contain;" />
+                        <div class="card-body">
+                            <h5 class="card-title">@food.Name</h5>
+                            <p class="fw-bold">RM @food.Price</p>
+
+                            <a asp-controller="Menu" asp-action="FoodDetail" asp-route-id="@food.Id" asp-route-SeatNo="@ViewBag.SeatNo"
+                               class="btn btn-sm btn-primary">View Detail</a>
+                        </div>
+                    </div>
+                </div>
+            }
         }
     </div>
 </div>

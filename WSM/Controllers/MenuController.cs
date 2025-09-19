@@ -16,32 +16,52 @@ namespace WMS.Controllers
         }
 
         // GET: /Menu/FoodListing
-        public IActionResult FoodListing(string? search = null, string categoryId = "All", string SeatNo = null)
-        {
-            ViewBag.SearchContext = "Food";
-            ViewBag.SearchPlaceholder = "Search by Food Name";
+       public IActionResult FoodListing(
+    string? search = null, 
+    string categoryId = "All", 
+    string SeatNo = null, 
+    decimal? minPrice = null, 
+    decimal? maxPrice = null)
+{
+    ViewBag.SearchContext = "Food";
+    ViewBag.SearchPlaceholder = "Search by Food Name";
 
-            search = search?.Trim() ?? "";
-            ViewBag.SearchTerm = search;
-            ViewBag.SeatNo = SeatNo;
+    search = search?.Trim() ?? "";
+    ViewBag.SearchTerm = search;
+    ViewBag.SeatNo = SeatNo;
+    ViewBag.MinPrice = minPrice;
+    ViewBag.MaxPrice = maxPrice;
 
-            IQueryable<Food> foods = _db.Foods;
+    IQueryable<Food> foods = _db.Foods;
 
-            if (!string.IsNullOrEmpty(categoryId) && categoryId != "All")
-            {
-                foods = foods.Where(f => f.CategoryId == categoryId);
-            }
+    // Filter by category
+    if (!string.IsNullOrEmpty(categoryId) && categoryId != "All")
+    {
+        foods = foods.Where(f => f.CategoryId == categoryId);
+    }
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                foods = foods.Where(f => f.Name.Contains(search));
-            }
+    // Filter by search term
+    if (!string.IsNullOrEmpty(search))
+    {
+        foods = foods.Where(f => f.Name.Contains(search));
+    }
 
-            ViewBag.Categories = _db.Categories.ToList();
-            ViewBag.SelectedCategory = categoryId;
+    // Filter by price range
+    if (minPrice.HasValue)
+    {
+        foods = foods.Where(f => f.Price >= minPrice.Value);
+    }
+    if (maxPrice.HasValue)
+    {
+        foods = foods.Where(f => f.Price <= maxPrice.Value);
+    }
 
-            return View(foods.ToList());
-        }
+    ViewBag.Categories = _db.Categories.ToList();
+    ViewBag.SelectedCategory = categoryId;
+
+    return View(foods.ToList());
+}
+
 
         public IActionResult FoodDetail(int id, string seatNo)
         {
