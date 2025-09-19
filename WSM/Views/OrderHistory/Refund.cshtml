@@ -11,31 +11,31 @@
     <div style="text-align:center;" class="read-details-header">
         <div class="page-logo">
             <img src="@Url.Content(
-                          string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
-                          ? "~/images/default-logo.png"
-                          : Context.Session.GetString("CompanyLogo")
-                )" alt="Company Logo" class="page-logo"/>
+                                           string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                                           ? "~/images/default-logo.png"
+                                           : Context.Session.GetString("CompanyLogo")
+                                 )" alt="Company Logo" class="page-logo" />
         </div>
-            <h1><strong>@Model.company.CompanyName</strong></h1>
-            <h4>@Model.company.Street, @Model.company.Postcode</h4>
-            <h4>@Model.company.City, @Model.company.State</h4>
+        <h1><strong>@Model.company.CompanyName</strong></h1>
+        <h4>@Model.company.Street, @Model.company.Postcode</h4>
+        <h4>@Model.company.City, @Model.company.State</h4>
 
-            <div class="order-info">
+        <div class="order-info">
             <span>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
             <br>
             <span>Order ID: @Model.orderDetail.Id</span>
         </div>
         <div class="additional-info">
-        <span>Table No: @Model.orderDetail.SeatNo</span>
-        <br>
-        <span>Status: @Model.orderDetail.Status</span>
-        <br>
+            <span>Table No: @Model.orderDetail.SeatNo</span>
+            <br>
+            <span>Status: @Model.orderDetail.Status</span>
+            <br>
         </div>
     </div>
 
     <form method="post" action="/OrderHistory/Refund" id="refundForm">
         <input type="hidden" name="orderId" value="@Model.orderDetail.Id" />
-        
+
         <table class="detail-table">
             <tr style="border-top:2px solid black;">
                 <th><h3></h3></th>
@@ -80,7 +80,7 @@
                     <strong>Subtotal:</strong>
                 </td>
                 <td>
-                    RM @Model.orderDetail.TotalPrice.ToString("F2")
+                    @Model.orderDetail.TotalPrice.ToString("F2")
                 </td>
             </tr>
             <tr>
@@ -88,7 +88,7 @@
                     <strong>Service charge (10%):</strong>
                 </td>
                 <td>
-                    RM @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
+                    @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
                 </td>
             </tr>
             <tr>
@@ -96,7 +96,7 @@
                     <strong>Tax (6%):</strong>
                 </td>
                 <td>
-                    RM @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
+                    @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
                 </td>
             </tr>
             <tr>
@@ -104,7 +104,7 @@
                     <strong>Original Total:</strong>
                 </td>
                 <td>
-                    <strong>RM @((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
+                    <strong>@((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
                 </td>
             </tr>
         </table>
