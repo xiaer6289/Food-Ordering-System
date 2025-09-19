@@ -34,7 +34,6 @@
 </div>
 
 
-
 <!-- Price Range Filter -->
 <form method="get" class="mb-4 p-3 border rounded bg-light">
     <input type="hidden" name="categoryId" value="@selectedCategory" />
@@ -58,10 +57,6 @@
 </form>
 
 
-<p class="pagination-count">
-    @Model.Count() of @Model.TotalItemCount Categories |
-    Page @Model.PageNumber of @Model.PageCount
-</p>
 
  <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All", SeatNo = ViewBag.SeatNo })"
            class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
@@ -70,6 +65,12 @@
             <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id, SeatNo = ViewBag.SeatNo })"
                class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
         }
+
+        
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount Food |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
 
 @if (ViewBag.TopSellingFoods != null && ((IEnumerable<dynamic>)ViewBag.TopSellingFoods).Any())
 {
@@ -111,28 +112,35 @@
         else
         {
             @foreach (var food in Model)
-            {
-                <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm food-card">
-                        <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
-                             class="card-img-top"
-                             alt="@food.Name"
-                             style="height:150px; object-fit:contain;" />
-                        <div class="card-body">
-                            <h5 class="card-title">@food.Name</h5>
-                            <p class="fw-bold">RM @food.Price</p>
-                            <a asp-controller="Menu" asp-action="FoodDetail" asp-route-id="@food.Id" asp-route-SeatNo="@ViewBag.SeatNo"
-                               class="btn btn-sm btn-primary">View Detail</a>
-                        </div>
-                    </div>
-                </div>
-            }
+{
+    <div class="col-md-4 col-sm-6 mb-4">
+        <div class="card h-100 shadow-sm food-card">
+            <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
+                 class="card-img-top"
+                 alt="@food.Name"
+                 style="height:150px; object-fit:contain;" />
+            
+            <div class="card-body text-center"> <!-- Added text-center here -->
+                <h5 class="card-title">@food.Name</h5>
+                <p class="fw-bold">RM @food.Price</p>
+                
+                <a asp-controller="Menu"
+                   asp-action="FoodDetail"
+                   asp-route-id="@food.Id"
+                   asp-route-SeatNo="@ViewBag.SeatNo"
+                   class="btn btn-sm btn-primary">
+                    View Detail
+                </a>
+            </div>
+        </div>
+    </div>
+}
         }
     </div>
 </div>
 
 <!-- Pagination -->
-<div class="pagination-wrapper text-center mt-4">
+<div class="pagination-wrapper">
     @{
         var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
         options.LinkToFirstPageFormat = "First";

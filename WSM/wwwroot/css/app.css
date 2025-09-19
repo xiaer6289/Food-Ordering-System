@@ -1054,8 +1054,8 @@ select.select-status option {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 30px;
-    max-width: 1200px;
+    gap: 20px;
+    max-width: 60px;
     margin: 40px auto;
     padding: 20px;
 }
@@ -1083,7 +1083,7 @@ select.select-status option {
     flex: 1;
     width: 50%;
     background: #fff;
-    border-radius: 16px;
+    border-radius: 52px;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
     padding: 30px;
     display: flex;
