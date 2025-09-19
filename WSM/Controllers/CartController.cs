@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WSM.Models;
 using WSM.Helpers;
+using WSM.Models;
 
 namespace WSM.Controllers;
 
+[Authorize]
 public class CartController : Controller
 {
     private readonly Helper _helper;

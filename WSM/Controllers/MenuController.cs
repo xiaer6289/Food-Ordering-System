@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WSM.Helpers;
 using WSM.Models;
 
 namespace WMS.Controllers
 {
+    [Authorize]
     public class MenuController : Controller
     {
         private readonly DB _db;

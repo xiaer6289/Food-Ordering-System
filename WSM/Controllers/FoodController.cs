@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using WSM.Helpers;
 using WSM.Models;
 using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
+    [Authorize]
     public class FoodController : Controller
     {
         private readonly DB db;
@@ -18,6 +20,8 @@ namespace WSM.Controllers
             this.hp = hp;
         }
         // GET: /Food/Foods
+
+        
         public IActionResult Foods(string? id, string? sort, string? dir, int page = 1)
         {
 

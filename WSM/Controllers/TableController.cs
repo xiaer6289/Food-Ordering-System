@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WSM.Models;
 
 namespace WSM.Controllers;
 
+[Authorize]
 public class TableController : Controller
 {
     private readonly DB _context;
@@ -19,6 +21,7 @@ public class TableController : Controller
         return View("Table", seats);
     }
 
+    [Authorize]
     public IActionResult Create()
     {
         // Find the smallest available SeatNo starting from 1
@@ -42,6 +45,7 @@ public class TableController : Controller
         return RedirectToAction("Index");
     }
 
+    [Authorize]
     public IActionResult Delete()
     {
         var maxSeat = _context.Seats.OrderByDescending(s => s.SeatNo).FirstOrDefault();

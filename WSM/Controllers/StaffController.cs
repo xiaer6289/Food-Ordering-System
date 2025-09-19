@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using EllipticCurve.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using X.PagedList.Extensions;
 
 namespace WSM.Controllers
 {
+    [Authorize]
     public class StaffController : Controller
     {
         private readonly DB db;
@@ -19,7 +21,7 @@ namespace WSM.Controllers
             db = context;
 
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult ReadStaff(string? id, string? sort, string? dir, int page = 1)
         {
             // For Layout.cshtml search bar
@@ -82,6 +84,7 @@ namespace WSM.Controllers
 
 
         //GET: Create Staff
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateStaff() => View();
 
         [HttpPost]
@@ -137,6 +140,7 @@ namespace WSM.Controllers
 
 
         // GET: Edit Staff
+        [Authorize(Roles = "Admin")]
         public IActionResult EditStaff(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -169,7 +173,7 @@ namespace WSM.Controllers
                 var staff = db.Staff.FirstOrDefault(s => s.Id == model.Id && s.CompanyId == companyId);
                 if (staff == null) return NotFound();
 
-                // ✅ Only allow editing Salary
+                
                 staff.Salary = model.Salary;
 
                 db.SaveChanges();
@@ -183,6 +187,7 @@ namespace WSM.Controllers
 
 
         // GET: Delete Staff
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteStaff(string id)
         {
             var companyId = HttpContext.Session.GetString("CompanyId");
@@ -218,6 +223,7 @@ namespace WSM.Controllers
         }
 
         // GET: Staff UpdateProfile
+        [Authorize(Roles = "Staff")]
         public IActionResult UpdateProfile()
         {
             var staffId = HttpContext.Session.GetString("StaffAdminId"); // 
@@ -241,6 +247,7 @@ namespace WSM.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> UpdateProfile(StaffUpdateProfileViewModel model, IFormFile? Photo)
         {
             var staffId = HttpContext.Session.GetString("StaffAdminId");
