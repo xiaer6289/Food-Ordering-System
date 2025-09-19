@@ -33,7 +33,6 @@ namespace WSM.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            // Sorting - only apply if "sort" is not null or empty
             if (!string.IsNullOrEmpty(sort))
             {
                 query = sort switch
@@ -59,7 +58,7 @@ namespace WSM.Controllers
         }
         public IActionResult CreateCategory()
         {
-            return View("CreateCategory");
+            return View("CreateCategory", new CategoryVM());
         }
 
         [HttpPost]
@@ -67,6 +66,16 @@ namespace WSM.Controllers
         {
             if (ModelState.IsValid)
             {
+                model.Id = model.Id?.ToUpper();
+
+                bool idExists = _db.Categories.Any(c => c.Id == model.Id);
+
+                if (idExists)
+                {
+                    ModelState.AddModelError("Id", "This Category ID already exists. Please use a different ID.");
+                    return View("CreateCategory", model);
+                }
+
                 var entity = new Category
                 {
                     Id = model.Id,
@@ -78,6 +87,7 @@ namespace WSM.Controllers
 
                 return RedirectToAction("Categories");
             }
+
             return View("CreateCategory", model);
         }
         public IActionResult EditCategory(string id)

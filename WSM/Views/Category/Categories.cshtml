@@ -13,49 +13,57 @@
     @Html.Hidden("dir")
 </form>
 
-@if (!Model.Any())
-{
-    <p>No categories found.</p>
-}
-else
-{
-    <p class="pagination-count">
-        @Model.Count() of @Model.TotalItemCount Categories |
-        Page @Model.PageNumber of @Model.PageCount
-    </p>
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount Categories |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
 
-    <form method="post" asp-action="DeleteMany" asp-controller="Category" id="deleteForm">
-        @Html.AntiForgeryToken()
+<form method="post" asp-action="DeleteMany" asp-controller="Category" id="deleteForm">
+    @Html.AntiForgeryToken()
 
-        <div style="display: flex; align-items: flex-start; gap: 20px;">
-            <table class="record-table">
-                <thead>
+    <div style="margin-bottom: 10px;">
+        <button type="button" class="btn btn-primary check-all-btn">Check All</button>
+        <button type="button" class="btn btn-secondary uncheck-all-btn">Uncheck All</button>
+    </div>
+
+    <div style="display: flex; align-items: flex-start; gap: 20px;">
+
+        <table class="record-table">
+            <thead>
+                <tr>
+                    <th></th>
+
+                    @* Sort by Id *@
+                    @{
+                        string idDirection = (ViewBag.Sort == "Id" && ViewBag.Dir == "asc") ? "des" : "asc";
+                        string idClass = (ViewBag.Sort == "Id") ? ViewBag.Dir : "";
+                    }
+                    <th>
+                        <a href="?searchString=@ViewBag.Search&sort=Id&dir=@idDirection" class="@idClass">Id</a>
+                    </th>
+
+                    @* Sort by Name *@
+                    @{
+                        string nameDirection = (ViewBag.Sort == "Name" && ViewBag.Dir == "asc") ? "des" : "asc";
+                        string nameClass = (ViewBag.Sort == "Name") ? ViewBag.Dir : "";
+                    }
+                    <th>
+                        <a href="?searchString=@ViewBag.Search&sort=Name&dir=@nameDirection" class="@nameClass">Name</a>
+                    </th>
+
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
                     <tr>
-                        <th></th>
-
-                        @* Sort by Id *@
-                        @{
-                            string idDirection = (ViewBag.Sort == "Id" && ViewBag.Dir == "asc") ? "des" : "asc";
-                            string idClass = (ViewBag.Sort == "Id") ? ViewBag.Dir : "";
-                        }
-                        <th>
-                            <a href="?searchString=@ViewBag.Search&sort=Id&dir=@idDirection" class="@idClass">Id</a>
-                        </th>
-
-                        @* Sort by Name *@
-                        @{
-                            string nameDirection = (ViewBag.Sort == "Name" && ViewBag.Dir == "asc") ? "des" : "asc";
-                            string nameClass = (ViewBag.Sort == "Name") ? ViewBag.Dir : "";
-                        }
-                        <th>
-                            <a href="?searchString=@ViewBag.Search&sort=Name&dir=@nameDirection" class="@nameClass">Name</a>
-                        </th>
-
-                        <th>Actions</th>
+                        <td colspan="4" class="text-center">No categories found.</td>
                     </tr>
-                </thead>
-
-                <tbody>
+                }
+                else
+                {
                     @foreach (var category in Model)
                     {
                         <tr data-checkable data-id="@category.Id">
@@ -80,33 +88,55 @@ else
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
 
-            <div class="restock-button">
-                <a asp-controller="Category" asp-action="CreateCategory" class="create-ingredient">Add New Category</a>
-                <button type="submit" class="remove-check-ingredient btn btn-danger"
-                        onclick="return confirm('Are you sure you want to delete the selected categories?');">
-                    Delete Selected
-                </button>
-            </div>
+        <div class="restock-button">
+            <a asp-controller="Category" asp-action="CreateCategory" class="create-ingredient">Add New Category</a>
+            <button type="submit" class="remove-check-ingredient btn btn-danger"
+                    onclick="return confirm('Are you sure you want to delete the selected categories?');">
+                Delete Selected
+            </button>
         </div>
-    </form>
+    </div>
+</form>
 
-    <!-- Pagination -->
-    <div class="pagination-wrapper">
-        @{
-            var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
-            options.LinkToFirstPageFormat = "First";
-            options.LinkToLastPageFormat = "Last";
-            options.LinkToPreviousPageFormat = "Previous";
-            options.LinkToNextPageFormat = "Next";
-        }
+<div class="pagination-wrapper">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+    }
 
-        @Html.PagedListPager(
-        Model,
-        page => $"?searchString={ViewBag.Search}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
-        options
+    @Html.PagedListPager(
+    Model,
+    page => $"?searchString={ViewBag.Search}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
         )
 </div>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+
+        $('.check-all-btn').click(function () {
+            $('.category-checkbox').prop('checked', true);
+        });
+
+        $('.uncheck-all-btn').click(function () {
+            $('.category-checkbox').prop('checked', false);
+        });
+
+        $('.category-checkbox').change(function () {
+            if ($(this).is(':checked')) {
+                $(this).closest('tr').addClass('table-active');
+            } else {
+                $(this).closest('tr').removeClass('table-active');
+            }
+        });
+    });
+</script>
 }

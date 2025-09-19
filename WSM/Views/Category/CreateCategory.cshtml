@@ -1,17 +1,15 @@
-﻿@model WSM.Models.Category
+﻿@model WSM.Models.CategoryVM
 
 <div class="edit-ingredient-form">
     <h2 class="edit-ingredient-title">Add Category</h2>
 
     <form asp-action="CreateCategory" method="post" class="edit-ingredient-wrapper">
-        <!-- Category ID -->
         <div>
             <label asp-for="Id"></label>
-            <input asp-for="Id" type="text" class="form-control" placeholder="BV,AP,MD" />
+            <input asp-for="Id" type="text" class="form-control" placeholder="BV,AP,MD" id="CategoryIdInput" />
             <span asp-validation-for="Id" class="text-danger"></span>
         </div>
 
-        <!-- Category Name -->
         <div>
             <label asp-for="Name"></label>
             <input asp-for="Name" type="text" class="form-control" placeholder="Beverages,Appetizers,Main Dish" />
@@ -24,3 +22,13 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#CategoryIdInput').on('input', function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+}

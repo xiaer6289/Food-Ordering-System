@@ -4,12 +4,10 @@
     <h2 class="edit-ingredient-title">Edit Category</h2>
 
     <form asp-action="EditCategory" method="post" class="edit-ingredient-wrapper">
-        <!-- hidden field ensures Id is submitted -->
         <input type="hidden" asp-for="Id" />
 
         <div>
             <label>ID</label>
-            <!-- just display Id, no binding -->
             <input value="@Model.Id" class="form-control" readonly />
         </div>
 
