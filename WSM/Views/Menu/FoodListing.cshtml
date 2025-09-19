@@ -1,4 +1,7 @@
-﻿@model X.PagedList.IPagedList<WSM.Models.Food>
+﻿@model IPagedList<WSM.Models.Food>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+
 
 @{
     ViewBag.Title = "Food Listing";
@@ -18,13 +21,7 @@
 <!-- Filters + Cart Button -->
 <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div class="d-flex flex-wrap gap-2">
-        <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All", SeatNo = ViewBag.SeatNo })"
-           class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
-        @foreach (var cat in categories)
-        {
-            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id, SeatNo = ViewBag.SeatNo })"
-               class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
-        }
+       
     </div>
 
     <!-- Go to Cart button -->
@@ -35,6 +32,7 @@
         </a>
     </div>
 </div>
+
 
 <!-- Price Range Filter -->
 <form method="get" class="mb-4 p-3 border rounded bg-light">
@@ -58,6 +56,44 @@
     </div>
 </form>
 
+
+
+ <a href="@Url.Action("FoodListing", "Menu", new { categoryId = "All", SeatNo = ViewBag.SeatNo })"
+           class="btn @(selectedCategory == "All" ? "btn-primary" : "btn-outline-primary")">All</a>
+        @foreach (var cat in categories)
+        {
+            <a href="@Url.Action("FoodListing", "Menu", new { categoryId = cat.Id, SeatNo = ViewBag.SeatNo })"
+               class="btn @(selectedCategory == cat.Id ? "btn-primary" : "btn-outline-primary")">@cat.Name</a>
+        }
+
+        
+<p class="pagination-count">
+    @Model.Count() of @Model.TotalItemCount Food |
+    Page @Model.PageNumber of @Model.PageCount
+</p>
+
+@if (ViewBag.TopSellingFoods != null && ((IEnumerable<dynamic>)ViewBag.TopSellingFoods).Any())
+{
+    <h3 class="mt-4 mb-3 text-warning">Top 3 Best Sellers</h3>
+    <div class="row mb-4">
+        @foreach (var item in ViewBag.TopSellingFoods)
+        {
+            <div class="col-md-4 col-sm-5 mb-3">
+                <div class="card h-100 shadow-sm" style="border: 3px solid gold; background-color: #fff8dc;">
+                    <img src="@(!string.IsNullOrEmpty(item.Photo) ? Url.Content("~/uploads/" + item.Photo) : Url.Content("~/images/default.png"))"
+                         class="card-img-top"
+                         alt="@item.Name"
+                         style="height:120px; object-fit:contain;" />
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="text-muted">Sold: @item.TotalSold</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
 <!-- Food Grid -->
 <div class="container">
     <div class="row">
@@ -72,23 +108,53 @@
         else
         {
             @foreach (var food in Model)
-            {
-                <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm food-card">
-                        <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
-                             class="card-img-top"
-                             alt="@food.Name"
-                             style="height:150px; object-fit:contain;" />
-                        <div class="card-body">
-                            <h5 class="card-title">@food.Name</h5>
-                            <p class="fw-bold">RM @food.Price</p>
-
-                            <a asp-controller="Menu" asp-action="FoodDetail" asp-route-id="@food.Id" asp-route-SeatNo="@ViewBag.SeatNo"
-                               class="btn btn-sm btn-primary">View Detail</a>
-                        </div>
-                    </div>
-                </div>
-            }
+{
+    <div class="col-md-4 col-sm-6 mb-4">
+        <div class="card h-100 shadow-sm food-card">
+            <img src="@(!string.IsNullOrEmpty(food.Photo) ? Url.Content("~/uploads/" + food.Photo) : Url.Content("~/images/default.png"))"
+                 class="card-img-top"
+                 alt="@food.Name"
+                 style="height:150px; object-fit:contain;" />
+            
+            <div class="card-body text-center"> <!-- Added text-center here -->
+                <h5 class="card-title">@food.Name</h5>
+                <p class="fw-bold">RM @food.Price</p>
+                
+                <a asp-controller="Menu"
+                   asp-action="FoodDetail"
+                   asp-route-id="@food.Id"
+                   asp-route-SeatNo="@ViewBag.SeatNo"
+                   class="btn btn-sm btn-primary">
+                    View Detail
+                </a>
+            </div>
+        </div>
+    </div>
+}
         }
     </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-wrapper">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+    }
+
+    @Html.PagedListPager(
+        Model,
+        page => Url.Action("FoodListing", new {
+            search = ViewBag.SearchTerm,
+            categoryId = ViewBag.SelectedCategory,
+            SeatNo = ViewBag.SeatNo,
+            minPrice = ViewBag.MinPrice,
+            maxPrice = ViewBag.MaxPrice,
+            page
+        }),
+        options
+    )
 </div>

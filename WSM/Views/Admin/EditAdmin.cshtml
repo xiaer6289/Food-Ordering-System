@@ -1,62 +1,61 @@
 ﻿@model WSM.Models.EditAdminViewModel
+
 @{
     ViewData["Title"] = "Edit Admin";
-    Layout = "_LayoutIngredient";
-
+    Layout = null;
 }
-<div class="edit-ingredient-form">
-    <h2 class="edit-ingredient-title">Edit Admin</h2>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success text-center">
-            @TempData["SuccessMessage"]
-        </div>
-    }
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul>
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <li>@error.ErrorMessage</li>
-                }
-            </ul>
-        </div>
-    }
+<form asp-controller="Admin" asp-action="EditAdmin" method="post" class="edit-ingredient-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <form asp-action="EditAdmin" method="post" class="edit-ingredient-wrapper">
-        @Html.AntiForgeryToken()
-        <input asp-for="Id" type="hidden" />
+    <div class="edit-ingredient-wrapper">
+        <h2 class="edit-ingredient-title">Edit Admin</h2>
 
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Admin ID (read-only) -->
         <div>
-            <label asp-for="Id">Admin ID</label>
+            <label asp-for="Id">Admin ID:</label>
             <input asp-for="Id" class="edit-ingredient-quantity" readonly />
         </div>
 
+        <!-- Admin Name -->
         <div>
-            <label asp-for="Name">Name</label>
-            <input asp-for="Name" placeholder="Enter admin name" class="edit-ingredient-quantity" />
+            <label asp-for="Name">Name:</label>
+            <input asp-for="Name" class="edit-ingredient-name" placeholder="Enter admin name" required />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
+        <!-- Admin Email -->
         <div>
-            <label asp-for="Email">Email</label>
-            <input asp-for="Email" type="email" placeholder="e.g., admin@example.com" maxlength="100" class="edit-ingredient-quantity" required />
+            <label asp-for="Email">Email:</label>
+            <input asp-for="Email" type="email" class="edit-ingredient-quantity"
+                   placeholder="e.g., admin@example.com" maxlength="100" required />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
+        <!-- Admin Phone -->
         <div>
-            <label asp-for="PhoneNo">Phone Number</label>
-            <input asp-for="PhoneNo" placeholder="e.g., 0123456789" pattern="^01[0-9]{8,13}$" class="edit-ingredient-quantity" required />
+            <label asp-for="PhoneNo">Phone Number:</label>
+            <input asp-for="PhoneNo" class="edit-ingredient-quantity"
+                   placeholder="e.g., 0123456789"
+                   pattern="^01[0-9]{8,13}$"
+                   required />
             <span asp-validation-for="PhoneNo" class="text-danger"></span>
         </div>
 
+        <!-- Action Buttons -->
         <div class="edit-button-group">
-            <button type="submit" class="edit-submit-btn">Save Changes</button>
-            <a asp-action="Admins" class="cancel-btn">Cancel</a>
+            <button type="submit" class="ingredient-edit-submit-btn">Update</button>
+            <button type="button" class="ingredient-edit-cancel-btn" onclick="window.location.href='/Admin/Admins'">Cancel</button>
         </div>
-    </form>
-</div>
-
+    </div>
+</form>

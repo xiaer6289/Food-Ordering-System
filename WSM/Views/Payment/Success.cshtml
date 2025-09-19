@@ -13,10 +13,10 @@
     <div style="text-align:center;" class="success-header">
         <div class="page-logo">
             <img src="@Url.Content(
-                                                                         string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
-                                                                         ? "~/images/default-logo.png"
-                                                                         : Context.Session.GetString("CompanyLogo")
-                                                               )" alt="Company Logo" class="page-logo" />
+                                                                                          string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                                                                                          ? "~/images/default-logo.png"
+                                                                                          : Context.Session.GetString("CompanyLogo")
+                                                                                )" alt="Company Logo" class="page-logo" />
         </div>
         <h1><strong>@Model.company.CompanyName</strong></h1>
         <h4>@Model.company.Street, @Model.company.Postcode</h4>
@@ -92,6 +92,6 @@
 
 <p>
     <div class="success-return">
-        <a asp-controller="Table" asp-action="Index" class="return-orderhistory">Back to Menu</a>
+        <a asp-controller="Table" asp-action="Index" class="return-orderhistory">Back to Home Page</a>
     </div>
 </p>
