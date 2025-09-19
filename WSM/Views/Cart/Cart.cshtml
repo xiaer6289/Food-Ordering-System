@@ -117,11 +117,12 @@
     }
     else
     {
-        <div class="empty-cart" style="text-align:center; margin-top:20px;">
-            <p>Your cart and previous orders are empty.</p>
-            <a asp-controller="Menu" asp-action="FoodListing" asp-route-seatNo="@ViewBag.SeatNo" class="btn btn-link">
-                Go back to order food
-            </a>
+        <div class="empty-cart">
+            <h2>🛒 Your Cart is Empty</h2>
+            <p>It looks like you haven't added any items yet.</p>
+            <a asp-controller="Menu" asp-action="FoodListing" asp-route-seatNo="@ViewBag.SeatNo" class="btn-link">Go back to food menu</a>
         </div>
+
+
     }
 </div>

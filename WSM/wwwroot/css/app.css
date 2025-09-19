@@ -1056,8 +1056,8 @@ select.select-status {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 20px;
-    max-width: 60px;
+    gap: 30px;
+    max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
 }
@@ -1085,7 +1085,7 @@ select.select-status {
     flex: 1;
     width: 50%;
     background: #fff;
-    border-radius: 52px;
+    border-radius: 16px;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
     padding: 30px;
     display: flex;
@@ -1171,7 +1171,7 @@ select.select-status {
 
 /* Order Sent Confirmation start */
 .order-sent-box {
-    border: 2px solid #ccc;
+    border: 2px solid;
     padding: 30px;
     width: 700px;
     margin: 100px auto;
@@ -1197,7 +1197,6 @@ select.select-status {
     border-top: 1px dashed #aaa;
     border-bottom: 1px dashed #aaa;
     font-size: 16px;
-    color: #444;
 }
 
 .back-btn {
@@ -1205,19 +1204,47 @@ select.select-status {
     padding: 10px 20px;
     margin-top: 20px;
     text-decoration: none;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
     border-radius: 6px;
-    color: #333;
+    color: #fff;
     font-size: 16px;
     transition: background-color 0.2s ease;
 }
 
-    .back-btn:hover {
-        background-color: #e0e0e0;
+/* Order Sent Confirmation end */
+
+/* Empty Cart / Cart start */
+.empty-cart {
+    border: 2px solid;
+    padding: 30px;
+    width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 18px;
+}
+
+    .empty-cart p {
+        margin: 15px 0;
+        font-size: 18px;
     }
 
-/* Order Sent Confirmation end */
+    .empty-cart .btn-link {
+        display: inline-block;
+        padding: 10px 25px;
+        margin-top: 20px;
+        text-decoration: none;
+        background-color: #0d6efd;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 16px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        border-color: #0d6efd;
+    }
+/* Empty Cart / Cart end */
 
 /* Success start */
 .success-header {
