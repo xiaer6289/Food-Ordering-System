@@ -69,7 +69,15 @@
         </tr>
         <tr>
             <td colspan="4" style="text-align:right">
-                <strong>Service charge (6%):</strong>
+                <strong>Service charge (10%):</strong>
+            </td>
+            <td>
+                RM @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align:right">
+                <strong>Tax (6%):</strong>
             </td>
             <td>
                 RM @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
@@ -80,7 +88,7 @@
                 <strong>Total:</strong>
             </td>
             <td>
-                <strong>RM @((Model.orderDetail.TotalPrice * 1.06M).ToString("F2"))</strong>
+                <strong>RM @((Model.orderDetail.TotalPrice * 1.06M * 1.1M).ToString("F2"))</strong>
             </td>
         </tr>
     </table>

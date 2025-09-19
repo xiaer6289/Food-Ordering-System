@@ -7,12 +7,13 @@
 }
 <link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
 
-<h2 class="edit-ingredient-title">Update Ingredient</h2>
 
 <form asp-controller="Ingredient"  asp-action="UpdateIngredient" method="post" class="edit-ingredient-form">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="edit-ingredient-wrapper">
+        <h2 class="edit-ingredient-title">Update Ingredient</h2>
+
         <div>
             <label asp-for="Id">Ingredient ID:</label>
             <input asp-for="Id" readonly />
@@ -43,8 +44,8 @@
         <input type="hidden" name="Unit" id="EditUnitValue" value="" />
 
         <div class="edit-button-group">
-            <button type="submit" class="edit-submit-btn">Submit</button>
-            <button type="button" class="edit-cancel-btn" onclick="window.location.href='/Ingredient/ReadIngredient'">Cancel</button>
+            <button type="submit" class="ingredient-edit-submit-btn">Update</button>
+            <button type="button" class="ingredient-edit-cancel-btn" onclick="window.location.href='/Ingredient/ReadIngredient'">Cancel</button>
         </div>
     </div>
 </form>

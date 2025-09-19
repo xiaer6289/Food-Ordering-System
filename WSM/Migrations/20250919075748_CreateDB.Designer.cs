@@ -12,8 +12,8 @@ using WSM.Models;
 namespace WMS.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20250919025151_InitialCretae")]
-    partial class InitialCretae
+    [Migration("20250919075748_CreateDB")]
+    partial class CreateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
