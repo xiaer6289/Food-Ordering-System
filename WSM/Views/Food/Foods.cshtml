@@ -4,16 +4,147 @@
 
 @{
     ViewData["Title"] = "Food Management";
-    string[] fields = ["", "Id", "Image", "Name", "Price", "Description", "Category",""];
 }
 
-<form method="post" action="/Food/DeleteMany" id="deleteForm">
-    <p>
-        <button type="button" class="check-all-btn">Check All</button>
-        <button type="button" class="uncheck-all-btn">Uncheck All</button>
-    </p>
+<h2 class="mb-4">Food Management</h2>
 
-<div id="target">
-    <partial name="_Foods">
-</div>
+<form method="post" action="/Food/DeleteMany" id="deleteForm">
+    @Html.AntiForgeryToken()
+
+    <div style="margin-bottom: 10px;">
+        <button type="button" class="btn btn-primary check-all-btn">Check All</button>
+        <button type="button" class="btn btn-secondary uncheck-all-btn">Uncheck All</button>
+    </div>
+
+    <div style="display: flex; align-items: flex-start; gap: 20px;">
+
+        <table class="record-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        <a href="?name=@ViewBag.Name&sort=Id&dir=@(ViewBag.Sort == "Id" && ViewBag.Dir == "asc" ? "des" : "asc")"
+                           class="@(ViewBag.Sort == "Id" ? ViewBag.Dir : "")">Id</a>
+                    </th>
+                    <th>Image</th>
+                    <th>
+                        <a href="?name=@ViewBag.Name&sort=Name&dir=@(ViewBag.Sort == "Name" && ViewBag.Dir == "asc" ? "des" : "asc")"
+                           class="@(ViewBag.Sort == "Name" ? ViewBag.Dir : "")">Name</a>
+                    </th>
+                    <th>
+                        <a href="?name=@ViewBag.Name&sort=Price&dir=@(ViewBag.Sort == "Price" && ViewBag.Dir == "asc" ? "des" : "asc")"
+                           class="@(ViewBag.Sort == "Price" ? ViewBag.Dir : "")">Price</a>
+                    </th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="ids" value="@s.Id" class="category-checkbox" />
+                        </td>
+                        <td>@s.Id</td>
+                        <td>
+                            <img src="~/uploads/@s.Photo" style="width:80px; height:80px;" alt="Food Image" />
+                        </td>
+                        <td>@s.Name</td>
+                        <td>@s.Price</td>
+                        <td>@s.Description</td>
+                        <td>@s.CategoryId</td>
+                        <td>
+                            <div class="edit-remove-group">
+                                <a asp-controller="Food" asp-action="EditFood" asp-route-id="@s.Id" class="edit-ingredient">Update</a>
+                                <a href="javascript:void(0);" class="remove-ingredient delete-category btn btn-link" data-id="@s.Id">
+                                    Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="restock-button" style="display: flex; flex-direction: column; gap: 10px;">
+            <a asp-controller="Food" asp-action="CreateFood" class="btn btn-success create-ingredient">Add New Food</a>
+            <button type="button" class="btn btn-danger remove-check-ingredient">Delete Selected</button>
+        </div>
+
+    </div>
 </form>
+
+<div class="pagination-wrapper" style="margin-top: 20px;">
+    @{
+        var options = PagedListRenderOptions.ClassicPlusFirstAndLast;
+        options.LinkToFirstPageFormat = "First";
+        options.LinkToLastPageFormat = "Last";
+        options.LinkToPreviousPageFormat = "Previous";
+        options.LinkToNextPageFormat = "Next";
+    }
+
+    @Html.PagedListPager(
+    Model,
+    page => $"?name={ViewBag.Name}&sort={ViewBag.Sort}&dir={ViewBag.Dir}&page={page}",
+    options
+        )
+</div>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+        $('.check-all-btn').click(function () {
+            $('.category-checkbox').prop('checked', true).trigger('change');
+        });
+
+        $('.uncheck-all-btn').click(function () {
+            $('.category-checkbox').prop('checked', false).trigger('change');
+        });
+
+        $(document).on('change', '.category-checkbox', function () {
+            $(this).closest('tr').toggleClass('table-active', $(this).is(':checked'));
+        });
+
+        $(document).on('click', '.delete-category', function (e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            if (!confirm('Are you sure you want to delete this food item?')) return;
+
+            $.ajax({
+                url: '@Url.Action("DeleteConfirmed", "Food")',
+                type: 'POST',
+                data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                    if (response.success) { alert(response.message); location.reload(); }
+                    else { alert(response.message); }
+                },
+                error: function () { alert('An unexpected error occurred while deleting the food item.'); }
+            });
+        });
+
+        $(document).on('click', '.remove-check-ingredient', function (e) {
+            e.preventDefault();
+            var selectedIds = [];
+            $('.category-checkbox:checked').each(function () { selectedIds.push($(this).val()); });
+
+            if (selectedIds.length === 0) { alert('Please select at least one food item to delete.'); return; }
+            if (!confirm('Are you sure you want to delete the selected foods?')) return;
+
+            $.ajax({
+                url: '@Url.Action("DeleteMany", "Food")',
+                type: 'POST',
+                traditional: true,
+                data: { ids: selectedIds, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                    if (response.success) { alert(response.message); location.reload(); }
+                    else { alert(response.message); }
+                },
+                error: function () { alert('An unexpected error occurred while deleting the selected foods.'); }
+            });
+        });
+    });
+</script>
+}
