@@ -40,13 +40,8 @@
                             <td>RM @item.Food.Price</td>
                             <td>RM @(item.Food.Price* item.Quantity.Quantity)</td>
                             <td>
-                                <a asp-controller="Cart"
-                                   asp-action="Remove"
-                                   asp-route-seatNo="@ViewBag.SeatNo"
-                                   asp-route-foodId="@item.Food.Id"
-                                   class="btn btn-danger btn-sm">
-                                    Remove
-                                </a>
+                                <a asp-controller="Cart" asp-action="Remove" asp-route-seatNo="@ViewBag.SeatNo" asp-route-foodId="@item.Food.Id"
+                                   class="btn btn-danger btn-sm" style="text-decoration: none">Remove</a>
                             </td>
                         </tr>
                     }
@@ -112,7 +107,7 @@
                 </form>
             </div>
 
-            
+
 
         }
         <div class="cart-actions-large">

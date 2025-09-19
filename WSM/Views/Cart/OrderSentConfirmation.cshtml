@@ -1,9 +1,18 @@
 ﻿@{
     ViewData["Title"] = "Order Sent";
+    Layout = "_LayoutIngredient";
 }
 
-<h2>✅ Order Sent</h2>
-<p>Your order (ID: @ViewBag.OrderId) has been sent to the kitchen.</p>
-<p>Status: Preparing</p>
+<div class="order-sent-box">
+    <h2>✅ Order Sent</h2>
+    <p>Your order (ID: @ViewBag.OrderId) has been sent to the kitchen.</p>
+    <p>Status: <b>Preparing</b></p>
 
-<a asp-controller="Table" asp-action="Index" class="btn btn-secondary">Back to Menu</a>
+    <div class="order-extra">
+        <p><b>Estimated Time:</b> 15 minutes</p>
+        <p><b>Order Time:</b> @DateTime.Now.ToString("HH:mm:ss")</p>
+        <p><b>Amount Paid:</b> RM 55.00</p>
+    </div>
+
+    <a asp-controller="Table" asp-action="Index" class="back-btn">Back to Menu</a>
+</div>

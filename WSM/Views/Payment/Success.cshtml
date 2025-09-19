@@ -1,0 +1,97 @@
+﻿@using WSM.Models
+@model DetailVM
+
+@{
+    ViewBag.Title = "Order Confirmation";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/css/app.css" asp-append-version="true">
+<div>
+    <p style="font-size: 70px; text-align: center;">Receipt</p>
+    </br>
+    <div style="text-align:center;" class="success-header">
+        <div class="page-logo">
+            <img src="@Url.Content(
+                                                                         string.IsNullOrEmpty(Context.Session.GetString("CompanyLogo"))
+                                                                         ? "~/images/default-logo.png"
+                                                                         : Context.Session.GetString("CompanyLogo")
+                                                               )" alt="Company Logo" class="page-logo" />
+        </div>
+        <h1><strong>@Model.company.CompanyName</strong></h1>
+        <h4>@Model.company.Street, @Model.company.Postcode</h4>
+        <h4>@Model.company.City, @Model.company.State</h4>
+
+        <div class="success-order-info">
+            <span>Date: @Model.orderDetail.OrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+            <br>
+            <span>Order ID: @Model.orderDetail.Id</span>
+        </div>
+        <div class="success-additional-info">
+            <span>Table No: @Model.orderDetail.SeatNo</span>
+            <br>
+            <span>Status: @Model.orderDetail.Status</span>
+            <br>
+        </div>
+    </div>
+
+    <table class="success-detail-table">
+        <tr style="border-top:2px solid black;">
+            <th>No.</th>
+            <th>Food Ordered</th>
+            <th>Quantity</th>
+            <th>Unit Price (RM)</th>
+            <th>Extra Detail</th>
+            <th>Subtotal (RM)</th>
+        </tr>
+
+        @for (int i = 0; i < Model.orderDetail.OrderItems.Count; i++)
+        {
+            var item = Model.orderDetail.OrderItems.ElementAt(i);
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@item.Food?.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Food?.Price.ToString("F2")</td>
+                <td>@item.ExtraDetail</td>
+                <td>@item.SubTotal.ToString("F2")</td>
+            </tr>
+        }
+
+        <tr>
+            <td colspan="5" style="text-align:right"><strong>Subtotal:</strong></td>
+            <td>@Model.orderDetail.TotalPrice.ToString("F2")</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align:right"><strong>Service Charge (10%):</strong></td>
+            <td>@((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align:right"><strong>Tax (6%):</strong></td>
+            <td>@((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align:right"><strong>Total:</strong></td>
+            <td><strong>@((Model.orderDetail.TotalPrice * (1 + 0.1M + 0.06M)).ToString("F2"))</strong></td>
+        </tr>
+    </table>
+
+    @if (Model.orderDetail.Payment != null)
+    {
+        <div class="success-payment-info">
+            <p>Payment Details:</p>
+            <p>Payment Method: @Model.orderDetail.Payment.PaymentMethod</p>
+            <p>Amount Paid: RM @Model.orderDetail.Payment.AmountPaid.ToString("F2")</p>
+            @if (!string.IsNullOrEmpty(Model.orderDetail.Payment.StripeTransactionId))
+            {
+                <p>Transaction ID: @Model.orderDetail.Payment.StripeTransactionId</p>
+            }
+        </div>
+    }
+</div>
+
+<p>
+    <div class="success-return">
+        <a asp-controller="Table" asp-action="Index" class="return-orderhistory">Back to Menu</a>
+    </div>
+</p>
