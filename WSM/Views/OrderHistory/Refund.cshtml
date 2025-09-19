@@ -76,11 +76,35 @@
             }
 
             <tr>
-                <td colspan="5" style="text-align:right">
+                <td style="text-align:right;" colspan="4">
+                    <strong>Subtotal:</strong>
+                </td>
+                <td>
+                    RM @Model.orderDetail.TotalPrice.ToString("F2")
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:right">
+                    <strong>Service charge (10%):</strong>
+                </td>
+                <td>
+                    RM @((Model.orderDetail.TotalPrice * 0.1M).ToString("F2"))
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:right">
+                    <strong>Tax (6%):</strong>
+                </td>
+                <td>
+                    RM @((Model.orderDetail.TotalPrice * 0.06M).ToString("F2"))
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:right">
                     <strong>Original Total:</strong>
                 </td>
                 <td>
-                    <strong>RM @((Model.orderDetail.OrderItems.Sum(x => x.SubTotal) * 1.06M).ToString("F2"))</strong>
+                    <strong>RM @((Model.orderDetail.TotalPrice * (1 + 0.10M + 0.06M)).ToString("F2"))</strong>
                 </td>
             </tr>
         </table>

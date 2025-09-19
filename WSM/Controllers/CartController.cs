@@ -35,7 +35,7 @@ public class CartController : Controller
         var previousOrders = _db.OrderDetails
             .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Food)
-            .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status == "Preparing")
+            .Where(o => o.SeatNo == int.Parse(seatNo) && o.Status == "Pending")
             .OrderByDescending(o => o.OrderDate)
             .ToList();
 
@@ -100,17 +100,14 @@ public class CartController : Controller
         OrderDetail orderDetail;
 
         if (role == "Staff")
-            orderDetail = _helper.CreateOrderDetail(seatNo, staffId: staffAdminId);
+            orderDetail = _helper.CreateOrUpdateOrderDetail(seatNo, staffId: staffAdminId);
         else if (role == "Admin")
-            orderDetail = _helper.CreateOrderDetail(seatNo, adminId: staffAdminId);
+            orderDetail = _helper.CreateOrUpdateOrderDetail(seatNo, adminId: staffAdminId);
         else
             return Unauthorized("Invalid role.");
 
         if (orderDetail == null)
             return BadRequest("Cart is empty.");
-
-        orderDetail.Status = "Preparing";
-        _db.OrderDetails.Update(orderDetail);
 
         var seat = _db.Seats.FirstOrDefault(s => s.SeatNo == int.Parse(seatNo));
         if (seat != null)
@@ -125,7 +122,6 @@ public class CartController : Controller
 
         return RedirectToAction("OrderSentConfirmation", new { orderId = orderDetail.Id });
     }
-
 
     public IActionResult OrderSentConfirmation(string orderId)
     {
