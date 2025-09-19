@@ -263,6 +263,7 @@ header {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
     .check-all-btn:hover,
@@ -1750,3 +1751,18 @@ select.select-status option {
     .superadmin-row td:first-child {
         cursor: not-allowed;
     }
+
+.dropdown{
+    text-align: center;
+}
+
+.dropdown-link {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.dropdown-profile{
+    font-weight: bold;
+    margin-top: 3px;
+    font-size: 15px;
+}

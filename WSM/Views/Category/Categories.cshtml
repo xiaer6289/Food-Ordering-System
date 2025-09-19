@@ -28,10 +28,7 @@
     @Html.Hidden("dir")
 </form>
 
-<p class="pagination-count">
-    @Model.Count() of @Model.TotalItemCount Categories |
-    Page @Model.PageNumber of @Model.PageCount
-</p>
+
 
 <form method="post" asp-action="DeleteMany" asp-controller="Category" id="deleteForm">
     @Html.AntiForgeryToken()
@@ -40,6 +37,11 @@
         <button type="button" class="btn btn-primary check-all-btn">Check All</button>
         <button type="button" class="btn btn-secondary uncheck-all-btn">Uncheck All</button>
     </div>
+
+    <p class="pagination-count">
+        @Model.Count() of @Model.TotalItemCount Categories |
+        Page @Model.PageNumber of @Model.PageCount
+    </p>
 
     <div style="display: flex; align-items: flex-start; gap: 20px;">
 

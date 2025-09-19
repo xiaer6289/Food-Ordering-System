@@ -74,13 +74,15 @@
                
                 @if (Context.Session.GetString("Role") == "Admin")
                 {
-                    <a href="../Admin/UpdateProfile">Update Profile</a>
+                    <p>Role: Admin</p>
+                    <a href="../Admin/UpdateProfile" class="dropdown-profile">Update Profile</a>
                 }
                 else if (Context.Session.GetString("Role") == "Staff")
                 {
-                    <a href="../Staff/UpdateProfile">Update Profile</a>
+                    <p>Role: Admin</p>
+                    <a href="../Staff/UpdateProfile" class="dropdown-profile">Update Profile</a>
                 }
-                <a href="../Home/Both">Logout</a>
+                <a href="../Home/Both" class="dropdown-link">Logout</a>
             </div>
         </div>
 
