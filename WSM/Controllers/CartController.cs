@@ -39,10 +39,12 @@ public class CartController : Controller
             .OrderByDescending(o => o.OrderDate)
             .ToList();
 
-        ViewBag.CartItems = cartItems;
+        ViewBag.CartItems = cartItems.ToList();
         ViewBag.TotalAmount = _helper.CalculateTotal(seatNo);
         ViewBag.SeatNo = seatNo;
         ViewBag.PreviousOrders = previousOrders;
+
+        ViewBag.PreviousOrdersTotal = previousOrders.Sum(o => o.OrderItems.Sum(i => i.SubTotal));
 
         return View();
     }

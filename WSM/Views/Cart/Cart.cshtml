@@ -1,98 +1,128 @@
-﻿<h3>🛒 My Cart (Seat @ViewBag.SeatNo)</h3>
+﻿@{
+    ViewData["Title"] = "My Cart";
+}
 
-@if ((ViewBag.CartItems != null && ViewBag.CartItems.Count > 0) ||
-     (ViewBag.PreviousOrders != null && ViewBag.PreviousOrders.Count > 0))
-{
-    <!-- Current Cart -->
-    @if (ViewBag.CartItems != null && ViewBag.CartItems.Count > 0)
+<div class="cart-container">
+    <div class="table-header">
+        <h1> Cart (Seat @ViewBag.SeatNo)</h1>
+    </div>
+
+    @if ((ViewBag.CartItems != null && ViewBag.CartItems.Count > 0) ||
+        (ViewBag.PreviousOrders != null && ViewBag.PreviousOrders.Count > 0))
     {
-        <h4>Current Cart</h4>
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Food</th>
-                    <th>Quantity</th>
-                    <th>Extra Detail</th>
-                    <th>Price</th>
-                    <th>Subtotal</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in ViewBag.CartItems)
-                {
-                    <tr>
-                        <td>@item.Food.Name</td>
-                        <td>@item.Quantity.Quantity</td>
-                        <td>@item.Quantity.ExtraDetail</td>
-                        <td>RM @item.Food.Price</td>
-                        <td>RM @(item.Food.Price* item.Quantity.Quantity)</td>
-                        <td>
-                            <a asp-controller="Cart" asp-action="Remove" asp-route-seatNo="@ViewBag.SeatNo" asp-route-foodId="@item.Food.Id" class="btn btn-danger btn-sm">Remove</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
-        <h5>Total: RM @ViewBag.TotalAmount</h5>
-
-        <form asp-controller="Cart" asp-action="SendOrder" method="post" class="mb-3">
-            <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
-            <button type="submit" class="btn btn-primary">Send Order</button>
-        </form>
-    }
-
-    <!-- Checkout Button -->
-    <form asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
-        <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
-        <button type="submit" class="btn btn-success btn-lg">
-            Checkout
-        </button>
-    </form>
-
-    <hr />
-
-    <!-- Previous Orders -->
-    @if (ViewBag.PreviousOrders != null && ViewBag.PreviousOrders.Count > 0)
-    {
-        <h4>Previous Orders</h4>
-        @foreach (var order in ViewBag.PreviousOrders)
+        <!-- Current Cart -->
+        @if (ViewBag.CartItems != null && ViewBag.CartItems.Count > 0)
         {
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    Order ID: @order.Id | Status: @order.Status | Date: @order.OrderDate.ToString("yyyy-MM-dd HH:mm")
-                </div>
-                <div class="card-body">
-                    <table class="table table-sm table-striped">
-                        <thead>
+            <div class="table-header">
+                <h3>Current Cart</h3>
+            </div>
+            <table class="record-table">
+                <thead>
+                    <tr>
+                        <th>Food</th>
+                        <th>Quantity</th>
+                        <th>Extra Detail</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.CartItems)
+                    {
+                        <tr>
+                            <td>@item.Food.Name</td>
+                            <td>@item.Quantity.Quantity</td>
+                            <td>@item.Quantity.ExtraDetail</td>
+                            <td>RM @item.Food.Price</td>
+                            <td>RM @(item.Food.Price* item.Quantity.Quantity)</td>
+                            <td>
+                                <a asp-controller="Cart"
+                                   asp-action="Remove"
+                                   asp-route-seatNo="@ViewBag.SeatNo"
+                                   asp-route-foodId="@item.Food.Id"
+                                   class="btn btn-danger btn-sm">
+                                    Remove
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <!-- Previous Orders -->
+        @if (ViewBag.PreviousOrders != null && ViewBag.PreviousOrders.Count > 0)
+        {
+
+            <div class="table-header">
+                <h3>Previous Orders</h3>
+            </div>
+            <table class="record-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Food</th>
+                        <th>Quantity</th>
+                        <th>Extra Detail</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in ViewBag.PreviousOrders)
+                    {
+                        @foreach (var item in order.OrderItems)
+                        {
                             <tr>
-                                <th>Food</th>
-                                <th>Quantity</th>
-                                <th>Extra Detail</th>
-                                <th>Price</th>
-                                <th>Subtotal</th>
+                                <td>@order.Id</td>
+                                <td>@order.Status</td>
+                                <td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@item.Food.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.ExtraDetail</td>
+                                <td>RM @item.Food.Price</td>
+                                <td>RM @item.SubTotal</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in order.OrderItems)
-                            {
-                                <tr>
-                                    <td>@item.Food.Name</td>
-                                    <td>@item.Quantity</td>
-                                    <td>@item.ExtraDetail</td>
-                                    <td>RM @item.Food.Price</td>
-                                    <td>RM @item.SubTotal</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    }
+
+                    <tr class="grand-total-row">
+                        <td colspan="7" style="text-align: right;">Total:</td>
+                        <td>RM @ViewBag.PreviousOrdersTotal</td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+
+            <div class="cart-actions-large">
+                @if (ViewBag.CartItems != null && ViewBag.CartItems.Count > 0)
+                {
+                    <form asp-controller="Cart" asp-action="SendOrder" method="post">
+                        <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
+                        <button type="submit" class="btn btn-primary btn-large">Add Order</button>
+                    </form>
+                }
+
+                <form asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
+                    <input type="hidden" name="seatNo" value="@ViewBag.SeatNo" />
+                    <button type="submit" class="btn btn-success btn-large">Checkout</button>
+                </form>
             </div>
         }
+
     }
-}
-else
-{
-    <p>Your cart and previous orders are empty.</p>
-}
+    else
+    {
+        <div class="empty-cart">
+            <p>Your cart and previous orders are empty.</p>
+            <a asp-controller="Menu" asp-action="FoodListing" asp-route-seatNo="@ViewBag.SeatNo" class="btn-link">Go back to order food</a>
+            
+        </div>
+    }
+
+
+</div>
